@@ -20,10 +20,12 @@ def test_successful_negotiation():
         version="3.0.0",
     )
 
-    available = CapabilityMatrix(capabilities=(
-        Capability(name="transactions"),
-        Capability(name="read"),
-    ))
+    available = CapabilityMatrix(
+        capabilities=(
+            Capability(name="transactions"),
+            Capability(name="read"),
+        )
+    )
 
     request = HandshakeRequest(client_identity=client, required_capabilities=("read",))
 
@@ -33,6 +35,7 @@ def test_successful_negotiation():
     assert response.provider_identity.provider == "mongoeco2"
     assert response.offered_capabilities.has_capability("transactions")
     assert response.protocol_version == CURRENT_PROTOCOL_VERSION
+
 
 def test_rejected_negotiation():
     client = ComponentIdentity(
@@ -73,9 +76,7 @@ def test_degraded_negotiation_when_optional_capabilities_are_missing():
         version="3.0.0",
     )
 
-    available = CapabilityMatrix(capabilities=(
-        Capability(name="read"),
-    ))
+    available = CapabilityMatrix(capabilities=(Capability(name="read"),))
 
     request = HandshakeRequest(
         client_identity=client,
@@ -105,9 +106,7 @@ def test_rejected_negotiation_when_protocol_version_is_not_supported():
         version="3.0.0",
     )
 
-    available = CapabilityMatrix(capabilities=(
-        Capability(name="read"),
-    ))
+    available = CapabilityMatrix(capabilities=(Capability(name="read"),))
 
     request = HandshakeRequest(
         client_identity=client,
@@ -137,9 +136,7 @@ def test_rejected_negotiation_when_interfaces_do_not_match():
         version="3.0.0",
     )
 
-    available = CapabilityMatrix(capabilities=(
-        Capability(name="read"),
-    ))
+    available = CapabilityMatrix(capabilities=(Capability(name="read"),))
 
     request = HandshakeRequest(
         client_identity=client,

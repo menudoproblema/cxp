@@ -22,6 +22,7 @@ class Capability(msgspec.Struct, frozen=True):
             return self.metadata
         return msgspec.convert(self.metadata, struct_type)
 
+
 class CapabilityMatrix(msgspec.Struct, frozen=True):
     capabilities: tuple[Capability, ...] = ()
 

@@ -80,6 +80,7 @@ class GherkinDescriptorProvider:
     def cxp_capability_snapshot(self) -> ComponentCapabilitySnapshot:
         return snapshot
 
+
 print(matrix)
 print(snapshot)
 print(snapshot.as_negotiated_capability_matrix())

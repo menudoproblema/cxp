@@ -2,10 +2,20 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator, Iterator
 from inspect import isawaitable
-from typing import Protocol, cast, runtime_checkable
+from typing import cast
 
 from cxp.capabilities import CapabilityMatrix
 from cxp.catalogs.base import CapabilityCatalog
+from cxp.contracts import (
+    AsyncCapabilityProvider,
+    AsyncCapabilitySnapshotProvider,
+    AsyncTelemetryProvider,
+    AsyncTelemetryStreamProvider,
+    CapabilityProvider,
+    CapabilitySnapshotProvider,
+    TelemetryProvider,
+    TelemetryStreamProvider,
+)
 from cxp.descriptors import ComponentCapabilitySnapshot
 from cxp.handshake import (
     SUPPORTED_PROTOCOL_VERSIONS,
@@ -17,66 +27,18 @@ from cxp.handshake import (
 from cxp.telemetry import TelemetrySnapshot
 from cxp.types import ComponentIdentity
 
-
-@runtime_checkable
-class CapabilityProvider(Protocol):
-    def cxp_identity(self) -> ComponentIdentity: ...
-
-    def cxp_capabilities(self) -> CapabilityMatrix: ...
-
-
-@runtime_checkable
-class CapabilitySnapshotProvider(Protocol):
-    def cxp_identity(self) -> ComponentIdentity: ...
-
-    def cxp_capability_snapshot(self) -> ComponentCapabilitySnapshot: ...
-
-
-@runtime_checkable
-class TelemetryProvider(Protocol):
-    def cxp_telemetry_provider_id(self) -> str: ...
-
-    def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None: ...
-
-
-@runtime_checkable
-class AsyncCapabilityProvider(Protocol):
-    async def cxp_identity(self) -> ComponentIdentity: ...
-
-    async def cxp_capabilities(self) -> CapabilityMatrix: ...
-
-
-@runtime_checkable
-class AsyncCapabilitySnapshotProvider(Protocol):
-    async def cxp_identity(self) -> ComponentIdentity: ...
-
-    async def cxp_capability_snapshot(self) -> ComponentCapabilitySnapshot: ...
-
-
-@runtime_checkable
-class AsyncTelemetryProvider(Protocol):
-    def cxp_telemetry_provider_id(self) -> str: ...
-
-    async def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None: ...
-
-
-@runtime_checkable
-class TelemetryStreamProvider(Protocol):
-    def cxp_telemetry_provider_id(self) -> str: ...
-
-    def cxp_telemetry_stream(self) -> Iterator[TelemetrySnapshot]: ...
-
-
-@runtime_checkable
-class AsyncTelemetryStreamProvider(Protocol):
-    def cxp_telemetry_provider_id(self) -> str: ...
-
-    async def cxp_telemetry_stream(self) -> AsyncIterator[TelemetrySnapshot]: ...
-
-
-@runtime_checkable
-class ProtocolVersionProvider(Protocol):
-    def cxp_supported_protocol_versions(self) -> tuple[ProtocolVersion, ...]: ...
+__all__ = (
+    "collect_provider_capability_snapshot",
+    "collect_provider_capability_snapshot_async",
+    "collect_provider_telemetry",
+    "collect_provider_telemetry_async",
+    "negotiate_with_async_provider",
+    "negotiate_with_async_provider_catalog",
+    "negotiate_with_provider",
+    "negotiate_with_provider_catalog",
+    "stream_provider_telemetry",
+    "stream_provider_telemetry_async",
+)
 
 
 def negotiate_with_provider_catalog(
@@ -176,8 +138,7 @@ def stream_provider_telemetry(
     if get_stream is None:
         if not isinstance(provider, TelemetryProvider):
             msg = (
-                "Provider must implement TelemetryProvider when no stream "
-                "is available"
+                "Provider must implement TelemetryProvider when no stream is available"
             )
             raise TypeError(msg)
         snapshot = collect_provider_telemetry(provider)
@@ -199,8 +160,8 @@ async def stream_provider_telemetry_async(
     if get_stream is None:
         if not isinstance(provider, AsyncTelemetryProvider):
             msg = (
-                "Provider must implement AsyncTelemetryProvider when no stream "
-                "is available"
+                "Provider must implement AsyncTelemetryProvider when no "
+                "stream is available"
             )
             raise TypeError(msg)
         snapshot = await collect_provider_telemetry_async(provider)

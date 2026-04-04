@@ -28,9 +28,7 @@ def test_capability_descriptor_exposes_helpers() -> None:
     descriptor = CapabilityDescriptor(
         name="planning",
         level="supported",
-        attributes=(
-            CapabilityAttribute(name="mode", value="strict"),
-        ),
+        attributes=(CapabilityAttribute(name="mode", value="strict"),),
         operations=(
             CapabilityOperationBinding(
                 operation_name="plan.analyze",
@@ -126,9 +124,7 @@ def test_catalog_validates_component_snapshot_operations_and_metadata() -> None:
             CapabilityDescriptor(
                 name="run",
                 level="supported",
-                operations=(
-                    CapabilityOperationBinding(operation_name="run"),
-                ),
+                operations=(CapabilityOperationBinding(operation_name="run"),),
             ),
         ),
     )
@@ -137,10 +133,13 @@ def test_catalog_validates_component_snapshot_operations_and_metadata() -> None:
 
     assert isinstance(validation, DescriptorValidationResult)
     assert validation.is_valid() is True
-    assert catalog.is_component_snapshot_compliant(
-        snapshot,
-        required_tier="core",
-    ) is True
+    assert (
+        catalog.is_component_snapshot_compliant(
+            snapshot,
+            required_tier="core",
+        )
+        is True
+    )
 
 
 def test_catalog_reports_unknown_operations_for_descriptor_snapshot() -> None:
@@ -207,9 +206,7 @@ def test_catalog_reports_invalid_metadata_for_descriptor_snapshot() -> None:
 
     assert validation.invalid_metadata == ("planning",)
     assert validation.interface_mismatch is None
-    assert validation.messages() == (
-        "Invalid metadata for capabilities: planning",
-    )
+    assert validation.messages() == ("Invalid metadata for capabilities: planning",)
     assert catalog.is_component_snapshot_compliant(snapshot) is False
 
 
@@ -252,10 +249,13 @@ def test_unsupported_capabilities_do_not_count_for_tier_compliance() -> None:
         ),
     )
 
-    assert EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
-        snapshot,
-        required_tier="core",
-    ) is False
+    assert (
+        EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
+            snapshot,
+            required_tier="core",
+        )
+        is False
+    )
 
 
 def test_accepted_noop_counts_for_structural_compliance() -> None:
@@ -267,10 +267,13 @@ def test_accepted_noop_counts_for_structural_compliance() -> None:
         ),
     )
 
-    assert EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
-        snapshot,
-        required_tier="core",
-    ) is True
+    assert (
+        EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
+            snapshot,
+            required_tier="core",
+        )
+        is True
+    )
 
 
 def test_descriptors_roundtrip_with_msgspec() -> None:

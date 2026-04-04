@@ -163,9 +163,7 @@ def test_catalog_can_validate_metadata_against_declared_schema() -> None:
 def test_catalog_can_return_rich_matrix_validation_result() -> None:
     catalog = CapabilityCatalog(
         interface="execution/engine",
-        capabilities=(
-            CatalogCapability(name="run"),
-        ),
+        capabilities=(CatalogCapability(name="run"),),
         tiers=(
             ConformanceTier(
                 name="core",

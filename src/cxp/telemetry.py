@@ -20,16 +20,20 @@ type ComponentStatus = Literal[
     "stopping",
 ]
 
+
 class TelemetryEvent(msgspec.Struct, frozen=True):
     """Un hecho puntual ocurrido en el componente."""
+
     event_type: str
     severity: TelemetrySeverity = "info"
     payload: Mapping[str, Any] = msgspec.field(default_factory=dict)
     timestamp: float = msgspec.field(default_factory=time.time)
     trace_id: str | None = None
 
+
 class TelemetryMetric(msgspec.Struct, frozen=True):
     """Una medida cuantitativa agregada."""
+
     name: str
     value: float | int
     unit: str | None = None
@@ -39,6 +43,7 @@ class TelemetryMetric(msgspec.Struct, frozen=True):
 
 class TelemetrySpan(msgspec.Struct, frozen=True):
     """Una unidad temporal de trabajo ya cerrada."""
+
     trace_id: str
     span_id: str
     parent_span_id: str | None
@@ -58,6 +63,7 @@ class TelemetryBufferOverflow(ValueError):
 
 class TelemetrySnapshot(msgspec.Struct, frozen=True):
     """Un paquete de telemetría agregado para transporte eficiente."""
+
     provider_id: str
     status: ComponentStatus = "healthy"
     events: tuple[TelemetryEvent, ...] = ()
@@ -68,15 +74,15 @@ class TelemetrySnapshot(msgspec.Struct, frozen=True):
 
     @classmethod
     def heartbeat(
-        cls,
-        provider_id: str,
-        status: ComponentStatus = "healthy"
+        cls, provider_id: str, status: ComponentStatus = "healthy"
     ) -> TelemetrySnapshot:
         """Crea un snapshot de tipo heartbeat de forma rápida."""
         return cls(provider_id=provider_id, status=status, is_heartbeat=True)
 
+
 class TelemetryContext:
     """Helper para propagar contexto (trace_id) en la telemetría."""
+
     def __init__(self, trace_id: str | None = None) -> None:
         self.trace_id = trace_id
         self._generated_trace_id: str | None = None
@@ -125,8 +131,10 @@ class TelemetryContext:
             attributes=attributes or {},
         )
 
+
 class TelemetryBuffer:
     """Buffer mutable para recolectar telemetría antes de un flush."""
+
     def __init__(
         self,
         provider_id: str,
@@ -164,10 +172,7 @@ class TelemetryBuffer:
             return True
 
         if self.overflow_policy == "raise":
-            msg = (
-                "TelemetryBuffer capacity exceeded: "
-                f"max_items={self.max_items}"
-            )
+            msg = f"TelemetryBuffer capacity exceeded: max_items={self.max_items}"
             raise TelemetryBufferOverflow(msg)
 
         self._dropped_items += additional_items
@@ -216,7 +221,7 @@ class TelemetryBuffer:
         name: str,
         value: float | int,
         unit: str | None = None,
-        labels: Mapping[str, str] | None = None
+        labels: Mapping[str, str] | None = None,
     ) -> None:
         """Crea y añade una métrica al buffer."""
         with self._lock:
@@ -236,9 +241,7 @@ class TelemetryBuffer:
             self._record_item("span", span)
 
     def flush(
-        self,
-        status: ComponentStatus = "healthy",
-        is_heartbeat: bool = False
+        self, status: ComponentStatus = "healthy", is_heartbeat: bool = False
     ) -> TelemetrySnapshot:
         """Genera un snapshot con los datos acumulados y vacía el buffer."""
         with self._lock:

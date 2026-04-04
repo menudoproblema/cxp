@@ -264,9 +264,7 @@ def test_collect_provider_capability_snapshot_rejects_identity_mismatch(
                         provider="mongoeco2",
                         version="3.0.0",
                     ),
-                    capabilities=(
-                        CapabilityDescriptor(name="run", level="supported"),
-                    ),
+                    capabilities=(CapabilityDescriptor(name="run", level="supported"),),
                 ),
             ),
         )

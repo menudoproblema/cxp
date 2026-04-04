@@ -89,9 +89,7 @@ class ComponentCapabilitySnapshot(msgspec.Struct, frozen=True):
 
     def offered_capabilities(self) -> tuple[CapabilityDescriptor, ...]:
         return tuple(
-            capability
-            for capability in self.capabilities
-            if capability.is_offered()
+            capability for capability in self.capabilities if capability.is_offered()
         )
 
     def as_negotiated_capability_matrix(self) -> CapabilityMatrix:
@@ -160,8 +158,7 @@ class DescriptorValidationResult(msgspec.Struct, frozen=True):
 
         if self.unknown_capabilities:
             messages.append(
-                "Unknown capabilities: "
-                + ", ".join(self.unknown_capabilities),
+                "Unknown capabilities: " + ", ".join(self.unknown_capabilities),
             )
 
         for unknown_operations in self.unknown_operations:
@@ -188,7 +185,5 @@ def offered_capability_names(
     descriptors: Iterable[CapabilityDescriptor],
 ) -> tuple[str, ...]:
     return tuple(
-        descriptor.name
-        for descriptor in descriptors
-        if descriptor.is_offered()
+        descriptor.name for descriptor in descriptors if descriptor.is_offered()
     )

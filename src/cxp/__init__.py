@@ -41,6 +41,17 @@ from cxp.catalogs import (
     get_catalog,
     register_catalog,
 )
+from cxp.contracts import (
+    AsyncCapabilityProvider,
+    AsyncCapabilitySnapshotProvider,
+    AsyncTelemetryProvider,
+    AsyncTelemetryStreamProvider,
+    CapabilityProvider,
+    CapabilitySnapshotProvider,
+    ProtocolVersionProvider,
+    TelemetryProvider,
+    TelemetryStreamProvider,
+)
 from cxp.descriptors import (
     CapabilityAttribute,
     CapabilityAttributeValue,
@@ -60,16 +71,7 @@ from cxp.handshake import (
     negotiate_capabilities,
     negotiate_protocol_version,
 )
-from cxp.provider import (
-    AsyncCapabilityProvider,
-    AsyncCapabilitySnapshotProvider,
-    AsyncTelemetryProvider,
-    AsyncTelemetryStreamProvider,
-    CapabilityProvider,
-    CapabilitySnapshotProvider,
-    ProtocolVersionProvider,
-    TelemetryProvider,
-    TelemetryStreamProvider,
+from cxp.integration import (
     collect_provider_capability_snapshot,
     collect_provider_capability_snapshot_async,
     collect_provider_telemetry,

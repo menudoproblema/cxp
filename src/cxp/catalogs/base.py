@@ -54,8 +54,7 @@ class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
         elif self.required_tier is not None and self.missing_tier_capabilities:
             messages.append(
                 "Missing capabilities for required tier "
-                f"{self.required_tier!r}: "
-                + ", ".join(self.missing_tier_capabilities),
+                f"{self.required_tier!r}: " + ", ".join(self.missing_tier_capabilities),
             )
 
         return tuple(messages)
@@ -276,9 +275,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             required_tier=required_tier,
         )
         invalid_metadata = (
-            self.invalid_capability_metadata(matrix)
-            if validate_metadata
-            else ()
+            self.invalid_capability_metadata(matrix) if validate_metadata else ()
         )
 
         return CapabilityMatrixValidationResult(
@@ -295,9 +292,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
     ) -> tuple[str, ...]:
         known_capabilities = frozenset(self.capability_names())
         return tuple(
-            name
-            for name in capability_names
-            if name not in known_capabilities
+            name for name in capability_names if name not in known_capabilities
         )
 
     def satisfied_tiers(
@@ -305,11 +300,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         capability_names: Iterable[str],
     ) -> tuple[CatalogTierName, ...]:
         offered = tuple(capability_names)
-        return tuple(
-            tier.name
-            for tier in self.tiers
-            if tier.is_satisfied_by(offered)
-        )
+        return tuple(tier.name for tier in self.tiers if tier.is_satisfied_by(offered))
 
     def is_matrix_compliant(
         self,
@@ -383,10 +374,7 @@ class CatalogRegistry:
                     return existing
 
                 if not replace:
-                    msg = (
-                        "Catalog interface already registered: "
-                        f"{catalog.interface!r}"
-                    )
+                    msg = f"Catalog interface already registered: {catalog.interface!r}"
                     raise ValueError(msg)
 
             self._catalogs[catalog.interface] = catalog

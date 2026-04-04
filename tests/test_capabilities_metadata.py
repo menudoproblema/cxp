@@ -8,26 +8,25 @@ class MongoReadMetadata(msgspec.Struct, frozen=True):
     supports_sessions: bool = True
     replica_set: str | None = None
 
+
 def test_capability_supports_raw_dictionary_metadata():
     cap = Capability(
-        name="read",
-        metadata={"max_pool_size": 20, "supports_sessions": False}
+        name="read", metadata={"max_pool_size": 20, "supports_sessions": False}
     )
-    
+
     assert cap.metadata["max_pool_size"] == 20
     assert cap.metadata["supports_sessions"] is False
 
+
 def test_capability_supports_msgspec_struct_metadata():
     meta = MongoReadMetadata(max_pool_size=50, replica_set="rs0")
-    cap = Capability(
-        name="read",
-        metadata=meta
-    )
-    
+    cap = Capability(name="read", metadata=meta)
+
     # Verificamos acceso directo
     assert cap.metadata.max_pool_size == 50
     assert cap.metadata.replica_set == "rs0"
-    assert cap.metadata.supports_sessions is True # Valor por defecto del Struct
+    assert cap.metadata.supports_sessions is True  # Valor por defecto del Struct
+
 
 def test_capability_metadata_serialization_roundtrip():
     meta = MongoReadMetadata(max_pool_size=100)

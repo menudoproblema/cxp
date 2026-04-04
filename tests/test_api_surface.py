@@ -1,6 +1,8 @@
 import msgspec
 from pytest import raises
 
+import cxp.contracts
+import cxp.integration
 from cxp import (
     CURRENT_PROTOCOL_VERSION,
     SUPPORTED_PROTOCOL_VERSIONS,
@@ -43,8 +45,7 @@ def test_negotiate_protocol_version_returns_none_for_unknown_version() -> None:
 
 def test_negotiate_protocol_version_returns_requested_version_when_supported() -> None:
     assert (
-        negotiate_protocol_version(CURRENT_PROTOCOL_VERSION)
-        == CURRENT_PROTOCOL_VERSION
+        negotiate_protocol_version(CURRENT_PROTOCOL_VERSION) == CURRENT_PROTOCOL_VERSION
     )
 
 
@@ -94,7 +95,9 @@ def test_telemetry_context_generates_consistent_trace_id_when_missing() -> None:
 def test_telemetry_buffer_flushes_and_clears_state() -> None:
     buffer = TelemetryBuffer(provider_id="mongoeco2")
     buffer.record_metric("ops", 2)
-    buffer.record_event(TelemetryContext(trace_id="trace-1").create_event("command_succeeded"))
+    buffer.record_event(
+        TelemetryContext(trace_id="trace-1").create_event("command_succeeded")
+    )
     buffer.record_span(
         TelemetryContext(trace_id="trace-1").create_span(
             "mongo.command",
@@ -122,7 +125,9 @@ def test_telemetry_buffer_can_enforce_capacity_limit() -> None:
     buffer.record_metric("ops", 1)
 
     try:
-        buffer.record_event(TelemetryContext(trace_id="trace-1").create_event("command_started"))
+        buffer.record_event(
+            TelemetryContext(trace_id="trace-1").create_event("command_started")
+        )
     except TelemetryBufferOverflow as error:
         assert "capacity exceeded" in str(error)
     else:
@@ -184,6 +189,16 @@ def test_descriptor_types_are_exported_in_public_api() -> None:
     assert collect_provider_capability_snapshot is not None
     assert CapabilitySnapshotProvider is not None
     assert CapabilityMatrixValidationResult is not None
+
+
+def test_public_module_layout_exposes_contracts_and_integration_layers() -> None:
+    from cxp.catalogs.interfaces.execution.engine import (
+        EXECUTION_ENGINE_CATALOG as execution_engine_catalog,
+    )
+
+    assert cxp.contracts.CapabilityProvider is not None
+    assert cxp.integration.negotiate_with_provider is not None
+    assert execution_engine_catalog.interface == "execution/engine"
 
 
 def test_catalog_registry_rejects_conflicting_duplicate_registration() -> None:
@@ -295,6 +310,4 @@ def test_catalog_validation_result_reports_invalid_metadata_messages() -> None:
     validation = catalog.validate_capability_matrix(matrix)
 
     assert validation.is_valid() is False
-    assert validation.messages() == (
-        "Invalid metadata for capabilities: planning",
-    )
+    assert validation.messages() == ("Invalid metadata for capabilities: planning",)

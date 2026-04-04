@@ -35,10 +35,7 @@ class _SyncMongoProvider:
 
     def cxp_capabilities(self) -> CapabilityMatrix:
         return CapabilityMatrix(
-            capabilities=tuple(
-                Capability(name=name)
-                for name in self._capabilities
-            ),
+            capabilities=tuple(Capability(name=name) for name in self._capabilities),
         )
 
     def cxp_supported_protocol_versions(self) -> tuple[int, ...]:
@@ -64,10 +61,7 @@ class _AsyncMongoProvider:
 
     async def cxp_capabilities(self) -> CapabilityMatrix:
         return CapabilityMatrix(
-            capabilities=tuple(
-                Capability(name=name)
-                for name in self._capabilities
-            ),
+            capabilities=tuple(Capability(name=name) for name in self._capabilities),
         )
 
     def cxp_supported_protocol_versions(self) -> tuple[int, ...]:
@@ -216,7 +210,5 @@ def async_snapshot_provider_factory():
 def supported_run_descriptor_snapshot():
     return ComponentCapabilitySnapshot(
         component_name="pytest",
-        capabilities=(
-            CapabilityDescriptor(name="run", level="supported"),
-        ),
+        capabilities=(CapabilityDescriptor(name="run", level="supported"),),
     )
