@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cxp"
+version = "1.0.0"
+description = "Capability Exchange Protocol"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Vicente Ruiz" }
+]
+keywords = [
+  "capabilities",
+  "catalogs",
+  "interoperability",
+  "protocol",
+  "telemetry",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: System :: Distributed Computing",
+  "Typing :: Typed",
+]
+dependencies = [
+  "msgspec"
+]
+
+[project.urls]
+Homepage = "https://github.com/menudoproblema/cxp"
+Repository = "https://github.com/menudoproblema/cxp"
+Issues = "https://github.com/menudoproblema/cxp/issues"
+
+[project.optional-dependencies]
+dev = [
+  "build",
+  "mypy",
+  "pytest",
+  "ruff",
+  "twine",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+pretty = true
+warn_unused_ignores = true
+check_untyped_defs = true
+strict_equality = true
