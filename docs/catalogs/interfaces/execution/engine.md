@@ -1,41 +1,42 @@
 # Catálogo de Execution Engine
 
 ## Interfaz
-Este catálogo define el vocabulario canónico de capabilities para la interfaz `execution/engine`.
+Este catálogo define la familia abstracta `execution/engine`.
 
-## Capabilities
-- `run`
-- `planning`
-- `draft_validation`
-- `live_execution_observability`
+No publica capabilities, operaciones ni tiers. Su función es servir como
+objetivo de compatibilidad para contratos concretos de ejecución.
 
-## Operaciones por Capability
-### `run`
-- `run` -> `run.result`
+## Compatibilidad Pública
+La familia abstracta usa símbolos propios:
 
-### `planning`
-- `plan.analyze` -> `plan.analyzed`
-- `plan.explain` -> `plan.explained`
-- `plan.simulate` -> `plan.simulated`
+- `EXECUTION_ENGINE_FAMILY_INTERFACE`
+- `EXECUTION_ENGINE_FAMILY_CATALOG`
 
-### `draft_validation`
-- `draft.validate` -> `draft.validated`
+Por compatibilidad histórica, los símbolos legacy:
 
-### `live_execution_observability`
-- `execution.subscribe` -> `execution.subscribe`
-- `execution.live_status` -> `execution.live_status`
-- `execution.live_tail` -> `execution.live_tail`
+- `EXECUTION_ENGINE_INTERFACE`
+- `EXECUTION_ENGINE_CATALOG`
+- `cxp.catalogs.interfaces.execution.engine`
 
-## Tiers
-### `core`
-- `run`
-- `planning`
+siguen apuntando al contrato concreto [`execution/plan-run`](./plan-run.md),
+no a esta familia abstracta.
 
-### `advanced`
-- `run`
-- `planning`
-- `draft_validation`
-- `live_execution_observability`
+## Rol
+La familia `execution/engine` representa “algún tipo de engine orientado a
+ejecución” expuesto al orquestador.
 
-## Procedencia
-Este catálogo toma como referencia la semántica pública que Cosecha ya expresa para engines de ejecución, planificación tipada, validación de draft y observabilidad viva.
+Los contratos concretos deben declararse en interfaces hijas y relacionarse con
+esta familia mediante `satisfies_interfaces`.
+
+## Catálogos Concretos Relacionados
+- [`execution/plan-run`](./plan-run.md)
+
+## Validación
+Al ser un catálogo abstracto:
+
+- no valida `CapabilityMatrix`;
+- no valida snapshots de capabilities;
+- no define tiers ni profiles.
+
+Sí participa en la jerarquía de interfaces durante el handshake cuando un
+provider concreto satisface esta familia.

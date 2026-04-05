@@ -117,7 +117,7 @@ class _SyncSnapshotProvider:
 
     def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
-            interface="execution/engine",
+            interface="execution/plan-run",
             provider="pytest",
             version="1.0.0",
         )
@@ -132,7 +132,7 @@ class _AsyncSnapshotProvider:
 
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
-            interface="execution/engine",
+            interface="execution/plan-run",
             provider="gherkin",
             version="1.0.0",
         )

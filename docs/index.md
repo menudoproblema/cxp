@@ -24,6 +24,12 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 - [Catálogo de WSGI Application](./catalogs/interfaces/application/wsgi.md)
 - [Catálogo de ASGI Application](./catalogs/interfaces/application/asgi.md)
 - [Catálogo de Execution Engine](./catalogs/interfaces/execution/engine.md)
+- [Catálogo de Execution Plan-Run](./catalogs/interfaces/execution/plan-run.md)
+
+Nota rápida:
+- `execution/engine` documenta la familia abstracta.
+- `execution/plan-run` documenta el contrato concreto actual.
+- Los exports legacy `EXECUTION_ENGINE_*` siguen representando el contrato concreto por compatibilidad.
 
 ## Ejemplos
 El repositorio incluye ejemplos ejecutables en:

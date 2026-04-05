@@ -27,8 +27,13 @@ pip install cxp
 ## What CXP Includes
 - A small handshake contract based on `ComponentIdentity`, `CapabilityMatrix`, and `HandshakeRequest`.
 - Sync and async provider protocols for capabilities, telemetry, and capability snapshots.
-- First-party catalogs for canonical interfaces such as `database/mongodb`, `transport/http`, `application/http`, `application/wsgi`, `application/asgi`, and `execution/engine`.
+- First-party catalogs for canonical interfaces such as `database/mongodb`, `transport/http`, `application/http`, `application/wsgi`, `application/asgi`, the abstract family `execution/engine`, and the concrete contract `execution/plan-run`.
 - A richer descriptor layer for component snapshots, typed operations, and declarative dependencies.
+
+Execution catalog naming note:
+- `execution/engine` is now an abstract compatibility family.
+- `execution/plan-run` is the concrete first-party contract for plan-and-run engines.
+- Legacy `EXECUTION_ENGINE_*` exports and `cxp.catalogs.interfaces.execution.engine` still point to the concrete `execution/plan-run` contract for compatibility.
 
 ## Quick Start
 ```python
@@ -201,7 +206,7 @@ from cxp import (
 snapshot = ComponentCapabilitySnapshot(
     component_name="gherkin",
     identity=ComponentIdentity(
-        interface="execution/engine",
+        interface="execution/plan-run",
         provider="gherkin",
         version="1.0.0",
     ),
@@ -260,7 +265,7 @@ Catalogs are the semantic authority for a given interface. They define canonical
 ```python
 from cxp import Capability, CapabilityMatrix, get_catalog
 
-catalog = get_catalog("execution/engine")
+catalog = get_catalog("execution/plan-run")
 assert catalog is not None
 
 matrix = CapabilityMatrix(
@@ -272,12 +277,14 @@ matrix = CapabilityMatrix(
 
 validation = catalog.validate_capability_matrix(
     matrix,
-    required_tier="core",
+    required_tier="planned",
 )
 
 if not validation.is_valid():
     print(validation.messages())
 ```
+
+For execution catalogs, use `execution/plan-run` when you need the concrete first-party engine contract. Reserve `execution/engine` for family-level compatibility checks through the handshake.
 
 For richer integrations, the same catalog can validate component snapshots with:
 

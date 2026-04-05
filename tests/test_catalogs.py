@@ -2,6 +2,8 @@ import msgspec
 from pytest import raises
 
 from cxp import (
+    EXECUTION_ENGINE_CATALOG,
+    EXECUTION_ENGINE_FAMILY_CATALOG,
     MONGODB_AGGREGATE,
     MONGODB_COUNT_DOCUMENTS,
     MONGODB_DELETE_MANY,
@@ -15,7 +17,7 @@ from cxp import (
     MONGODB_UPDATE_MANY,
     MONGODB_UPDATE_ONE,
     CapabilityOperationBinding,
-    EXECUTION_ENGINE_CATALOG,
+    PLAN_RUN_EXECUTION_CATALOG,
     HTTP_APPLICATION_CATALOG,
     HTTP_TRANSPORT_CATALOG,
     MONGODB_CATALOG,
@@ -398,7 +400,9 @@ def test_public_api_reexports_complete_mongodb_contract() -> None:
 def test_default_registry_exposes_transport_and_application_catalogs():
     assert get_catalog("transport/http") is HTTP_TRANSPORT_CATALOG
     assert get_catalog("application/http") is HTTP_APPLICATION_CATALOG
-    assert get_catalog("execution/engine") is EXECUTION_ENGINE_CATALOG
+    assert get_catalog("execution/engine") is EXECUTION_ENGINE_FAMILY_CATALOG
+    assert EXECUTION_ENGINE_CATALOG is PLAN_RUN_EXECUTION_CATALOG
+    assert get_catalog("execution/plan-run") is PLAN_RUN_EXECUTION_CATALOG
 
 
 def test_custom_catalog_can_define_its_own_tiers():
@@ -423,7 +427,7 @@ def test_custom_catalog_can_define_its_own_tiers():
 
 def test_catalog_capability_can_define_operations() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",
@@ -453,13 +457,10 @@ def test_catalog_capability_can_define_operations() -> None:
 
 
 def test_execution_engine_catalog_exposes_typed_operations() -> None:
-    assert EXECUTION_ENGINE_CATALOG.has_operation("planning", "plan.analyze")
-    assert EXECUTION_ENGINE_CATALOG.has_operation(
-        "live_execution_observability",
-        "execution.live_tail",
-    )
+    assert PLAN_RUN_EXECUTION_CATALOG.has_operation("planning", "plan.analyze")
+    assert PLAN_RUN_EXECUTION_CATALOG.has_operation("execution_stream", "execution.tail")
 
-    operation = EXECUTION_ENGINE_CATALOG.get_operation("run", "run")
+    operation = PLAN_RUN_EXECUTION_CATALOG.get_operation("run", "run")
     assert operation is not None
     assert operation.result_type == "run.result"
 
@@ -471,7 +472,7 @@ class PlanningMetadata(msgspec.Struct, frozen=True):
 
 def test_catalog_can_validate_metadata_against_declared_schema() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",
@@ -494,7 +495,7 @@ def test_catalog_can_validate_metadata_against_declared_schema() -> None:
 
 def test_catalog_can_return_rich_matrix_validation_result() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(CatalogCapability(name="run"),),
         tiers=(
             ConformanceTier(
@@ -527,7 +528,7 @@ def test_catalog_can_return_rich_matrix_validation_result() -> None:
 
 def test_catalog_reports_invalid_metadata_when_schema_does_not_match() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",
@@ -550,7 +551,7 @@ def test_catalog_reports_invalid_metadata_when_schema_does_not_match() -> None:
 
 def test_catalog_reports_unknown_required_tier_in_matrix_validation() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(CatalogCapability(name="run"),),
     )
     matrix = CapabilityMatrix(

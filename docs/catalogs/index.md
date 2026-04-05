@@ -44,6 +44,14 @@ Catálogos first-party actuales:
 - [`application/wsgi`](./interfaces/application/wsgi.md)
 - [`application/asgi`](./interfaces/application/asgi.md)
 - [`execution/engine`](./interfaces/execution/engine.md)
+- [`execution/plan-run`](./interfaces/execution/plan-run.md)
+
+Nota sobre execution:
+
+- `execution/engine` es una familia abstracta de compatibilidad.
+- `execution/plan-run` es el contrato first-party concreto.
+- Los aliases legacy `EXECUTION_ENGINE_*` siguen apuntando al contrato
+  concreto `execution/plan-run`.
 
 ## Capabilities y Operaciones
 Un catálogo puede describir dos niveles:
@@ -51,7 +59,7 @@ Un catálogo puede describir dos niveles:
 - `Capability`: área funcional interoperable.
 - `Operation`: acción tipada asociada a una capability.
 
-Esto permite modelar interfaces donde no basta con decir "qué puede hacer", sino también "qué operaciones concretas publica". Es especialmente útil en catálogos como `execution/engine`.
+Esto permite modelar interfaces donde no basta con decir "qué puede hacer", sino también "qué operaciones concretas publica". Es especialmente útil en catálogos como `execution/plan-run`.
 
 La misma autoridad semántica del catálogo puede reutilizarse sobre la capa rica de descriptores:
 
@@ -63,6 +71,17 @@ Eso permite validar snapshots completos de componente sin convertir el catálogo
 
 Los catálogos abstractos existen para compatibilidad de familia y no deben
 usarse como objetivo de validación de capabilities.
+
+## Telemetría Asociada
+Un `CatalogCapability` también puede declarar semántica de telemetría asociada
+a esa capability.
+
+Eso permite definir spans, métricas y eventos canónicos esperables para una
+surface funcional dada, junto con los atributos o labels mínimos que deben
+acompañarlos.
+
+La validación de telemetría no forma parte del handshake. Es una validación
+opcional posterior sobre `TelemetrySnapshot`.
 
 ## Metadata Tipada
 Una `CatalogCapability` también puede declarar un `metadata_schema`. Ese esquema actúa como contrato esperado para la metadata publicada por el provider en la `CapabilityMatrix`.
@@ -94,7 +113,7 @@ class PlanningMetadata(msgspec.Struct, frozen=True):
 
 
 catalog = CapabilityCatalog(
-    interface="execution/engine",
+    interface="execution/plan-run",
     capabilities=(
         CatalogCapability(
             name="planning",

@@ -105,8 +105,49 @@ Además del polling puntual de snapshots, el core admite providers que publiquen
 ## Lo Que Aún No Define el Núcleo
 El núcleo actual no define todavía:
 
-- una taxonomía estándar de eventos por dominio;
+- una taxonomía universal de telemetría válida para todos los dominios;
 - semántica de negocio asociada a cada estado de salud;
-- vocabulario canónico de métricas por interfaz.
+- obligatoriedad global de un mismo vocabulario de spans, métricas y eventos para todas las interfaces.
 
-Esas piezas se introducirán más adelante cuando el contrato de telemetría madure.
+Lo que sí permite ahora el core es que cada catálogo de interfaz publique su
+propio vocabulario canónico de telemetría cuando el dominio lo necesite.
+
+Eso ya se usa en catálogos first-party como:
+
+- `execution/plan-run`, con señales separadas para `run`, `planning` y estado;
+- `database/mongodb`, con señales distintas para operaciones documentales,
+  `aggregate`, `$search`, `$vectorSearch`, transacciones y topología.
+
+## Semántica de Catálogo
+Los catálogos de capabilities también pueden declarar semántica de telemetría
+por capability.
+
+Eso permite describir, para una capability concreta:
+
+- spans canónicos;
+- métricas canónicas;
+- eventos canónicos;
+- atributos, labels o claves de payload requeridas.
+
+La API expone estos tipos:
+
+- `CapabilityTelemetry`
+- `TelemetryFieldRequirement`
+- `TelemetrySpanSpec`
+- `TelemetryMetricSpec`
+- `TelemetryEventSpec`
+- `TelemetryValidationResult`
+
+Y cada `CapabilityCatalog` puede validar un `TelemetrySnapshot` contra un
+conjunto de capabilities:
+
+- `validate_telemetry_snapshot(snapshot, capability_names)`
+- `is_telemetry_snapshot_compliant(snapshot, capability_names)`
+
+La diferencia importante respecto a capabilities es esta: la validación de
+telemetría comprueba semántica de los elementos emitidos, pero no exige que
+todas las señales definidas aparezcan en cada snapshot.
+
+Además, la validación ignora por defecto señales extra ajenas al subconjunto de
+capabilities que se esté comprobando. Si el integrador necesita un modo más
+estricto, puede usar `reject_unknown_signals=True`.

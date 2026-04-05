@@ -56,6 +56,40 @@ Las capabilities enriquecidas validan metadata estructurada:
 - `persistence`: `persistent` y `storageEngine`.
 - `topology_discovery`: `topologyType`, `serverCount` y `sdam`.
 
+## Telemetria Canonica
+La telemetria de `database/mongodb` se declara por capability y no se limita a
+una unica señal generica compartida.
+
+Las reglas practicas son estas:
+
+- `read` y `write` comparten `db.client.operation`, `db.client.operation.duration`
+  y `db.client.operation.completed`.
+- `aggregation` usa señales propias: `db.client.aggregate`,
+  `db.client.aggregate.duration` y `db.client.aggregate.completed`.
+- `search` usa señales propias: `db.client.search`,
+  `db.client.search.duration` y `db.client.search.completed`.
+- `vector_search` usa señales propias: `db.client.vector_search`,
+  `db.client.vector_search.duration` y `db.client.vector_search.completed`.
+- `transactions`, `change_streams`, `collation`, `persistence` y
+  `topology_discovery` declaran eventos o spans especificos del dominio.
+
+Los campos comunes minimos para operaciones documentales son:
+
+- `db.system.name`
+- `db.operation.name`
+- `db.namespace.name`
+- `db.operation.outcome`
+
+Y las capabilities especializadas exigen campos extra:
+
+- `aggregation`: `db.pipeline.stage.count`
+- `search`: `db.pipeline.stage.name` y `db.search.operator`
+- `vector_search`: `db.pipeline.stage.name` y `db.vector_search.similarity`
+- `change_streams`: `db.change.operation_type`
+- `collation`: `db.collation.locale`
+- `persistence`: `db.persistence.storage_engine` y `db.persistence.persistent`
+- `topology_discovery`: `db.topology.type` y `db.topology.server.count`
+
 ## Perfiles Reutilizables
 - `mongodb-core`: exige las operaciones completas de `read`, `write` y `aggregation`.
 - `mongodb-search`: extiende `mongodb-core` y exige `search` y `vector_search`.
@@ -68,5 +102,7 @@ Los providers deben usar estos nombres exactos cuando quieran una negociacion in
 ## Procedencia
 Este vocabulario toma como referencia:
 
-- la superficie de runtime que Cosecha trata como interoperable para `database/mongodb`;
-- la introspeccion publica que Mongoeco2 ya expone en change streams, search/vector search, collation y SDAM.
+- la superficie publica interoperable de runtimes MongoDB-like que exponen la
+  interfaz `database/mongodb`;
+- la introspeccion publica que Mongoeco y otros providers pueden proyectar en
+  change streams, search, vector search, collation, persistence y SDAM.

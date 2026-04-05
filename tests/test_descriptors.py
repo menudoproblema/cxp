@@ -3,7 +3,7 @@ from __future__ import annotations
 import msgspec
 
 from cxp import (
-    EXECUTION_ENGINE_CATALOG,
+    PLAN_RUN_EXECUTION_CATALOG,
     CapabilityAttribute,
     CapabilityCatalog,
     CapabilityDescriptor,
@@ -52,14 +52,14 @@ def test_component_snapshot_can_project_to_negotiated_capability_matrix() -> Non
     snapshot = ComponentCapabilitySnapshot(
         component_name="gherkin",
         identity=ComponentIdentity(
-            interface="execution/engine",
+            interface="execution/plan-run",
             provider="gherkin",
             version="1.0.0",
         ),
         capabilities=(
             CapabilityDescriptor(name="run", level="supported"),
             CapabilityDescriptor(name="planning", level="accepted_noop"),
-            CapabilityDescriptor(name="draft_validation", level="unsupported"),
+            CapabilityDescriptor(name="input_validation", level="unsupported"),
         ),
     )
 
@@ -68,7 +68,7 @@ def test_component_snapshot_can_project_to_negotiated_capability_matrix() -> Non
     assert snapshot.capability_names() == (
         "run",
         "planning",
-        "draft_validation",
+        "input_validation",
     )
     assert snapshot.capability_names(include_unsupported=False) == (
         "run",
@@ -83,7 +83,7 @@ def test_component_snapshot_can_project_to_negotiated_capability_matrix() -> Non
 
 def test_catalog_validates_component_snapshot_operations_and_metadata() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",
@@ -158,7 +158,7 @@ def test_catalog_reports_unknown_operations_for_descriptor_snapshot() -> None:
         ),
     )
 
-    validation = EXECUTION_ENGINE_CATALOG.validate_component_snapshot(snapshot)
+    validation = PLAN_RUN_EXECUTION_CATALOG.validate_component_snapshot(snapshot)
 
     assert validation.unknown_capabilities == ()
     assert validation.invalid_metadata == ()
@@ -172,12 +172,12 @@ def test_catalog_reports_unknown_operations_for_descriptor_snapshot() -> None:
     assert validation.messages() == (
         "Unknown operations for capability 'planning': plan.unknown",
     )
-    assert EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(snapshot) is False
+    assert PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_compliant(snapshot) is False
 
 
 def test_catalog_reports_invalid_metadata_for_descriptor_snapshot() -> None:
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",
@@ -224,20 +224,20 @@ def test_catalog_reports_interface_mismatch_for_component_snapshot() -> None:
         ),
     )
 
-    validation = EXECUTION_ENGINE_CATALOG.validate_component_snapshot(snapshot)
+    validation = PLAN_RUN_EXECUTION_CATALOG.validate_component_snapshot(snapshot)
 
     assert validation.interface_mismatch == "database/mongodb"
-    assert validation.expected_interface == "execution/engine"
+    assert validation.expected_interface == "execution/plan-run"
     assert validation.interface_mismatch_message == (
-        "Interface mismatch: expected 'execution/engine' but received "
+        "Interface mismatch: expected 'execution/plan-run' but received "
         "'database/mongodb'"
     )
     assert validation.messages() == (
-        "Interface mismatch: expected 'execution/engine' but received "
+        "Interface mismatch: expected 'execution/plan-run' but received "
         "'database/mongodb'",
     )
     assert validation.is_valid() is False
-    assert EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(snapshot) is False
+    assert PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_compliant(snapshot) is False
 
 
 def test_unsupported_capabilities_do_not_count_for_tier_compliance() -> None:
@@ -250,9 +250,9 @@ def test_unsupported_capabilities_do_not_count_for_tier_compliance() -> None:
     )
 
     assert (
-        EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
+        PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_compliant(
             snapshot,
-            required_tier="core",
+            required_tier="planned",
         )
         is False
     )
@@ -268,9 +268,9 @@ def test_accepted_noop_counts_for_structural_compliance() -> None:
     )
 
     assert (
-        EXECUTION_ENGINE_CATALOG.is_component_snapshot_compliant(
+        PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_compliant(
             snapshot,
-            required_tier="core",
+            required_tier="planned",
         )
         is True
     )
@@ -281,7 +281,7 @@ def test_descriptors_roundtrip_with_msgspec() -> None:
         component_name="gherkin",
         component_kind="engine",
         identity=ComponentIdentity(
-            interface="execution/engine",
+            interface="execution/plan-run",
             provider="gherkin",
             version="1.0.0",
         ),

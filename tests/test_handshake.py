@@ -126,7 +126,7 @@ def test_rejected_negotiation_when_protocol_version_is_not_supported():
 
 def test_rejected_negotiation_when_interfaces_do_not_match():
     client = ComponentIdentity(
-        interface="execution/engine",
+        interface="execution/plan-run",
         provider="cosecha",
         version="1.0.0",
     )

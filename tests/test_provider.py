@@ -79,7 +79,7 @@ def test_negotiate_with_provider_rejects_interface_mismatch(
     sync_mongo_provider_factory,
 ) -> None:
     request = mongo_request_factory(
-        interface="execution/engine",
+        interface="execution/plan-run",
         required_capabilities=("read",),
     )
 
@@ -247,7 +247,7 @@ def test_collect_provider_capability_snapshot_injects_missing_identity(
     )
 
     assert snapshot.identity is not None
-    assert snapshot.identity.interface == "execution/engine"
+    assert snapshot.identity.interface == "execution/plan-run"
     assert snapshot.identity.provider == "pytest"
 
 

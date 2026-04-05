@@ -192,13 +192,13 @@ def test_descriptor_types_are_exported_in_public_api() -> None:
 
 
 def test_public_module_layout_exposes_contracts_and_integration_layers() -> None:
-    from cxp.catalogs.interfaces.execution.engine import (
-        EXECUTION_ENGINE_CATALOG as execution_engine_catalog,
+    from cxp.catalogs.interfaces.execution.plan_run import (
+        PLAN_RUN_EXECUTION_CATALOG as plan_run_execution_catalog,
     )
 
     assert cxp.contracts.CapabilityProvider is not None
     assert cxp.integration.negotiate_with_provider is not None
-    assert execution_engine_catalog.interface == "execution/engine"
+    assert plan_run_execution_catalog.interface == "execution/plan-run"
 
 
 def test_catalog_registry_rejects_conflicting_duplicate_registration() -> None:
@@ -290,7 +290,7 @@ def test_catalog_validation_result_reports_invalid_metadata_messages() -> None:
         mode: str
 
     catalog = CapabilityCatalog(
-        interface="execution/engine",
+        interface="execution/plan-run",
         capabilities=(
             CatalogCapability(
                 name="planning",

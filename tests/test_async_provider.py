@@ -141,7 +141,7 @@ def test_collect_provider_capability_snapshot_async_injects_missing_identity(
     )
 
     assert snapshot.identity is not None
-    assert snapshot.identity.interface == "execution/engine"
+    assert snapshot.identity.interface == "execution/plan-run"
     assert snapshot.identity.provider == "gherkin"
 
 

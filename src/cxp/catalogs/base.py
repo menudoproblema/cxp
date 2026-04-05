@@ -13,6 +13,7 @@ from cxp.descriptors import (
     UnknownCapabilityOperations,
     offered_capability_names,
 )
+from cxp.telemetry import TelemetrySeverity, TelemetrySnapshot
 
 type CatalogTierName = str
 type CapabilityMetadataSchema = type[msgspec.Struct] | None
@@ -66,6 +67,112 @@ class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
             messages.append(
                 "Interface mismatch: "
                 f"{self.interface_mismatch!r} != {self.expected_interface!r}",
+            )
+
+        return tuple(messages)
+
+
+class TelemetryFieldRequirement(msgspec.Struct, frozen=True):
+    name: str
+    description: str | None = None
+
+
+class TelemetrySpanSpec(msgspec.Struct, frozen=True):
+    name: str
+    required_attributes: tuple[TelemetryFieldRequirement, ...] = ()
+    description: str | None = None
+
+
+class TelemetryMetricSpec(msgspec.Struct, frozen=True):
+    name: str
+    unit: str | None = None
+    required_labels: tuple[TelemetryFieldRequirement, ...] = ()
+    description: str | None = None
+
+
+class TelemetryEventSpec(msgspec.Struct, frozen=True):
+    event_type: str
+    severity: TelemetrySeverity | None = None
+    required_payload_keys: tuple[TelemetryFieldRequirement, ...] = ()
+    description: str | None = None
+
+
+class CapabilityTelemetry(msgspec.Struct, frozen=True):
+    spans: tuple[TelemetrySpanSpec, ...] = ()
+    metrics: tuple[TelemetryMetricSpec, ...] = ()
+    events: tuple[TelemetryEventSpec, ...] = ()
+    description: str | None = None
+
+
+class TelemetryValidationResult(msgspec.Struct, frozen=True):
+    unknown_capabilities: tuple[str, ...] = ()
+    unknown_spans: tuple[str, ...] = ()
+    unknown_metrics: tuple[str, ...] = ()
+    unknown_events: tuple[str, ...] = ()
+    missing_span_attributes: tuple[str, ...] = ()
+    missing_metric_labels: tuple[str, ...] = ()
+    missing_event_payload_keys: tuple[str, ...] = ()
+    invalid_metric_units: tuple[str, ...] = ()
+    invalid_event_severities: tuple[str, ...] = ()
+
+    def is_valid(self) -> bool:
+        return (
+            not self.unknown_capabilities
+            and not self.unknown_spans
+            and not self.unknown_metrics
+            and not self.unknown_events
+            and not self.missing_span_attributes
+            and not self.missing_metric_labels
+            and not self.missing_event_payload_keys
+            and not self.invalid_metric_units
+            and not self.invalid_event_severities
+        )
+
+    def messages(self) -> tuple[str, ...]:
+        messages: list[str] = []
+
+        if self.unknown_capabilities:
+            messages.append(
+                "Unknown capabilities for telemetry validation: "
+                + ", ".join(self.unknown_capabilities),
+            )
+
+        if self.unknown_spans:
+            messages.append("Unknown telemetry spans: " + ", ".join(self.unknown_spans))
+
+        if self.unknown_metrics:
+            messages.append(
+                "Unknown telemetry metrics: " + ", ".join(self.unknown_metrics),
+            )
+
+        if self.unknown_events:
+            messages.append("Unknown telemetry events: " + ", ".join(self.unknown_events))
+
+        if self.missing_span_attributes:
+            messages.append(
+                "Missing span attributes: " + ", ".join(self.missing_span_attributes),
+            )
+
+        if self.missing_metric_labels:
+            messages.append(
+                "Missing metric labels: " + ", ".join(self.missing_metric_labels),
+            )
+
+        if self.missing_event_payload_keys:
+            messages.append(
+                "Missing event payload keys: "
+                + ", ".join(self.missing_event_payload_keys),
+            )
+
+        if self.invalid_metric_units:
+            messages.append(
+                "Invalid metric units: " + ", ".join(self.invalid_metric_units),
+            )
+
+        if self.invalid_event_severities:
+            messages.append(
+                "Invalid event severities: "
+                + ", ".join(self.invalid_event_severities),
             )
 
         return tuple(messages)
@@ -212,6 +319,7 @@ class CatalogCapability(msgspec.Struct, frozen=True):
     description: str | None = None
     operations: tuple[CatalogOperation, ...] = ()
     metadata_schema: CapabilityMetadataSchema = None
+    telemetry: CapabilityTelemetry | None = None
 
     def operation_names(self) -> tuple[str, ...]:
         return tuple(operation.name for operation in self.operations)
@@ -314,6 +422,42 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         if capability is None:
             return None
         return capability.get_operation(operation_name)
+
+    def get_capability_telemetry(
+        self,
+        capability_name: str,
+    ) -> CapabilityTelemetry | None:
+        capability = self.get_capability(capability_name)
+        if capability is None:
+            return None
+        return capability.telemetry
+
+    def telemetry_span_names(
+        self,
+        capability_name: str,
+    ) -> tuple[str, ...]:
+        telemetry = self.get_capability_telemetry(capability_name)
+        if telemetry is None:
+            return ()
+        return tuple(span.name for span in telemetry.spans)
+
+    def telemetry_metric_names(
+        self,
+        capability_name: str,
+    ) -> tuple[str, ...]:
+        telemetry = self.get_capability_telemetry(capability_name)
+        if telemetry is None:
+            return ()
+        return tuple(metric.name for metric in telemetry.metrics)
+
+    def telemetry_event_types(
+        self,
+        capability_name: str,
+    ) -> tuple[str, ...]:
+        telemetry = self.get_capability_telemetry(capability_name)
+        if telemetry is None:
+            return ()
+        return tuple(event.event_type for event in telemetry.events)
 
     def invalid_capability_metadata(
         self,
@@ -525,6 +669,99 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             profile,
         ).is_valid()
 
+    def validate_telemetry_snapshot(
+        self,
+        snapshot: TelemetrySnapshot,
+        capability_names: Iterable[str],
+        *,
+        reject_unknown_signals: bool = False,
+    ) -> TelemetryValidationResult:
+        self._ensure_concrete("telemetry validation")
+        offered_capabilities = tuple(capability_names)
+        unknown_capabilities = self.validate_capability_names(offered_capabilities)
+        telemetry_sets = tuple(
+            telemetry
+            for capability_name in offered_capabilities
+            if capability_name not in unknown_capabilities
+            for telemetry in (self.get_capability_telemetry(capability_name),)
+            if telemetry is not None
+        )
+        span_specs = _merge_span_specs(telemetry_sets)
+        metric_specs = _merge_metric_specs(telemetry_sets)
+        event_specs = _merge_event_specs(telemetry_sets)
+
+        unknown_spans: list[str] = []
+        missing_span_attributes: list[str] = []
+        for span in snapshot.spans:
+            span_spec = span_specs.get(span.name)
+            if span_spec is None:
+                if reject_unknown_signals:
+                    unknown_spans.append(span.name)
+                continue
+            for field in span_spec.required_attributes:
+                if field.name not in span.attributes:
+                    missing_span_attributes.append(f"{span.name}.{field.name}")
+
+        unknown_metrics: list[str] = []
+        missing_metric_labels: list[str] = []
+        invalid_metric_units: list[str] = []
+        for metric in snapshot.metrics:
+            metric_spec = metric_specs.get(metric.name)
+            if metric_spec is None:
+                if reject_unknown_signals:
+                    unknown_metrics.append(metric.name)
+                continue
+            for field in metric_spec.required_labels:
+                if field.name not in metric.labels:
+                    missing_metric_labels.append(f"{metric.name}.{field.name}")
+            if metric_spec.unit is not None and metric.unit != metric_spec.unit:
+                invalid_metric_units.append(
+                    f"{metric.name}: expected {metric_spec.unit!r}, got {metric.unit!r}"
+                )
+
+        unknown_events: list[str] = []
+        missing_event_payload_keys: list[str] = []
+        invalid_event_severities: list[str] = []
+        for event in snapshot.events:
+            event_spec = event_specs.get(event.event_type)
+            if event_spec is None:
+                if reject_unknown_signals:
+                    unknown_events.append(event.event_type)
+                continue
+            for field in event_spec.required_payload_keys:
+                if field.name not in event.payload:
+                    missing_event_payload_keys.append(f"{event.event_type}.{field.name}")
+            if event_spec.severity is not None and event.severity != event_spec.severity:
+                invalid_event_severities.append(
+                    f"{event.event_type}: expected {event_spec.severity!r}, "
+                    f"got {event.severity!r}"
+                )
+
+        return TelemetryValidationResult(
+            unknown_capabilities=unknown_capabilities,
+            unknown_spans=tuple(unknown_spans),
+            unknown_metrics=tuple(unknown_metrics),
+            unknown_events=tuple(unknown_events),
+            missing_span_attributes=tuple(missing_span_attributes),
+            missing_metric_labels=tuple(missing_metric_labels),
+            missing_event_payload_keys=tuple(missing_event_payload_keys),
+            invalid_metric_units=tuple(invalid_metric_units),
+            invalid_event_severities=tuple(invalid_event_severities),
+        )
+
+    def is_telemetry_snapshot_compliant(
+        self,
+        snapshot: TelemetrySnapshot,
+        capability_names: Iterable[str],
+        *,
+        reject_unknown_signals: bool = False,
+    ) -> bool:
+        return self.validate_telemetry_snapshot(
+            snapshot,
+            capability_names,
+            reject_unknown_signals=reject_unknown_signals,
+        ).is_valid()
+
     def validate_capability_set(
         self,
         capability_names: Iterable[str],
@@ -672,6 +909,7 @@ class CatalogRegistry:
                     msg = f"Catalog interface already registered: {catalog.interface!r}"
                     raise ValueError(msg)
 
+            self._validate_catalog_telemetry(catalog)
             self._validate_catalog_relations(catalog)
             self._catalogs[catalog.interface] = catalog
             return catalog
@@ -729,6 +967,74 @@ class CatalogRegistry:
                 )
                 raise ValueError(msg)
 
+    def _validate_catalog_telemetry(
+        self,
+        catalog: CapabilityCatalog,
+    ) -> None:
+        span_specs: dict[str, tuple[str, frozenset[str]]] = {}
+        metric_specs: dict[str, tuple[str, str | None, frozenset[str]]] = {}
+        event_specs: dict[str, tuple[str, TelemetrySeverity | None, frozenset[str]]] = {}
+
+        for capability in catalog.capabilities:
+            if capability.telemetry is None:
+                continue
+
+            for span in capability.telemetry.spans:
+                field_names = frozenset(
+                    field.name for field in span.required_attributes
+                )
+                existing = span_specs.get(span.name)
+                if existing is None:
+                    span_specs[span.name] = (capability.name, field_names)
+                    continue
+                if existing[1] != field_names:
+                    msg = (
+                        "Conflicting telemetry span definition for "
+                        f"{span.name!r} in catalog {catalog.interface!r}: "
+                        f"{existing[0]!r} vs {capability.name!r}"
+                    )
+                    raise ValueError(msg)
+
+            for metric in capability.telemetry.metrics:
+                label_names = frozenset(
+                    field.name for field in metric.required_labels
+                )
+                existing = metric_specs.get(metric.name)
+                if existing is None:
+                    metric_specs[metric.name] = (
+                        capability.name,
+                        metric.unit,
+                        label_names,
+                    )
+                    continue
+                if existing[1] != metric.unit or existing[2] != label_names:
+                    msg = (
+                        "Conflicting telemetry metric definition for "
+                        f"{metric.name!r} in catalog {catalog.interface!r}: "
+                        f"{existing[0]!r} vs {capability.name!r}"
+                    )
+                    raise ValueError(msg)
+
+            for event in capability.telemetry.events:
+                payload_keys = frozenset(
+                    field.name for field in event.required_payload_keys
+                )
+                existing = event_specs.get(event.event_type)
+                if existing is None:
+                    event_specs[event.event_type] = (
+                        capability.name,
+                        event.severity,
+                        payload_keys,
+                    )
+                    continue
+                if existing[1] != event.severity or existing[2] != payload_keys:
+                    msg = (
+                        "Conflicting telemetry event definition for "
+                        f"{event.event_type!r} in catalog {catalog.interface!r}: "
+                        f"{existing[0]!r} vs {capability.name!r}"
+                    )
+                    raise ValueError(msg)
+
 
 DEFAULT_CATALOG_REGISTRY = CatalogRegistry()
 
@@ -784,3 +1090,85 @@ def catalog_satisfies_interface(
         offered_interface=offered_interface,
         required_interface=required_interface,
     )
+
+
+def _merge_span_specs(
+    telemetry_sets: tuple[CapabilityTelemetry, ...],
+) -> dict[str, TelemetrySpanSpec]:
+    merged: dict[str, TelemetrySpanSpec] = {}
+    for telemetry in telemetry_sets:
+        for span in telemetry.spans:
+            current = merged.get(span.name)
+            if current is None:
+                merged[span.name] = span
+                continue
+            merged[span.name] = TelemetrySpanSpec(
+                name=span.name,
+                required_attributes=_merge_field_requirements(
+                    current.required_attributes,
+                    span.required_attributes,
+                ),
+                description=current.description or span.description,
+            )
+    return merged
+
+
+def _merge_metric_specs(
+    telemetry_sets: tuple[CapabilityTelemetry, ...],
+) -> dict[str, TelemetryMetricSpec]:
+    merged: dict[str, TelemetryMetricSpec] = {}
+    for telemetry in telemetry_sets:
+        for metric in telemetry.metrics:
+            current = merged.get(metric.name)
+            if current is None:
+                merged[metric.name] = metric
+                continue
+            merged[metric.name] = TelemetryMetricSpec(
+                name=metric.name,
+                unit=current.unit or metric.unit,
+                required_labels=_merge_field_requirements(
+                    current.required_labels,
+                    metric.required_labels,
+                ),
+                description=current.description or metric.description,
+            )
+    return merged
+
+
+def _merge_event_specs(
+    telemetry_sets: tuple[CapabilityTelemetry, ...],
+) -> dict[str, TelemetryEventSpec]:
+    merged: dict[str, TelemetryEventSpec] = {}
+    for telemetry in telemetry_sets:
+        for event in telemetry.events:
+            current = merged.get(event.event_type)
+            if current is None:
+                merged[event.event_type] = event
+                continue
+            merged[event.event_type] = TelemetryEventSpec(
+                event_type=event.event_type,
+                severity=current.severity or event.severity,
+                required_payload_keys=_merge_field_requirements(
+                    current.required_payload_keys,
+                    event.required_payload_keys,
+                ),
+                description=current.description or event.description,
+            )
+    return merged
+
+
+def _merge_field_requirements(
+    left: tuple[TelemetryFieldRequirement, ...],
+    right: tuple[TelemetryFieldRequirement, ...],
+) -> tuple[TelemetryFieldRequirement, ...]:
+    merged: dict[str, TelemetryFieldRequirement] = {
+        field.name: field for field in left
+    }
+    for field in right:
+        existing = merged.get(field.name)
+        if existing is None:
+            merged[field.name] = field
+            continue
+        if existing.description is None and field.description is not None:
+            merged[field.name] = field
+    return tuple(merged[name] for name in sorted(merged))

@@ -119,7 +119,7 @@ snapshot = ComponentCapabilitySnapshot(
     component_name="gherkin",
     component_kind="engine",
     identity=ComponentIdentity(
-        interface="execution/engine",
+        interface="execution/plan-run",
         provider="gherkin",
         version="1.0.0",
     ),
@@ -151,7 +151,7 @@ dependency = ComponentDependencyRule(
     required_operations=("plan.explain",),
 )
 
-catalog = get_catalog("execution/engine")
+catalog = get_catalog("execution/plan-run")
 assert catalog is not None
 assert catalog.is_component_snapshot_compliant(snapshot) is True
 ```
