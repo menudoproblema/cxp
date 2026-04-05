@@ -29,7 +29,7 @@ class _SyncMongoProvider:
     def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -55,7 +55,7 @@ class _AsyncMongoProvider:
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -73,7 +73,7 @@ class _SyncTelemetryProvider:
         self._snapshot = snapshot
 
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None:
         return self._snapshot
@@ -84,7 +84,7 @@ class _AsyncTelemetryProvider:
         self._snapshot = snapshot
 
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     async def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None:
         return self._snapshot
@@ -92,23 +92,23 @@ class _AsyncTelemetryProvider:
 
 class _SyncTelemetryStreamProvider:
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     def cxp_telemetry_stream(self) -> Iterator[TelemetrySnapshot]:
-        yield TelemetrySnapshot(provider_id="mongoeco2")
+        yield TelemetrySnapshot(provider_id="example-mongodb")
         yield TelemetrySnapshot(
-            provider_id="mongoeco2",
+            provider_id="example-mongodb",
             metrics=(TelemetryMetric(name="ops", value=2),),
         )
 
 
 class _AsyncTelemetryStreamProvider:
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     async def cxp_telemetry_stream(self):
-        yield TelemetrySnapshot(provider_id="mongoeco2")
-        yield TelemetrySnapshot(provider_id="mongoeco2", status="degraded")
+        yield TelemetrySnapshot(provider_id="example-mongodb")
+        yield TelemetrySnapshot(provider_id="example-mongodb", status="degraded")
 
 
 class _SyncSnapshotProvider:

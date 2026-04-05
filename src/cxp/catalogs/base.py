@@ -18,6 +18,80 @@ type CatalogTierName = str
 type CapabilityMetadataSchema = type[msgspec.Struct] | None
 
 
+class CapabilityRequirement(msgspec.Struct, frozen=True):
+    capability_name: str
+    required_operations: tuple[str, ...] = ()
+    required_metadata_keys: tuple[str, ...] = ()
+
+
+class CapabilityProfileValidationResult(msgspec.Struct, frozen=True):
+    unknown_profile_capabilities: tuple[str, ...] = ()
+    missing_capabilities: tuple[str, ...] = ()
+    missing_operations: tuple[UnknownCapabilityOperations, ...] = ()
+    missing_metadata_keys: tuple[str, ...] = ()
+    invalid_metadata: tuple[str, ...] = ()
+    interface_mismatch: str | None = None
+    expected_interface: str | None = None
+
+    def is_valid(self) -> bool:
+        return (
+            not self.unknown_profile_capabilities
+            and not self.missing_capabilities
+            and not self.missing_operations
+            and not self.missing_metadata_keys
+            and not self.invalid_metadata
+            and self.interface_mismatch is None
+        )
+
+    def messages(self) -> tuple[str, ...]:
+        messages: list[str] = []
+
+        if self.unknown_profile_capabilities:
+            messages.append(
+                "Unknown profile capabilities: "
+                + ", ".join(self.unknown_profile_capabilities),
+            )
+
+        if self.missing_capabilities:
+            messages.append(
+                "Missing capabilities: " + ", ".join(self.missing_capabilities),
+            )
+
+        if self.missing_operations:
+            for unknown in self.missing_operations:
+                messages.append(
+                    "Missing operations for capability "
+                    f"{unknown.capability_name!r}: "
+                    + ", ".join(unknown.operation_names),
+                )
+
+        if self.missing_metadata_keys:
+            messages.append(
+                "Missing metadata keys: " + ", ".join(self.missing_metadata_keys),
+            )
+
+        if self.invalid_metadata:
+            messages.append(
+                "Invalid metadata for capabilities: "
+                + ", ".join(self.invalid_metadata),
+            )
+
+        if self.interface_mismatch is not None:
+            messages.append(
+                "Interface mismatch: "
+                f"{self.interface_mismatch!r} != {self.expected_interface!r}",
+            )
+
+        return tuple(messages)
+
+
+class CapabilityProfile(msgspec.Struct, frozen=True):
+    name: str
+    interface: str
+    requirements: tuple[CapabilityRequirement, ...]
+    description: str | None = None
+
+
 class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
     unknown_capabilities: tuple[str, ...] = ()
     invalid_metadata: tuple[str, ...] = ()
@@ -232,6 +306,85 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             if tier.name == name:
                 return tier
         return None
+
+    def validate_component_snapshot_against_profile(
+        self,
+        snapshot: ComponentCapabilitySnapshot,
+        profile: CapabilityProfile,
+    ) -> CapabilityProfileValidationResult:
+        if snapshot.identity is not None and snapshot.identity.interface != self.interface:
+            return CapabilityProfileValidationResult(
+                interface_mismatch=snapshot.identity.interface,
+                expected_interface=self.interface,
+            )
+
+        if profile.interface != self.interface:
+            return CapabilityProfileValidationResult(
+                interface_mismatch=profile.interface,
+                expected_interface=self.interface,
+            )
+
+        unknown_profile_capabilities: list[str] = []
+        missing_capabilities: list[str] = []
+        missing_operations: list[UnknownCapabilityOperations] = []
+        missing_metadata_keys: list[str] = []
+        invalid_metadata: list[str] = []
+
+        descriptors_by_name = {
+            descriptor.name: descriptor for descriptor in snapshot.capabilities
+        }
+
+        for requirement in profile.requirements:
+            catalog_capability = self.get_capability(requirement.capability_name)
+            if catalog_capability is None:
+                unknown_profile_capabilities.append(requirement.capability_name)
+                continue
+
+            descriptor = descriptors_by_name.get(requirement.capability_name)
+            if descriptor is None or descriptor.level == "unsupported":
+                missing_capabilities.append(requirement.capability_name)
+                continue
+
+            if not catalog_capability.validate_metadata(descriptor.as_capability()):
+                invalid_metadata.append(requirement.capability_name)
+
+            missing_requirement_operations = tuple(
+                operation_name
+                for operation_name in requirement.required_operations
+                if operation_name not in descriptor.operation_names()
+            )
+            if missing_requirement_operations:
+                missing_operations.append(
+                    UnknownCapabilityOperations(
+                        capability_name=requirement.capability_name,
+                        operation_names=missing_requirement_operations,
+                    )
+                )
+
+            descriptor_metadata = descriptor.metadata
+            for metadata_key in requirement.required_metadata_keys:
+                if metadata_key not in descriptor_metadata:
+                    missing_metadata_keys.append(
+                        f"{requirement.capability_name}.{metadata_key}"
+                    )
+
+        return CapabilityProfileValidationResult(
+            unknown_profile_capabilities=tuple(unknown_profile_capabilities),
+            missing_capabilities=tuple(missing_capabilities),
+            missing_operations=tuple(missing_operations),
+            missing_metadata_keys=tuple(missing_metadata_keys),
+            invalid_metadata=tuple(invalid_metadata),
+        )
+
+    def is_component_snapshot_profile_compliant(
+        self,
+        snapshot: ComponentCapabilitySnapshot,
+        profile: CapabilityProfile,
+    ) -> bool:
+        return self.validate_component_snapshot_against_profile(
+            snapshot,
+            profile,
+        ).is_valid()
 
     def validate_capability_set(
         self,

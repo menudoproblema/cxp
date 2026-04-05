@@ -1,10 +1,26 @@
 import msgspec
 
 from cxp import (
+    MONGODB_AGGREGATE,
+    MONGODB_COUNT_DOCUMENTS,
+    MONGODB_DELETE_MANY,
+    MONGODB_DELETE_ONE,
+    MONGODB_DISTINCT,
+    MONGODB_ESTIMATED_DOCUMENT_COUNT,
+    MONGODB_INSERT_MANY,
+    MONGODB_INSERT_ONE,
+    MONGODB_REPLACE_ONE,
+    MONGODB_START_SESSION,
+    MONGODB_UPDATE_MANY,
+    MONGODB_UPDATE_ONE,
+    CapabilityOperationBinding,
     EXECUTION_ENGINE_CATALOG,
     HTTP_APPLICATION_CATALOG,
     HTTP_TRANSPORT_CATALOG,
     MONGODB_CATALOG,
+    MONGODB_CORE_PROFILE,
+    MONGODB_PLATFORM_PROFILE,
+    MONGODB_SEARCH_PROFILE,
     Capability,
     CapabilityCatalog,
     CapabilityMatrix,
@@ -12,6 +28,8 @@ from cxp import (
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
+    ComponentCapabilitySnapshot,
+    CapabilityDescriptor,
     get_catalog,
 )
 
@@ -61,6 +79,280 @@ def test_mongodb_catalog_reports_search_and_platform_tiers():
     )
 
     assert satisfied_tiers == ("core", "search", "platform")
+
+
+def test_mongodb_search_and_platform_tiers_require_aggregation() -> None:
+    search_validation = MONGODB_CATALOG.validate_capability_set(
+        (
+            "read",
+            "write",
+            "search",
+            "vector_search",
+        ),
+        required_tier="search",
+    )
+    platform_validation = MONGODB_CATALOG.validate_capability_set(
+        (
+            "read",
+            "write",
+            "transactions",
+            "change_streams",
+            "collation",
+            "persistence",
+            "topology_discovery",
+        ),
+        required_tier="platform",
+    )
+
+    assert search_validation.missing_tier_capabilities == ("aggregation",)
+    assert platform_validation.missing_tier_capabilities == ("aggregation",)
+
+
+def test_mongodb_catalog_exposes_canonical_first_level_operations() -> None:
+    assert MONGODB_CATALOG.has_operation("aggregation", MONGODB_AGGREGATE) is True
+    assert MONGODB_CATALOG.has_operation("read", "find") is True
+    assert MONGODB_CATALOG.has_operation("write", "update_one") is True
+    assert MONGODB_CATALOG.has_operation("change_streams", "watch") is True
+
+
+def test_mongodb_profiles_validate_snapshot_requirements() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="provider",
+        identity=None,
+        capabilities=(
+            CapabilityDescriptor(
+                name="read",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("find"),
+                    CapabilityOperationBinding("find_one"),
+                    CapabilityOperationBinding("count_documents"),
+                    CapabilityOperationBinding("estimated_document_count"),
+                    CapabilityOperationBinding("distinct"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="write",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("insert_one"),
+                    CapabilityOperationBinding("insert_many"),
+                    CapabilityOperationBinding("update_one"),
+                    CapabilityOperationBinding("update_many"),
+                    CapabilityOperationBinding("replace_one"),
+                    CapabilityOperationBinding("delete_one"),
+                    CapabilityOperationBinding("delete_many"),
+                    CapabilityOperationBinding("bulk_write"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="aggregation",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata={"supportedStages": ["$match", "$group"]},
+            ),
+            CapabilityDescriptor(
+                name="search",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata={"operators": ["text"], "aggregateStage": "$search"},
+            ),
+            CapabilityDescriptor(
+                name="vector_search",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata={
+                    "similarities": ["cosine"],
+                    "aggregateStage": "$vectorSearch",
+                },
+            ),
+            CapabilityDescriptor(
+                name="transactions",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("start_session"),
+                    CapabilityOperationBinding("with_transaction"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="change_streams",
+                level="supported",
+                operations=(CapabilityOperationBinding("watch"),),
+            ),
+            CapabilityDescriptor(
+                name="collation",
+                level="supported",
+                metadata={"backend": {}, "capabilities": {}},
+            ),
+            CapabilityDescriptor(
+                name="persistence",
+                level="supported",
+                metadata={"persistent": True, "storageEngine": "sqlite"},
+            ),
+            CapabilityDescriptor(
+                name="topology_discovery",
+                level="supported",
+                metadata={"topologyType": "single", "serverCount": 1, "sdam": {}},
+            ),
+        ),
+    )
+
+    assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        MONGODB_CORE_PROFILE,
+    )
+    assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        MONGODB_SEARCH_PROFILE,
+    )
+    assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        MONGODB_PLATFORM_PROFILE,
+    )
+
+
+def test_mongodb_core_profile_requires_complete_read_and_write_operations() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="provider",
+        capabilities=(
+            CapabilityDescriptor(
+                name="read",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("find"),
+                    CapabilityOperationBinding("find_one"),
+                    CapabilityOperationBinding("count_documents"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="write",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("insert_one"),
+                    CapabilityOperationBinding("update_one"),
+                    CapabilityOperationBinding("delete_one"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="aggregation",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata={"supportedStages": ["$match"]},
+            ),
+        ),
+    )
+
+    validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_CORE_PROFILE,
+    )
+
+    assert tuple(
+        (missing.capability_name, missing.operation_names)
+        for missing in validation.missing_operations
+    ) == (
+        ("read", ("estimated_document_count", "distinct")),
+        (
+            "write",
+            (
+                "insert_many",
+                "update_many",
+                "replace_one",
+                "delete_many",
+                "bulk_write",
+            ),
+        ),
+    )
+
+
+def test_mongodb_catalog_and_profiles_validate_metadata_shape() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="provider",
+        capabilities=(
+            CapabilityDescriptor(
+                name="aggregation",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata={"supportedStages": "$match"},
+            ),
+            CapabilityDescriptor(
+                name="collation",
+                level="supported",
+                metadata={"backend": 1, "capabilities": "invalid"},
+            ),
+            CapabilityDescriptor(
+                name="persistence",
+                level="supported",
+                metadata={"persistent": "yes", "storageEngine": []},
+            ),
+            CapabilityDescriptor(
+                name="topology_discovery",
+                level="supported",
+                metadata={"topologyType": 0, "serverCount": "one", "sdam": []},
+            ),
+        ),
+    )
+    matrix = CapabilityMatrix(
+        capabilities=(
+            Capability(
+                name="aggregation",
+                metadata={"supportedStages": "$match"},
+            ),
+            Capability(
+                name="collation",
+                metadata={"backend": 1, "capabilities": "invalid"},
+            ),
+            Capability(
+                name="persistence",
+                metadata={"persistent": "yes", "storageEngine": []},
+            ),
+            Capability(
+                name="topology_discovery",
+                metadata={"topologyType": 0, "serverCount": "one", "sdam": []},
+            ),
+        ),
+    )
+
+    descriptor_validation = MONGODB_CATALOG.validate_component_snapshot(snapshot)
+    matrix_validation = MONGODB_CATALOG.validate_capability_matrix(matrix)
+    profile_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_PLATFORM_PROFILE,
+    )
+
+    assert descriptor_validation.invalid_metadata == (
+        "aggregation",
+        "collation",
+        "persistence",
+        "topology_discovery",
+    )
+    assert matrix_validation.invalid_metadata == (
+        "aggregation",
+        "collation",
+        "persistence",
+        "topology_discovery",
+    )
+    assert profile_validation.invalid_metadata == (
+        "aggregation",
+        "collation",
+        "persistence",
+        "topology_discovery",
+    )
+    assert profile_validation.is_valid() is False
+
+
+def test_public_api_reexports_complete_mongodb_contract() -> None:
+    assert MONGODB_COUNT_DOCUMENTS == "count_documents"
+    assert MONGODB_DELETE_MANY == "delete_many"
+    assert MONGODB_DELETE_ONE == "delete_one"
+    assert MONGODB_DISTINCT == "distinct"
+    assert MONGODB_ESTIMATED_DOCUMENT_COUNT == "estimated_document_count"
+    assert MONGODB_INSERT_MANY == "insert_many"
+    assert MONGODB_INSERT_ONE == "insert_one"
+    assert MONGODB_REPLACE_ONE == "replace_one"
+    assert MONGODB_START_SESSION == "start_session"
+    assert MONGODB_UPDATE_MANY == "update_many"
+    assert MONGODB_UPDATE_ONE == "update_one"
 
 
 def test_default_registry_exposes_transport_and_application_catalogs():

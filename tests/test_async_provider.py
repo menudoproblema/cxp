@@ -66,7 +66,7 @@ def test_negotiate_with_async_provider_catalog_rejects_unknown_capabilities(
         async def cxp_identity(self) -> ComponentIdentity:
             return ComponentIdentity(
                 interface="database/mongodb",
-                provider="mongoeco2",
+                provider="example-mongodb",
                 version="3.0.0",
             )
 
@@ -156,7 +156,7 @@ def test_collect_provider_capability_snapshot_async_rejects_identity_mismatch(
                         component_name="gherkin",
                         identity=ComponentIdentity(
                             interface="database/mongodb",
-                            provider="mongoeco2",
+                            provider="example-mongodb",
                             version="3.0.0",
                         ),
                         capabilities=(

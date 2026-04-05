@@ -62,7 +62,7 @@ La API actual también incluye:
 from cxp import TelemetryBuffer, TelemetryContext
 
 context = TelemetryContext(trace_id="trace-123")
-buffer = TelemetryBuffer(provider_id="mongoeco2")
+buffer = TelemetryBuffer(provider_id="example-mongodb")
 buffer.record_event(context.create_event("command_started"))
 buffer.record_span(
     context.create_span(
@@ -85,7 +85,7 @@ Si necesitas controlar qué ocurre al superar la capacidad, `TelemetryBuffer` so
 from cxp import TelemetryBuffer
 
 buffer = TelemetryBuffer(
-    provider_id="mongoeco2",
+    provider_id="example-mongodb",
     max_items=1000,
     overflow_policy="drop_oldest",
 )

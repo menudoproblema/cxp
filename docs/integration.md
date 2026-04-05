@@ -13,7 +13,7 @@ Esa superficie mínima se apoya en:
 Además, CXP ofrece una capa opcional de descripción rica cuando un integrador necesite publicar algo más que una lista plana de capabilities.
 
 ### Síncrona vs Asíncrona
-CXP soporta tanto integraciones bloqueantes (síncronas) como no bloqueantes (asíncronas). Esto es crítico para componentes que realizan I/O (como `mongoeco2`).
+CXP soporta tanto integraciones bloqueantes (síncronas) como no bloqueantes (asíncronas). Esto es crítico para componentes que realizan I/O (como `example-mongodb`).
 
 ## Protocolos de Proveedor
 Un proveedor puede implementar la interfaz síncrona o asíncrona:
@@ -151,7 +151,7 @@ Si el provider puede producir ráfagas grandes de telemetría, puedes acotar el 
 from cxp import TelemetryBuffer
 
 buffer = TelemetryBuffer(
-    provider_id="mongoeco2",
+    provider_id="example-mongodb",
     max_items=1000,
     overflow_policy="drop_oldest",
 )
@@ -173,7 +173,7 @@ class MongoProvider:
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 

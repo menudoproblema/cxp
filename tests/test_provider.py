@@ -31,7 +31,7 @@ def test_negotiate_with_provider_accepts_known_capabilities(
     )
 
     assert response.status == "accepted"
-    assert response.provider_identity.provider == "mongoeco2"
+    assert response.provider_identity.provider == "example-mongodb"
 
 
 def test_negotiate_with_provider_rejects_missing_capabilities(
@@ -120,7 +120,7 @@ def test_negotiate_with_provider_catalog_rejects_unknown_capabilities(
         def cxp_identity(self) -> ComponentIdentity:
             return ComponentIdentity(
                 interface="database/mongodb",
-                provider="mongoeco2",
+                provider="example-mongodb",
                 version="3.0.0",
             )
 
@@ -171,7 +171,7 @@ def test_negotiate_with_provider_catalog_preserves_missing_optional_on_reject(
         def cxp_identity(self) -> ComponentIdentity:
             return ComponentIdentity(
                 interface="database/mongodb",
-                provider="mongoeco2",
+                provider="example-mongodb",
                 version="3.0.0",
             )
 
@@ -207,7 +207,7 @@ def test_collect_provider_telemetry_accepts_matching_provider_id(
     snapshot = collect_provider_telemetry(
         sync_telemetry_provider_factory(
             TelemetrySnapshot(
-                provider_id="mongoeco2",
+                provider_id="example-mongodb",
                 metrics=(TelemetryMetric(name="ops", value=3),),
                 is_heartbeat=True,
             ),
@@ -215,7 +215,7 @@ def test_collect_provider_telemetry_accepts_matching_provider_id(
     )
 
     assert snapshot is not None
-    assert snapshot.provider_id == "mongoeco2"
+    assert snapshot.provider_id == "example-mongodb"
 
 
 def test_collect_provider_telemetry_rejects_mismatched_provider_id(
@@ -261,7 +261,7 @@ def test_collect_provider_capability_snapshot_rejects_identity_mismatch(
                     component_name="pytest",
                     identity=ComponentIdentity(
                         interface="database/mongodb",
-                        provider="mongoeco2",
+                        provider="example-mongodb",
                         version="3.0.0",
                     ),
                     capabilities=(CapabilityDescriptor(name="run", level="supported"),),

@@ -50,9 +50,9 @@ def test_negotiate_protocol_version_returns_requested_version_when_supported() -
 
 
 def test_telemetry_snapshot_heartbeat_marks_snapshot() -> None:
-    snapshot = TelemetrySnapshot.heartbeat(provider_id="mongoeco2")
+    snapshot = TelemetrySnapshot.heartbeat(provider_id="example-mongodb")
 
-    assert snapshot.provider_id == "mongoeco2"
+    assert snapshot.provider_id == "example-mongodb"
     assert snapshot.is_heartbeat is True
     assert snapshot.status == "healthy"
 
@@ -93,7 +93,7 @@ def test_telemetry_context_generates_consistent_trace_id_when_missing() -> None:
 
 
 def test_telemetry_buffer_flushes_and_clears_state() -> None:
-    buffer = TelemetryBuffer(provider_id="mongoeco2")
+    buffer = TelemetryBuffer(provider_id="example-mongodb")
     buffer.record_metric("ops", 2)
     buffer.record_event(
         TelemetryContext(trace_id="trace-1").create_event("command_succeeded")
@@ -108,7 +108,7 @@ def test_telemetry_buffer_flushes_and_clears_state() -> None:
 
     snapshot = buffer.flush(status="healthy", is_heartbeat=True)
 
-    assert snapshot.provider_id == "mongoeco2"
+    assert snapshot.provider_id == "example-mongodb"
     assert snapshot.is_heartbeat is True
     assert len(snapshot.metrics) == 1
     assert len(snapshot.events) == 1
@@ -121,7 +121,7 @@ def test_telemetry_buffer_flushes_and_clears_state() -> None:
 
 
 def test_telemetry_buffer_can_enforce_capacity_limit() -> None:
-    buffer = TelemetryBuffer(provider_id="mongoeco2", max_items=1)
+    buffer = TelemetryBuffer(provider_id="example-mongodb", max_items=1)
     buffer.record_metric("ops", 1)
 
     try:
@@ -136,7 +136,7 @@ def test_telemetry_buffer_can_enforce_capacity_limit() -> None:
 
 def test_telemetry_buffer_can_drop_new_items_when_full() -> None:
     buffer = TelemetryBuffer(
-        provider_id="mongoeco2",
+        provider_id="example-mongodb",
         max_items=1,
         overflow_policy="drop_newest",
     )
@@ -155,7 +155,7 @@ def test_telemetry_buffer_can_drop_new_items_when_full() -> None:
 
 def test_telemetry_buffer_can_drop_oldest_items_when_full() -> None:
     buffer = TelemetryBuffer(
-        provider_id="mongoeco2",
+        provider_id="example-mongodb",
         max_items=1,
         overflow_policy="drop_oldest",
     )

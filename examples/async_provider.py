@@ -22,7 +22,7 @@ class AsyncMongoProvider:
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -35,12 +35,12 @@ class AsyncMongoProvider:
         )
 
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     async def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None:
         context = TelemetryContext(trace_id="async-example")
         return TelemetrySnapshot(
-            provider_id="mongoeco2",
+            provider_id="example-mongodb",
             events=(context.create_event("command_succeeded"),),
             metrics=(TelemetryMetric(name="ops", value=3),),
             spans=(

@@ -16,7 +16,7 @@ def test_successful_negotiation():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 
@@ -32,7 +32,7 @@ def test_successful_negotiation():
     response = negotiate_capabilities(request, provider, available)
 
     assert response.status == "accepted"
-    assert response.provider_identity.provider == "mongoeco2"
+    assert response.provider_identity.provider == "example-mongodb"
     assert response.offered_capabilities.has_capability("transactions")
     assert response.protocol_version == CURRENT_PROTOCOL_VERSION
 
@@ -45,7 +45,7 @@ def test_rejected_negotiation():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 
@@ -72,7 +72,7 @@ def test_degraded_negotiation_when_optional_capabilities_are_missing():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 
@@ -102,7 +102,7 @@ def test_rejected_negotiation_when_protocol_version_is_not_supported():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 
@@ -132,7 +132,7 @@ def test_rejected_negotiation_when_interfaces_do_not_match():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 
@@ -160,7 +160,7 @@ def test_rejected_negotiation_when_required_and_optional_overlap():
     )
     provider = ComponentIdentity(
         interface="database/mongodb",
-        provider="mongoeco2",
+        provider="example-mongodb",
         version="3.0.0",
     )
 

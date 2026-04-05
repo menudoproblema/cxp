@@ -59,7 +59,7 @@ class MongoProvider:
     def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -106,7 +106,7 @@ class MongoProvider:
     def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -119,11 +119,11 @@ class MongoProvider:
         )
 
     def cxp_telemetry_provider_id(self) -> str:
-        return "mongoeco2"
+        return "example-mongodb"
 
     def cxp_telemetry_snapshot(self):
         context = TelemetryContext(trace_id="trace-1")
-        buffer = TelemetryBuffer(provider_id="mongoeco2")
+        buffer = TelemetryBuffer(provider_id="example-mongodb")
         buffer.record_event(context.create_event("command_succeeded"))
         buffer.record_metric("ops", 1)
         return buffer.flush()
@@ -161,7 +161,7 @@ class AsyncMongoProvider:
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
             interface="database/mongodb",
-            provider="mongoeco2",
+            provider="example-mongodb",
             version="3.0.0",
         )
 
@@ -245,7 +245,7 @@ If the provider may emit large bursts of telemetry, you can bound the buffer and
 from cxp import TelemetryBuffer
 
 buffer = TelemetryBuffer(
-    provider_id="mongoeco2",
+    provider_id="example-mongodb",
     max_items=1000,
     overflow_policy="drop_oldest",
 )
