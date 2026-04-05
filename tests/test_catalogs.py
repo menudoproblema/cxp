@@ -1,4 +1,5 @@
 import msgspec
+from pytest import raises
 
 from cxp import (
     MONGODB_AGGREGATE,
@@ -25,8 +26,10 @@ from cxp import (
     CapabilityCatalog,
     CapabilityMatrix,
     CapabilityMatrixValidationResult,
+    CapabilityProfile,
     CatalogCapability,
     CatalogOperation,
+    CapabilityRequirement,
     ConformanceTier,
     ComponentCapabilitySnapshot,
     CapabilityDescriptor,
@@ -209,6 +212,43 @@ def test_mongodb_profiles_validate_snapshot_requirements() -> None:
         snapshot,
         MONGODB_PLATFORM_PROFILE,
     )
+
+
+def test_profile_definition_rejects_unknown_operations() -> None:
+    with raises(ValueError, match="Unknown profile operations"):
+        CapabilityProfile(
+            name="invalid-read-profile",
+            interface="database/mongodb",
+            requirements=(
+                CapabilityRequirement(
+                    capability_name="read",
+                    required_operations=("read_all",),
+                ),
+            ),
+        )
+
+
+def test_profile_definition_rejects_unknown_metadata_keys() -> None:
+    with raises(ValueError, match="Unknown profile metadata keys"):
+        CapabilityProfile(
+            name="invalid-aggregation-profile",
+            interface="database/mongodb",
+            requirements=(
+                CapabilityRequirement(
+                    capability_name="aggregation",
+                    required_metadata_keys=("nonCanonicalKey",),
+                ),
+            ),
+        )
+
+
+def test_profile_definition_rejects_unregistered_interfaces() -> None:
+    with raises(ValueError, match="references unregistered interface"):
+        CapabilityProfile(
+            name="invalid-interface-profile",
+            interface="application/unknown",
+            requirements=(),
+        )
 
 
 def test_mongodb_core_profile_requires_complete_read_and_write_operations() -> None:

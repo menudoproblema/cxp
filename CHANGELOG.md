@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added abstract interface-family support in catalogs via `abstract` and `satisfies_interfaces`.
+- Added first-party `application/wsgi` and `application/asgi` catalogs, and moved the previous high-level HTTP framework semantics to `application/http-framework`.
+- Updated the handshake so a concrete interface can satisfy an abstract family interface only when both interfaces are backed by registered catalogs. For example, `application/asgi` can satisfy a request for `application/http`.
+
 ## 1.0.0
 
 - Stabilized the core handshake contract around `ComponentIdentity`, `CapabilityMatrix`, and protocol-version negotiation.

@@ -24,6 +24,53 @@ class CapabilityRequirement(msgspec.Struct, frozen=True):
     required_metadata_keys: tuple[str, ...] = ()
 
 
+class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
+    unknown_capabilities: tuple[str, ...] = ()
+    unknown_operations: tuple[UnknownCapabilityOperations, ...] = ()
+    unknown_metadata_keys: tuple[str, ...] = ()
+    interface_mismatch: str | None = None
+    expected_interface: str | None = None
+
+    def is_valid(self) -> bool:
+        return (
+            not self.unknown_capabilities
+            and not self.unknown_operations
+            and not self.unknown_metadata_keys
+            and self.interface_mismatch is None
+        )
+
+    def messages(self) -> tuple[str, ...]:
+        messages: list[str] = []
+
+        if self.unknown_capabilities:
+            messages.append(
+                "Unknown profile capabilities: "
+                + ", ".join(self.unknown_capabilities),
+            )
+
+        if self.unknown_operations:
+            for unknown in self.unknown_operations:
+                messages.append(
+                    "Unknown profile operations for capability "
+                    f"{unknown.capability_name!r}: "
+                    + ", ".join(unknown.operation_names),
+                )
+
+        if self.unknown_metadata_keys:
+            messages.append(
+                "Unknown profile metadata keys: "
+                + ", ".join(self.unknown_metadata_keys),
+            )
+
+        if self.interface_mismatch is not None:
+            messages.append(
+                "Interface mismatch: "
+                f"{self.interface_mismatch!r} != {self.expected_interface!r}",
+            )
+
+        return tuple(messages)
+
+
 class CapabilityProfileValidationResult(msgspec.Struct, frozen=True):
     unknown_profile_capabilities: tuple[str, ...] = ()
     missing_capabilities: tuple[str, ...] = ()
@@ -91,6 +138,26 @@ class CapabilityProfile(msgspec.Struct, frozen=True):
     requirements: tuple[CapabilityRequirement, ...]
     description: str | None = None
 
+    def __post_init__(self) -> None:
+        catalog = get_catalog(self.interface)
+        if catalog is None:
+            msg = (
+                f"Capability profile {self.name!r} references "
+                f"unregistered interface {self.interface!r}"
+            )
+            raise ValueError(msg)
+
+        validation = catalog.validate_profile_definition(self)
+        if validation.is_valid():
+            return
+
+        msg = (
+            f"Invalid capability profile {self.name!r} for "
+            f"interface {self.interface!r}: "
+            + "; ".join(validation.messages())
+        )
+        raise ValueError(msg)
+
 
 class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
     unknown_capabilities: tuple[str, ...] = ()
@@ -157,6 +224,12 @@ class CatalogCapability(msgspec.Struct, frozen=True):
             if operation.name == name:
                 return operation
         return None
+
+    def metadata_keys(self) -> tuple[str, ...]:
+        if self.metadata_schema is None:
+            return ()
+
+        return tuple(getattr(self.metadata_schema, "__struct_fields__", ()))
 
     def validate_metadata(self, capability: Capability) -> bool:
         if self.metadata_schema is None:
@@ -393,6 +466,53 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             missing_operations=tuple(missing_operations),
             missing_metadata_keys=tuple(missing_metadata_keys),
             invalid_metadata=tuple(invalid_metadata),
+        )
+
+    def validate_profile_definition(
+        self,
+        profile: CapabilityProfile,
+    ) -> CapabilityProfileDefinitionValidationResult:
+        self._ensure_concrete("profile definition validation")
+        if profile.interface != self.interface:
+            return CapabilityProfileDefinitionValidationResult(
+                interface_mismatch=profile.interface,
+                expected_interface=self.interface,
+            )
+
+        unknown_capabilities: list[str] = []
+        unknown_operations: list[UnknownCapabilityOperations] = []
+        unknown_metadata_keys: list[str] = []
+
+        for requirement in profile.requirements:
+            catalog_capability = self.get_capability(requirement.capability_name)
+            if catalog_capability is None:
+                unknown_capabilities.append(requirement.capability_name)
+                continue
+
+            invalid_requirement_operations = tuple(
+                operation_name
+                for operation_name in requirement.required_operations
+                if not catalog_capability.has_operation(operation_name)
+            )
+            if invalid_requirement_operations:
+                unknown_operations.append(
+                    UnknownCapabilityOperations(
+                        capability_name=requirement.capability_name,
+                        operation_names=invalid_requirement_operations,
+                    )
+                )
+
+            known_metadata_keys = frozenset(catalog_capability.metadata_keys())
+            for metadata_key in requirement.required_metadata_keys:
+                if metadata_key not in known_metadata_keys:
+                    unknown_metadata_keys.append(
+                        f"{requirement.capability_name}.{metadata_key}"
+                    )
+
+        return CapabilityProfileDefinitionValidationResult(
+            unknown_capabilities=tuple(unknown_capabilities),
+            unknown_operations=tuple(unknown_operations),
+            unknown_metadata_keys=tuple(unknown_metadata_keys),
         )
 
     def is_component_snapshot_profile_compliant(
