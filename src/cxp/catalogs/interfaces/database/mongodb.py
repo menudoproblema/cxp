@@ -177,61 +177,61 @@ MONGODB_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=MONGODB_INTERFACE,
         description=(
-            'Estándar CXP para proveedores compatibles con la interfaz '
-            'database/mongodb.'
+            'CXP standard for providers compatible with the '
+            'database/mongodb interface.'
         ),
         capabilities=(
             CatalogCapability(
                 name=MONGODB_READ,
-                description='Consultas básicas de lectura.',
+                description='Basic read queries.',
                 operations=_READ_OPERATIONS,
             ),
             CatalogCapability(
                 name=MONGODB_WRITE,
-                description='Inserción, actualización y borrado de documentos.',
+                description='Insert, update, and delete document operations.',
                 operations=_WRITE_OPERATIONS,
             ),
             CatalogCapability(
                 name=MONGODB_TRANSACTIONS,
-                description='Operaciones multi-documento atómicas.',
+                description='Atomic multi-document operations.',
                 operations=_TRANSACTION_OPERATIONS,
             ),
             CatalogCapability(
                 name=MONGODB_AGGREGATION,
-                description='Soporte para el framework de agregación.',
+                description='Support for the aggregation framework.',
                 operations=_AGGREGATION_OPERATIONS,
                 metadata_schema=MongoAggregationMetadata,
             ),
             CatalogCapability(
                 name=MONGODB_CHANGE_STREAMS,
-                description='Observabilidad de cambios en tiempo real.',
+                description='Realtime change observability.',
                 operations=_CHANGE_STREAM_OPERATIONS,
             ),
             CatalogCapability(
                 name=MONGODB_SEARCH,
-                description='Soporte para consultas textuales de tipo search.',
+                description='Support for Atlas Search-style textual queries.',
                 operations=_SEARCH_OPERATIONS,
                 metadata_schema=MongoSearchMetadata,
             ),
             CatalogCapability(
                 name=MONGODB_VECTOR_SEARCH,
-                description='Búsquedas por similitud semántica.',
+                description='Semantic similarity search support.',
                 operations=_VECTOR_SEARCH_OPERATIONS,
                 metadata_schema=MongoVectorSearchMetadata,
             ),
             CatalogCapability(
                 name=MONGODB_COLLATION,
-                description='Ordenación y comparación sensibles a collation.',
+                description='Collation-aware sorting and comparison.',
                 metadata_schema=MongoCollationMetadata,
             ),
             CatalogCapability(
                 name=MONGODB_PERSISTENCE,
-                description='Persistencia de datos más allá del proceso.',
+                description='Data persistence beyond process lifetime.',
                 metadata_schema=MongoPersistenceMetadata,
             ),
             CatalogCapability(
                 name=MONGODB_TOPOLOGY_DISCOVERY,
-                description='Descubrimiento de topología y estado de nodos.',
+                description='Topology and node-state discovery.',
                 metadata_schema=MongoTopologyDiscoveryMetadata,
             ),
         ),
@@ -243,7 +243,7 @@ MONGODB_CATALOG = register_catalog(
                     MONGODB_WRITE,
                     MONGODB_AGGREGATION,
                 ),
-                description='Contrato mínimo interoperable para proveedores MongoDB.',
+                description='Minimum interoperable contract for MongoDB providers.',
             ),
             ConformanceTier(
                 name=MONGODB_SEARCH_TIER,
@@ -254,7 +254,7 @@ MONGODB_CATALOG = register_catalog(
                     MONGODB_SEARCH,
                     MONGODB_VECTOR_SEARCH,
                 ),
-                description='Core más búsqueda textual y vectorial.',
+                description='Core support plus textual and vector search.',
             ),
             ConformanceTier(
                 name=MONGODB_PLATFORM_TIER,
@@ -268,7 +268,7 @@ MONGODB_CATALOG = register_catalog(
                     MONGODB_PERSISTENCE,
                     MONGODB_TOPOLOGY_DISCOVERY,
                 ),
-                description='Capacidades de plataforma y operación de runtime.',
+                description='Platform and runtime operation capabilities.',
             ),
         ),
     )
@@ -277,7 +277,7 @@ MONGODB_CATALOG = register_catalog(
 MONGODB_CORE_PROFILE = CapabilityProfile(
     name=MONGODB_CORE_PROFILE_NAME,
     interface=MONGODB_INTERFACE,
-    description='Perfil mínimo reutilizable para tests y recursos MongoDB básicos.',
+    description='Reusable minimum profile for basic MongoDB tests and resources.',
     requirements=(
         CapabilityRequirement(
             capability_name=MONGODB_READ,
@@ -298,7 +298,7 @@ MONGODB_CORE_PROFILE = CapabilityProfile(
 MONGODB_SEARCH_PROFILE = CapabilityProfile(
     name=MONGODB_SEARCH_PROFILE_NAME,
     interface=MONGODB_INTERFACE,
-    description='Perfil reutilizable para tests y recursos con search/vector search.',
+    description='Reusable profile for tests and resources with search and vector search.',
     requirements=(
         *MONGODB_CORE_PROFILE.requirements,
         CapabilityRequirement(
@@ -317,7 +317,7 @@ MONGODB_SEARCH_PROFILE = CapabilityProfile(
 MONGODB_PLATFORM_PROFILE = CapabilityProfile(
     name=MONGODB_PLATFORM_PROFILE_NAME,
     interface=MONGODB_INTERFACE,
-    description='Perfil reutilizable para runtimes MongoDB con surface de plataforma.',
+    description='Reusable profile for MongoDB runtimes with platform surface.',
     requirements=(
         *MONGODB_CORE_PROFILE.requirements,
         CapabilityRequirement(
@@ -346,7 +346,7 @@ MONGODB_PLATFORM_PROFILE = CapabilityProfile(
 MONGODB_AGGREGATE_RICH_PROFILE = CapabilityProfile(
     name=MONGODB_AGGREGATE_RICH_PROFILE_NAME,
     interface=MONGODB_INTERFACE,
-    description='Perfil reutilizable para tests que necesitan un subset rico de aggregate.',
+    description='Reusable profile for tests that need a richer aggregation subset.',
     requirements=(
         CapabilityRequirement(
             capability_name=MONGODB_AGGREGATION,
