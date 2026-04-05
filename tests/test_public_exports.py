@@ -1,6 +1,10 @@
+import tomllib
+from pathlib import Path
+
 import cxp
 import cxp.catalogs
 import cxp.catalogs.interfaces
+import cxp.catalogs.interfaces.cosecha.engine
 
 
 def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
@@ -13,6 +17,16 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "TelemetryMetricSpec",
         "TelemetryEventSpec",
         "TelemetryValidationResult",
+        "COSECHA_ENGINE_CATALOG",
+        "COSECHA_ENGINE_INTERFACE",
+        "COSECHA_ENGINE_LIFECYCLE",
+        "COSECHA_ENGINE_TEST_LIFECYCLE",
+        "COSECHA_REPORTER_CATALOG",
+        "COSECHA_REPORTER_INTERFACE",
+        "COSECHA_PLUGIN_CATALOG",
+        "COSECHA_PLUGIN_INTERFACE",
+        "BROWSER_AUTOMATION_CATALOG",
+        "BROWSER_AUTOMATION_INTERFACE",
         "HTTP_APPLICATION_CATALOG",
         "HTTP_APPLICATION_INTERFACE",
         "HTTP_APPLICATION_FRAMEWORK_CATALOG",
@@ -37,8 +51,20 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "PLAN_RUN_EXECUTION_INPUT_VALIDATION",
         "PLAN_RUN_EXECUTION_EXECUTION_STATUS",
         "PLAN_RUN_EXECUTION_EXECUTION_STREAM",
+        "PLAYWRIGHT_BROWSER_CATALOG",
+        "PLAYWRIGHT_BROWSER_INTERFACE",
     )
     interface_symbols = (
+        "COSECHA_ENGINE_CATALOG",
+        "COSECHA_ENGINE_INTERFACE",
+        "COSECHA_ENGINE_LIFECYCLE",
+        "COSECHA_ENGINE_TEST_LIFECYCLE",
+        "COSECHA_REPORTER_CATALOG",
+        "COSECHA_REPORTER_INTERFACE",
+        "COSECHA_PLUGIN_CATALOG",
+        "COSECHA_PLUGIN_INTERFACE",
+        "BROWSER_AUTOMATION_CATALOG",
+        "BROWSER_AUTOMATION_INTERFACE",
         "HTTP_APPLICATION_CATALOG",
         "HTTP_APPLICATION_INTERFACE",
         "HTTP_APPLICATION_FRAMEWORK_CATALOG",
@@ -63,6 +89,8 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "PLAN_RUN_EXECUTION_INPUT_VALIDATION",
         "PLAN_RUN_EXECUTION_EXECUTION_STATUS",
         "PLAN_RUN_EXECUTION_EXECUTION_STREAM",
+        "PLAYWRIGHT_BROWSER_CATALOG",
+        "PLAYWRIGHT_BROWSER_INTERFACE",
     )
 
     for module in (cxp, cxp.catalogs):
@@ -95,3 +123,36 @@ def test_legacy_execution_engine_symbols_are_no_longer_exported() -> None:
     for module in (cxp, cxp.catalogs, cxp.catalogs.interfaces):
         for symbol in legacy_symbols:
             assert hasattr(module, symbol) is False
+
+
+def test_legacy_execution_engine_symbols_are_not_exported_by_submodules() -> None:
+    import cxp.catalogs.interfaces.execution
+    import cxp.catalogs.interfaces.execution.engine
+
+    for module in (
+        cxp.catalogs.interfaces.execution,
+        cxp.catalogs.interfaces.execution.engine,
+    ):
+        assert hasattr(module, "EXECUTION_ENGINE_DRAFT_VALIDATION") is False
+        assert (
+            hasattr(module, "EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY")
+            is False
+        )
+
+
+def test_package_version_matches_project_metadata() -> None:
+    pyproject = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    project = tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]
+
+    assert cxp.__version__ == project["version"]
+
+
+def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:
+    assert (
+        "COSECHA_ENGINE_LIFECYCLE"
+        in cxp.catalogs.interfaces.cosecha.engine.__all__
+    )
+    assert (
+        "COSECHA_ENGINE_TEST_LIFECYCLE"
+        in cxp.catalogs.interfaces.cosecha.engine.__all__
+    )

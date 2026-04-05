@@ -37,6 +37,11 @@ La idempotencia del registro se apoya en la igualdad estructural de `msgspec.Str
 
 Catálogos first-party actuales:
 
+- [`cosecha/engine`](./interfaces/cosecha/engine.md)
+- [`cosecha/reporter`](./interfaces/cosecha/reporter.md)
+- [`cosecha/plugin`](./interfaces/cosecha/plugin.md)
+- [`browser/automation`](./interfaces/browser/automation.md)
+- [`browser/playwright`](./interfaces/browser/playwright.md)
 - [`database/mongodb`](./interfaces/database/mongodb.md)
 - [`transport/http`](./interfaces/transport/http.md)
 - [`application/http`](./interfaces/application/http.md)
@@ -52,6 +57,16 @@ Nota sobre execution:
 - `execution/plan-run` es el contrato first-party concreto.
 - Los aliases legacy `EXECUTION_ENGINE_*` siguen apuntando al contrato
   concreto `execution/plan-run`.
+
+Nota sobre browser:
+
+- `browser/automation` es una familia abstracta de compatibilidad.
+- `browser/playwright` es el contrato first-party concreto actual.
+
+Nota sobre Cosecha:
+
+- `cosecha/engine`, `cosecha/reporter` y `cosecha/plugin` son contratos concretos.
+- Están pensados para extensiones propias de Cosecha y no participan en la validación de runtime profiles reservados como `application/*`, `database/*`, `execution/*` o `transport/*`.
 
 ## Capabilities y Operaciones
 Un catálogo puede describir dos niveles:

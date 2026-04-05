@@ -117,6 +117,10 @@ Eso ya se usa en catálogos first-party como:
 - `execution/plan-run`, con señales separadas para `run`, `planning` y estado;
 - `database/mongodb`, con señales distintas para operaciones documentales,
   `aggregate`, `$search`, `$vectorSearch`, transacciones y topología.
+- `browser/playwright`, con señales específicas para navegación, resolución de
+  locators, acciones DOM, waits, red, screenshots y dialogs.
+- `cosecha/engine`, `cosecha/reporter` y `cosecha/plugin`, con una convención
+  `span-only` para lifecycle, knowledge, reporting y efectos de plugins.
 
 ## Semántica de Catálogo
 Los catálogos de capabilities también pueden declarar semántica de telemetría

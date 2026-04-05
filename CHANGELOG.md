@@ -2,10 +2,18 @@
 
 ## Unreleased
 
+- Nothing yet.
+
+## 2.0.0 - 2026-04-06
+
 - Added abstract interface-family support in catalogs via `abstract` and `satisfies_interfaces`.
 - Added first-party `application/wsgi` and `application/asgi` catalogs, and moved the previous high-level HTTP framework semantics to `application/http-framework`.
+- Added the abstract browser automation family `browser/automation` and the concrete `browser/playwright` catalog with canonical capabilities for navigation, locators, DOM actions, waits, script evaluation, network observation, screenshots, and dialogs.
 - Updated the handshake so a concrete interface can satisfy an abstract family interface only when both interfaces are backed by registered catalogs. For example, `application/asgi` can satisfy a request for `application/http`.
 - Added capability-linked telemetry semantics and telemetry snapshot validation in catalogs, with first-party telemetry conventions for `execution/plan-run` and `database/mongodb`.
+- Added canonical browser automation telemetry for `browser/playwright`, including launch/close lifecycle operations, context management, navigation, locator resolution, DOM interaction, waits, screenshots, dialogs, and network observation.
+- Added first-party normalized catalogs for Cosecha extensions: `cosecha/engine`, `cosecha/reporter`, and `cosecha/plugin`.
+- Added canonical `span-only` telemetry conventions for Cosecha engines, reporters, and plugins, including normalized knowledge/planning semantics for engines and lifecycle/output semantics for reporters and plugins.
 - Refined `database/mongodb` telemetry so `aggregation`, `search`, and `vector_search` use their own canonical signals instead of overloading the generic document-operation span, and added stage-specific required fields for search/vector telemetry.
 - Split execution catalogs into an abstract `execution/engine` family and a concrete `execution/plan-run` contract.
 - Kept the legacy `EXECUTION_ENGINE_*` symbols and `cxp.catalogs.interfaces.execution.engine` import path as compatibility aliases for the concrete `execution/plan-run` contract.

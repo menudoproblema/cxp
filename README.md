@@ -1,6 +1,6 @@
 # CXP: Capability Exchange Protocol
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12+-green)
 
 **CXP** is a semantic interoperability protocol for software components. It allows libraries, runtimes, and services to publish their capabilities and telemetry through a small shared contract.
@@ -27,7 +27,8 @@ pip install cxp
 ## What CXP Includes
 - A small handshake contract based on `ComponentIdentity`, `CapabilityMatrix`, and `HandshakeRequest`.
 - Sync and async provider protocols for capabilities, telemetry, and capability snapshots.
-- First-party catalogs for canonical interfaces such as `database/mongodb`, `transport/http`, `application/http`, `application/wsgi`, `application/asgi`, the abstract family `execution/engine`, and the concrete contract `execution/plan-run`.
+- First-party catalogs for canonical interfaces such as the abstract family `browser/automation`, the concrete contract `browser/playwright`, `database/mongodb`, `transport/http`, `application/http`, `application/wsgi`, `application/asgi`, the abstract family `execution/engine`, and the concrete contract `execution/plan-run`.
+- First-party catalogs for Cosecha extensions via `cosecha/engine`, `cosecha/reporter`, and `cosecha/plugin`.
 - A richer descriptor layer for component snapshots, typed operations, and declarative dependencies.
 
 Execution catalog naming note:
