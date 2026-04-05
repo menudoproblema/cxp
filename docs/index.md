@@ -20,6 +20,9 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 - [Catálogo de MongoDB](./catalogs/interfaces/database/mongodb.md)
 - [Catálogo de HTTP Transport](./catalogs/interfaces/transport/http.md)
 - [Catálogo de HTTP Application](./catalogs/interfaces/application/http.md)
+- [Catálogo de HTTP Application Framework](./catalogs/interfaces/application/http-framework.md)
+- [Catálogo de WSGI Application](./catalogs/interfaces/application/wsgi.md)
+- [Catálogo de ASGI Application](./catalogs/interfaces/application/asgi.md)
 - [Catálogo de Execution Engine](./catalogs/interfaces/execution/engine.md)
 
 ## Ejemplos

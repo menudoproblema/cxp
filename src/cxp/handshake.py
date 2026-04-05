@@ -5,6 +5,7 @@ from typing import Literal
 import msgspec
 
 from cxp.capabilities import CapabilityMatrix
+from cxp.catalogs.base import catalog_satisfies_interface, get_catalog
 from cxp.types import ComponentIdentity
 
 type HandshakeStatus = Literal["accepted", "degraded", "rejected"]
@@ -88,15 +89,25 @@ def negotiate_capabilities(
             protocol_version=response_protocol_version,
         )
 
-    if request.client_identity.interface != provider_identity.interface:
+    requested_interface = request.client_identity.interface
+    offered_interface = provider_identity.interface
+    requested_catalog = get_catalog(requested_interface)
+    offered_catalog = get_catalog(offered_interface)
+    interfaces_are_compatible = requested_interface == offered_interface or (
+        requested_catalog is not None
+        and offered_catalog is not None
+        and catalog_satisfies_interface(offered_interface, requested_interface)
+    )
+
+    if not interfaces_are_compatible:
         return HandshakeResponse(
             provider_identity=provider_identity,
             status="rejected",
             offered_capabilities=CapabilityMatrix(),
             reason=(
                 "Interface mismatch: client requested "
-                f"{request.client_identity.interface!r} but provider exposes "
-                f"{provider_identity.interface!r}"
+                f"{requested_interface!r} but provider exposes "
+                f"{offered_interface!r}"
             ),
             missing_required_capabilities=(),
             missing_optional_capabilities=(),

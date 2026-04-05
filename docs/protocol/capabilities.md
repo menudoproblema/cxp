@@ -62,6 +62,11 @@ El request también debe ser coherente: una misma capability no puede aparecer a
 
 Si un integrador necesita persistir o diagnosticar un estado más rico del componente, debe usar la superficie de snapshots de capacidades documentada en `protocol/descriptors.md`, no ampliar el handshake.
 
+Cuando ambos lados negocian interfaces pertenecientes a catálogos registrados,
+el handshake también puede aceptar interfaces concretas que satisfacen una
+familia abstracta. Por ejemplo, un provider `application/asgi` puede aceptar
+un request para `application/http`.
+
 ## Relación con los Catálogos
 El protocolo solo transporta capabilities. No define por sí mismo el significado de cada nombre de capability.
 

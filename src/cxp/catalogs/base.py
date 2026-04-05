@@ -182,9 +182,24 @@ class ConformanceTier(msgspec.Struct, frozen=True):
 
 class CapabilityCatalog(msgspec.Struct, frozen=True):
     interface: str
-    capabilities: tuple[CatalogCapability, ...]
+    capabilities: tuple[CatalogCapability, ...] = ()
     tiers: tuple[ConformanceTier, ...] = ()
     description: str | None = None
+    abstract: bool = False
+    satisfies_interfaces: tuple[str, ...] = ()
+
+    def _ensure_concrete(
+        self,
+        operation_name: str,
+    ) -> None:
+        if not self.abstract:
+            return
+
+        msg = (
+            f"Abstract catalog {self.interface!r} cannot perform "
+            f"{operation_name}"
+        )
+        raise ValueError(msg)
 
     def capability_names(self) -> tuple[str, ...]:
         return tuple(capability.name for capability in self.capabilities)
@@ -231,6 +246,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         self,
         matrix: CapabilityMatrix,
     ) -> tuple[str, ...]:
+        self._ensure_concrete("capability metadata validation")
         invalid_capabilities: list[str] = []
 
         for capability in matrix.capabilities:
@@ -247,6 +263,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         self,
         descriptors: Iterable[CapabilityDescriptor],
     ) -> DescriptorValidationResult:
+        self._ensure_concrete("descriptor validation")
         unknown_capabilities: list[str] = []
         unknown_operations: list[UnknownCapabilityOperations] = []
         invalid_metadata: list[str] = []
@@ -285,6 +302,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         self,
         snapshot: ComponentCapabilitySnapshot,
     ) -> DescriptorValidationResult:
+        self._ensure_concrete("component snapshot validation")
         validation = self.validate_capability_descriptors(snapshot.capabilities)
 
         if (
@@ -312,6 +330,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         snapshot: ComponentCapabilitySnapshot,
         profile: CapabilityProfile,
     ) -> CapabilityProfileValidationResult:
+        self._ensure_concrete("profile validation")
         if snapshot.identity is not None and snapshot.identity.interface != self.interface:
             return CapabilityProfileValidationResult(
                 interface_mismatch=snapshot.identity.interface,
@@ -391,6 +410,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         capability_names: Iterable[str],
         required_tier: CatalogTierName | None = None,
     ) -> CapabilityMatrixValidationResult:
+        self._ensure_concrete("capability set validation")
         offered = tuple(capability_names)
         unknown_capabilities = self.validate_capability_names(offered)
 
@@ -443,6 +463,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         self,
         capability_names: Iterable[str],
     ) -> tuple[str, ...]:
+        self._ensure_concrete("capability name validation")
         known_capabilities = frozenset(self.capability_names())
         return tuple(
             name for name in capability_names if name not in known_capabilities
@@ -452,6 +473,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         self,
         capability_names: Iterable[str],
     ) -> tuple[CatalogTierName, ...]:
+        self._ensure_concrete("tier satisfaction evaluation")
         offered = tuple(capability_names)
         return tuple(tier.name for tier in self.tiers if tier.is_satisfied_by(offered))
 
@@ -530,6 +552,7 @@ class CatalogRegistry:
                     msg = f"Catalog interface already registered: {catalog.interface!r}"
                     raise ValueError(msg)
 
+            self._validate_catalog_relations(catalog)
             self._catalogs[catalog.interface] = catalog
             return catalog
 
@@ -540,6 +563,51 @@ class CatalogRegistry:
     def interfaces(self) -> tuple[str, ...]:
         with self._lock:
             return tuple(sorted(self._catalogs))
+
+    def satisfies_interface(
+        self,
+        offered_interface: str,
+        required_interface: str,
+    ) -> bool:
+        with self._lock:
+            return _catalog_satisfies_interface(
+                offered_interface=offered_interface,
+                required_interface=required_interface,
+                catalogs=dict(self._catalogs),
+            )
+
+    def _validate_catalog_relations(
+        self,
+        catalog: CapabilityCatalog,
+    ) -> None:
+        candidate_catalogs = dict(self._catalogs)
+        candidate_catalogs[catalog.interface] = catalog
+
+        for satisfied_interface in catalog.satisfies_interfaces:
+            if satisfied_interface == catalog.interface:
+                msg = (
+                    "Catalog interface cannot satisfy itself: "
+                    f"{catalog.interface!r}"
+                )
+                raise ValueError(msg)
+
+            if satisfied_interface not in candidate_catalogs:
+                msg = (
+                    "Catalog references unknown satisfied interface: "
+                    f"{satisfied_interface!r}"
+                )
+                raise ValueError(msg)
+
+            if _catalog_satisfies_interface(
+                offered_interface=satisfied_interface,
+                required_interface=catalog.interface,
+                catalogs=candidate_catalogs,
+            ):
+                msg = (
+                    "Catalog interface hierarchy cannot contain cycles: "
+                    f"{catalog.interface!r} -> {satisfied_interface!r}"
+                )
+                raise ValueError(msg)
 
 
 DEFAULT_CATALOG_REGISTRY = CatalogRegistry()
@@ -555,3 +623,44 @@ def register_catalog(
 
 def get_catalog(interface: str) -> CapabilityCatalog | None:
     return DEFAULT_CATALOG_REGISTRY.get(interface)
+
+
+def _catalog_satisfies_interface(
+    *,
+    offered_interface: str,
+    required_interface: str,
+    catalogs: dict[str, CapabilityCatalog],
+    visited: set[str] | None = None,
+) -> bool:
+    if offered_interface == required_interface:
+        return True
+
+    catalog = catalogs.get(offered_interface)
+    if catalog is None:
+        return False
+
+    if visited is None:
+        visited = set()
+    if offered_interface in visited:
+        return False
+    visited.add(offered_interface)
+
+    return any(
+        _catalog_satisfies_interface(
+            offered_interface=satisfied_interface,
+            required_interface=required_interface,
+            catalogs=catalogs,
+            visited=visited,
+        )
+        for satisfied_interface in catalog.satisfies_interfaces
+    )
+
+
+def catalog_satisfies_interface(
+    offered_interface: str,
+    required_interface: str,
+) -> bool:
+    return DEFAULT_CATALOG_REGISTRY.satisfies_interface(
+        offered_interface=offered_interface,
+        required_interface=required_interface,
+    )

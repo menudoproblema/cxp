@@ -27,7 +27,7 @@ pip install cxp
 ## What CXP Includes
 - A small handshake contract based on `ComponentIdentity`, `CapabilityMatrix`, and `HandshakeRequest`.
 - Sync and async provider protocols for capabilities, telemetry, and capability snapshots.
-- First-party catalogs for canonical interfaces such as `database/mongodb`, `transport/http`, `application/http`, and `execution/engine`.
+- First-party catalogs for canonical interfaces such as `database/mongodb`, `transport/http`, `application/http`, `application/wsgi`, `application/asgi`, and `execution/engine`.
 - A richer descriptor layer for component snapshots, typed operations, and declarative dependencies.
 
 ## Quick Start

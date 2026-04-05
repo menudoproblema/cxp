@@ -18,69 +18,69 @@ EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY = "live_execution_observability"
 EXECUTION_ENGINE_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=EXECUTION_ENGINE_INTERFACE,
-        description="Catálogo canónico para engines de ejecución tipada.",
+        description="Canonical catalog for typed execution engines.",
         capabilities=(
             CatalogCapability(
                 name=EXECUTION_ENGINE_RUN,
-                description="Ejecución materializada con reporting.",
+                description="Materialized execution with reporting.",
                 operations=(
                     CatalogOperation(
                         name="run",
                         result_type="run.result",
-                        description="Ejecuta un plan o selección materializada.",
+                        description="Execute a plan or materialized selection.",
                     ),
                 ),
             ),
             CatalogCapability(
                 name=EXECUTION_ENGINE_PLANNING,
-                description="Planificación y explicación previas a la ejecución.",
+                description="Planning and explanation before execution.",
                 operations=(
                     CatalogOperation(
                         name="plan.analyze",
                         result_type="plan.analyzed",
-                        description="Analiza la intención ejecutable.",
+                        description="Analyze executable intent.",
                     ),
                     CatalogOperation(
                         name="plan.explain",
                         result_type="plan.explained",
-                        description="Explica decisiones de planificación.",
+                        description="Explain planning decisions.",
                     ),
                     CatalogOperation(
                         name="plan.simulate",
                         result_type="plan.simulated",
-                        description="Simula la ejecución sin materializarla.",
+                        description="Simulate execution without materializing it.",
                     ),
                 ),
             ),
             CatalogCapability(
                 name=EXECUTION_ENGINE_DRAFT_VALIDATION,
-                description="Validación de contenido en memoria o borrador.",
+                description="Validation of in-memory or draft content.",
                 operations=(
                     CatalogOperation(
                         name="draft.validate",
                         result_type="draft.validated",
-                        description="Valida contenido sin persistencia.",
+                        description="Validate content without persistence.",
                     ),
                 ),
             ),
             CatalogCapability(
                 name=EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY,
-                description="Seguimiento vivo de ejecución en curso.",
+                description="Live observability for in-progress execution.",
                 operations=(
                     CatalogOperation(
                         name="execution.subscribe",
                         result_type="execution.subscribe",
-                        description="Abre suscripción viva a la ejecución.",
+                        description="Open a live execution subscription.",
                     ),
                     CatalogOperation(
                         name="execution.live_status",
                         result_type="execution.live_status",
-                        description="Consulta el estado vivo agregado.",
+                        description="Read aggregate live status.",
                     ),
                     CatalogOperation(
                         name="execution.live_tail",
                         result_type="execution.live_tail",
-                        description="Recupera cola viva de eventos recientes.",
+                        description="Read a live tail of recent events.",
                     ),
                 ),
             ),
@@ -92,7 +92,7 @@ EXECUTION_ENGINE_CATALOG = register_catalog(
                     EXECUTION_ENGINE_RUN,
                     EXECUTION_ENGINE_PLANNING,
                 ),
-                description="Engine capaz de planificar y ejecutar.",
+                description="Engine capable of planning and execution.",
             ),
             ConformanceTier(
                 name="advanced",
@@ -102,7 +102,7 @@ EXECUTION_ENGINE_CATALOG = register_catalog(
                     EXECUTION_ENGINE_DRAFT_VALIDATION,
                     EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY,
                 ),
-                description="Engine con validación y observabilidad en vivo.",
+                description="Engine with validation and live observability.",
             ),
         ),
     )

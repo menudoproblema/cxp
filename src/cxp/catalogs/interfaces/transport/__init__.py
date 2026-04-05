@@ -21,7 +21,7 @@ HTTP_TRANSPORT_CORE_TIER = "core"
 HTTP_TRANSPORT_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=HTTP_TRANSPORT_INTERFACE,
-        description="Catálogo canónico para transporte HTTP.",
+        description="Canonical catalog for HTTP transport.",
         capabilities=(
             CatalogCapability(name=HTTP_TRANSPORT_HEADERS),
             CatalogCapability(name=HTTP_TRANSPORT_COOKIES),
@@ -37,7 +37,7 @@ HTTP_TRANSPORT_CATALOG = register_catalog(
                     HTTP_TRANSPORT_HEADERS,
                     HTTP_TRANSPORT_NETWORK_TRANSPORT,
                 ),
-                description="Transporte HTTP básico interoperable.",
+                description="Basic interoperable HTTP transport.",
             ),
         ),
     )

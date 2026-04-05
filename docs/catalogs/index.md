@@ -28,6 +28,9 @@ La capa genérica de catálogos expone:
 - `ConformanceTier`
 - `CatalogRegistry`
 
+Además, un catálogo puede declararse como abstracto y expresar compatibilidad
+con otras interfaces mediante `satisfies_interfaces`.
+
 Los catálogos concretos de dominio se construyen sobre esa capa genérica y viven en código bajo `src/cxp/catalogs/interfaces/`.
 Los catálogos first-party se registran automáticamente en `DEFAULT_CATALOG_REGISTRY` al importar el paquete, y el registro ya no sobrescribe interfaces distintas de forma silenciosa: una duplicada conflictiva lanza error salvo que se use reemplazo explícito.
 La idempotencia del registro se apoya en la igualdad estructural de `msgspec.Struct`, incluyendo la identidad real de tipos usados como `metadata_schema`.
@@ -37,6 +40,9 @@ Catálogos first-party actuales:
 - [`database/mongodb`](./interfaces/database/mongodb.md)
 - [`transport/http`](./interfaces/transport/http.md)
 - [`application/http`](./interfaces/application/http.md)
+- [`application/http-framework`](./interfaces/application/http-framework.md)
+- [`application/wsgi`](./interfaces/application/wsgi.md)
+- [`application/asgi`](./interfaces/application/asgi.md)
 - [`execution/engine`](./interfaces/execution/engine.md)
 
 ## Capabilities y Operaciones
@@ -54,6 +60,9 @@ La misma autoridad semántica del catálogo puede reutilizarse sobre la capa ric
 - `is_component_snapshot_compliant(...)`
 
 Eso permite validar snapshots completos de componente sin convertir el catálogo en parte del handshake.
+
+Los catálogos abstractos existen para compatibilidad de familia y no deben
+usarse como objetivo de validación de capabilities.
 
 ## Metadata Tipada
 Una `CatalogCapability` también puede declarar un `metadata_schema`. Ese esquema actúa como contrato esperado para la metadata publicada por el provider en la `CapabilityMatrix`.
