@@ -59,6 +59,10 @@ captura visual y gestión de dialogs.
 - `screenshot_capture`: `page.screenshot`, `element.screenshot`
 - `dialog_handling`: `dialog.accept`, `dialog.dismiss`
 
+## Perfiles Reutilizables
+- `playwright-core`: exige ciclo de vida, contextos, navegación, locators, interacción DOM y waits.
+- `playwright-observable`: extiende `playwright-core` y exige además evaluación de script, observación de red, screenshots y dialogs.
+
 ## Telemetría Canónica
 La telemetría de `browser/playwright` se declara por capability y se concentra
 en las señales mínimas con valor interoperable para un orquestador:
@@ -106,3 +110,10 @@ La intención es fijar un vocabulario estable y pequeño para:
 
 Los detalles específicos del provider deben seguir viviendo en metadata
 propietaria o en señales adicionales fuera del vocabulario canónico.
+
+## Flujo de Consumo Recomendado
+Un consumidor de `browser/playwright` suele:
+
+1. elegir `playwright-core` cuando solo necesita automatización interactiva básica;
+2. elegir `playwright-observable` cuando además necesita inspección de red, capturas o evaluación de script;
+3. validar snapshots y telemetría solo contra el perfil realmente necesario.

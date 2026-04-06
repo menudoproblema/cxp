@@ -29,7 +29,9 @@ from cxp import (
     MONGODB_CATALOG,
     MONGODB_CORE_PROFILE,
     MONGODB_PLATFORM_PROFILE,
+    MONGODB_TEXT_SEARCH_PROFILE,
     MONGODB_SEARCH_PROFILE,
+    PLAN_RUN_EXECUTION_ADVANCED_PROFILE,
     Capability,
     CapabilityCatalog,
     CapabilityMatrix,
@@ -42,6 +44,10 @@ from cxp import (
     ComponentCapabilitySnapshot,
     CapabilityDescriptor,
     get_catalog,
+    PLAYWRIGHT_BROWSER_CORE_PROFILE,
+    PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE,
+    PLAN_RUN_EXECUTION_CORE_PROFILE,
+    PLAN_RUN_EXECUTION_PLANNED_PROFILE,
 )
 from cxp.catalogs.base import _metadata_key_set
 
@@ -212,6 +218,10 @@ def test_mongodb_profiles_validate_snapshot_requirements() -> None:
     assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
         snapshot,
         MONGODB_CORE_PROFILE,
+    )
+    assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        MONGODB_TEXT_SEARCH_PROFILE,
     )
     assert MONGODB_CATALOG.is_component_snapshot_profile_compliant(
         snapshot,
@@ -479,6 +489,243 @@ def test_mongodb_search_profile_supports_consumer_style_snapshot_validation() ->
     assert validation.is_valid() is True
     assert validation.missing_capabilities == ()
     assert validation.invalid_metadata == ()
+
+
+def test_mongodb_text_search_profile_does_not_require_vector_search() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="provider",
+        capabilities=(
+            CapabilityDescriptor(
+                name="read",
+                level="supported",
+                operations=tuple(
+                    CapabilityOperationBinding(name)
+                    for name in (
+                        "find",
+                        "find_one",
+                        "count_documents",
+                        "estimated_document_count",
+                        "distinct",
+                    )
+                ),
+            ),
+            CapabilityDescriptor(
+                name="write",
+                level="supported",
+                operations=tuple(
+                    CapabilityOperationBinding(name)
+                    for name in (
+                        "insert_one",
+                        "insert_many",
+                        "update_one",
+                        "update_many",
+                        "replace_one",
+                        "delete_one",
+                        "delete_many",
+                        "bulk_write",
+                    )
+                ),
+            ),
+            CapabilityDescriptor(
+                name="aggregation",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata=MongoAggregationMetadata(
+                    supportedStages=("$match", "$search"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="search",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata=MongoSearchMetadata(operators=("text", "phrase")),
+            ),
+        ),
+    )
+
+    text_search_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_TEXT_SEARCH_PROFILE,
+    )
+    search_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_SEARCH_PROFILE,
+    )
+
+    assert text_search_validation.is_valid() is True
+    assert search_validation.missing_capabilities == ("vector_search",)
+
+
+def test_plan_run_profiles_validate_progressive_execution_snapshots() -> None:
+    core_snapshot = ComponentCapabilitySnapshot(
+        component_name="engine",
+        capabilities=(
+            CapabilityDescriptor(
+                name="run",
+                level="supported",
+                operations=(CapabilityOperationBinding("run"),),
+            ),
+        ),
+    )
+    planned_snapshot = ComponentCapabilitySnapshot(
+        component_name="engine",
+        capabilities=core_snapshot.capabilities
+        + (
+            CapabilityDescriptor(
+                name="planning",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("plan.analyze"),
+                    CapabilityOperationBinding("plan.explain"),
+                    CapabilityOperationBinding("plan.simulate"),
+                ),
+            ),
+        ),
+    )
+    advanced_snapshot = ComponentCapabilitySnapshot(
+        component_name="engine",
+        capabilities=planned_snapshot.capabilities
+        + (
+            CapabilityDescriptor(
+                name="input_validation",
+                level="supported",
+                operations=(CapabilityOperationBinding("input.validate"),),
+            ),
+            CapabilityDescriptor(
+                name="execution_status",
+                level="supported",
+                operations=(CapabilityOperationBinding("execution.status"),),
+            ),
+            CapabilityDescriptor(
+                name="execution_stream",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("execution.subscribe"),
+                    CapabilityOperationBinding("execution.tail"),
+                ),
+            ),
+        ),
+    )
+
+    assert PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_profile_compliant(
+        core_snapshot,
+        PLAN_RUN_EXECUTION_CORE_PROFILE,
+    )
+    assert PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_profile_compliant(
+        planned_snapshot,
+        PLAN_RUN_EXECUTION_PLANNED_PROFILE,
+    )
+    assert PLAN_RUN_EXECUTION_CATALOG.is_component_snapshot_profile_compliant(
+        advanced_snapshot,
+        PLAN_RUN_EXECUTION_ADVANCED_PROFILE,
+    )
+
+
+def test_playwright_profiles_validate_core_and_observable_snapshots() -> None:
+    core_snapshot = ComponentCapabilitySnapshot(
+        component_name="browser",
+        capabilities=(
+            CapabilityDescriptor(
+                name="browser_lifecycle",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("browser.launch"),
+                    CapabilityOperationBinding("browser.close"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="context_management",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("context.create"),
+                    CapabilityOperationBinding("context.close"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="page_navigation",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("page.goto"),
+                    CapabilityOperationBinding("page.reload"),
+                    CapabilityOperationBinding("page.go_back"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="locator_resolution",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("locator.query"),
+                    CapabilityOperationBinding("locator.filter"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="dom_interaction",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("element.click"),
+                    CapabilityOperationBinding("element.fill"),
+                    CapabilityOperationBinding("element.press"),
+                    CapabilityOperationBinding("element.select_option"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="wait_conditions",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("wait.for_selector"),
+                    CapabilityOperationBinding("wait.for_url"),
+                    CapabilityOperationBinding("wait.for_response"),
+                ),
+            ),
+        ),
+    )
+    observable_snapshot = ComponentCapabilitySnapshot(
+        component_name="browser",
+        capabilities=core_snapshot.capabilities
+        + (
+            CapabilityDescriptor(
+                name="script_evaluation",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("page.evaluate"),
+                    CapabilityOperationBinding("element.evaluate"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="network_observation",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("network.request.observe"),
+                    CapabilityOperationBinding("network.response.observe"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="screenshot_capture",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("page.screenshot"),
+                    CapabilityOperationBinding("element.screenshot"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="dialog_handling",
+                level="supported",
+                operations=(
+                    CapabilityOperationBinding("dialog.accept"),
+                    CapabilityOperationBinding("dialog.dismiss"),
+                ),
+            ),
+        ),
+    )
+
+    assert get_catalog("browser/playwright").is_component_snapshot_profile_compliant(
+        core_snapshot,
+        PLAYWRIGHT_BROWSER_CORE_PROFILE,
+    )
+    assert get_catalog("browser/playwright").is_component_snapshot_profile_compliant(
+        observable_snapshot,
+        PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE,
+    )
 
 
 def test_metadata_key_set_supports_mappings_structs_and_fallback_values() -> None:

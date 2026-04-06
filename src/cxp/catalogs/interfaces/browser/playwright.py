@@ -3,6 +3,8 @@ from __future__ import annotations
 from cxp.catalogs.base import (
     CapabilityCatalog,
     CapabilityTelemetry,
+    CapabilityProfile,
+    CapabilityRequirement,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
@@ -54,6 +56,8 @@ PLAYWRIGHT_BROWSER_DIALOG_DISMISS = "dialog.dismiss"
 
 PLAYWRIGHT_BROWSER_CORE_TIER = "core"
 PLAYWRIGHT_BROWSER_OBSERVABLE_TIER = "observable"
+PLAYWRIGHT_BROWSER_CORE_PROFILE_NAME = "playwright-core"
+PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE_NAME = "playwright-observable"
 
 _BROWSER_ENGINE_FIELD = TelemetryFieldRequirement(name="browser.engine")
 _BROWSER_HEADLESS_FIELD = TelemetryFieldRequirement(name="browser.headless")
@@ -763,8 +767,107 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
     )
 )
 
+PLAYWRIGHT_BROWSER_CORE_PROFILE = CapabilityProfile(
+    name=PLAYWRIGHT_BROWSER_CORE_PROFILE_NAME,
+    interface=PLAYWRIGHT_BROWSER_INTERFACE,
+    description=(
+        "Reusable profile for browser automation with session control, "
+        "navigation, locator resolution, DOM interaction, and waits."
+    ),
+    requirements=(
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_LIFECYCLE,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_LAUNCH,
+                PLAYWRIGHT_BROWSER_CLOSE,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_CONTEXT_MANAGEMENT,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_CONTEXT_CREATE,
+                PLAYWRIGHT_BROWSER_CONTEXT_CLOSE,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_PAGE_NAVIGATION,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_PAGE_GOTO,
+                PLAYWRIGHT_BROWSER_PAGE_RELOAD,
+                PLAYWRIGHT_BROWSER_PAGE_GO_BACK,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_LOCATOR_RESOLUTION,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_LOCATOR_QUERY,
+                PLAYWRIGHT_BROWSER_LOCATOR_FILTER,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_DOM_INTERACTION,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_ELEMENT_CLICK,
+                PLAYWRIGHT_BROWSER_ELEMENT_FILL,
+                PLAYWRIGHT_BROWSER_ELEMENT_PRESS,
+                PLAYWRIGHT_BROWSER_ELEMENT_SELECT_OPTION,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_WAIT_CONDITIONS,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_WAIT_FOR_SELECTOR,
+                PLAYWRIGHT_BROWSER_WAIT_FOR_URL,
+                PLAYWRIGHT_BROWSER_WAIT_FOR_RESPONSE,
+            ),
+        ),
+    ),
+)
+
+PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE = CapabilityProfile(
+    name=PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE_NAME,
+    interface=PLAYWRIGHT_BROWSER_INTERFACE,
+    description=(
+        "Reusable profile for fully observable Playwright-style automation "
+        "with script evaluation, network observation, screenshots, and dialogs."
+    ),
+    requirements=(
+        *PLAYWRIGHT_BROWSER_CORE_PROFILE.requirements,
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_SCRIPT_EVALUATION,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_PAGE_EVALUATE,
+                PLAYWRIGHT_BROWSER_ELEMENT_EVALUATE,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_NETWORK_OBSERVATION,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_NETWORK_REQUEST_OBSERVE,
+                PLAYWRIGHT_BROWSER_NETWORK_RESPONSE_OBSERVE,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_SCREENSHOT_CAPTURE,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_PAGE_SCREENSHOT,
+                PLAYWRIGHT_BROWSER_ELEMENT_SCREENSHOT,
+            ),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAYWRIGHT_BROWSER_DIALOG_HANDLING,
+            required_operations=(
+                PLAYWRIGHT_BROWSER_DIALOG_ACCEPT,
+                PLAYWRIGHT_BROWSER_DIALOG_DISMISS,
+            ),
+        ),
+    ),
+)
+
 __all__ = (
     "PLAYWRIGHT_BROWSER_CATALOG",
+    "PLAYWRIGHT_BROWSER_CORE_PROFILE",
+    "PLAYWRIGHT_BROWSER_CORE_PROFILE_NAME",
     "PLAYWRIGHT_BROWSER_INTERFACE",
     "PLAYWRIGHT_BROWSER_LIFECYCLE",
     "PLAYWRIGHT_BROWSER_CONTEXT_MANAGEMENT",
@@ -801,5 +904,7 @@ __all__ = (
     "PLAYWRIGHT_BROWSER_DIALOG_ACCEPT",
     "PLAYWRIGHT_BROWSER_DIALOG_DISMISS",
     "PLAYWRIGHT_BROWSER_CORE_TIER",
+    "PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE",
+    "PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE_NAME",
     "PLAYWRIGHT_BROWSER_OBSERVABLE_TIER",
 )

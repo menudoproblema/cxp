@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added reusable profiles for `execution/plan-run` and `browser/playwright`, plus consumer-oriented documentation for picking and validating them.
+- Added `mongodb-text-search` as a reusable `database/mongodb` profile for textual `$search` without requiring `vector_search`.
 - Added a runnable `database/mongodb` consumer example that validates search-capable snapshots and canonical `db.client.search*` telemetry.
 - Re-exported the canonical MongoDB metadata schema types through `cxp.catalogs.interfaces.database`, `cxp.catalogs`, and the root `cxp` API.
 - Made profile validation accept typed metadata structs as well as mapping-shaped metadata.

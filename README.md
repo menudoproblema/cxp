@@ -36,6 +36,11 @@ Execution catalog naming note:
 - `execution/plan-run` is the concrete first-party contract for plan-and-run engines.
 - Legacy `EXECUTION_ENGINE_*` exports and `cxp.catalogs.interfaces.execution.engine` still point to the concrete `execution/plan-run` contract for compatibility.
 
+Reusable profiles note:
+- first-party catalogs can publish stable `CapabilityProfile` constants for common consumer needs;
+- `database/mongodb` now distinguishes `mongodb-text-search` from `mongodb-search` so tooling can require textual `$search` without forcing `vector_search`;
+- `browser/playwright` and `execution/plan-run` also publish reusable profiles instead of relying only on tiers.
+
 ## Quick Start
 ```python
 from cxp import (

@@ -3,6 +3,8 @@ from __future__ import annotations
 from cxp.catalogs.base import (
     CapabilityTelemetry,
     CapabilityCatalog,
+    CapabilityProfile,
+    CapabilityRequirement,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
@@ -20,6 +22,10 @@ PLAN_RUN_EXECUTION_PLANNING = "planning"
 PLAN_RUN_EXECUTION_INPUT_VALIDATION = "input_validation"
 PLAN_RUN_EXECUTION_EXECUTION_STATUS = "execution_status"
 PLAN_RUN_EXECUTION_EXECUTION_STREAM = "execution_stream"
+
+PLAN_RUN_EXECUTION_CORE_PROFILE_NAME = "plan-run-core"
+PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME = "plan-run-planned"
+PLAN_RUN_EXECUTION_ADVANCED_PROFILE_NAME = "plan-run-advanced"
 
 PLAN_RUN_EXECUTION_CATALOG = register_catalog(
     CapabilityCatalog(
@@ -277,12 +283,67 @@ PLAN_RUN_EXECUTION_CATALOG = register_catalog(
     )
 )
 
+PLAN_RUN_EXECUTION_CORE_PROFILE = CapabilityProfile(
+    name=PLAN_RUN_EXECUTION_CORE_PROFILE_NAME,
+    interface=PLAN_RUN_EXECUTION_INTERFACE,
+    description="Reusable profile for engines that can execute materialized runs.",
+    requirements=(
+        CapabilityRequirement(
+            capability_name=PLAN_RUN_EXECUTION_RUN,
+            required_operations=("run",),
+        ),
+    ),
+)
+
+PLAN_RUN_EXECUTION_PLANNED_PROFILE = CapabilityProfile(
+    name=PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME,
+    interface=PLAN_RUN_EXECUTION_INTERFACE,
+    description="Reusable profile for engines that can plan before executing.",
+    requirements=(
+        *PLAN_RUN_EXECUTION_CORE_PROFILE.requirements,
+        CapabilityRequirement(
+            capability_name=PLAN_RUN_EXECUTION_PLANNING,
+            required_operations=("plan.analyze", "plan.explain", "plan.simulate"),
+        ),
+    ),
+)
+
+PLAN_RUN_EXECUTION_ADVANCED_PROFILE = CapabilityProfile(
+    name=PLAN_RUN_EXECUTION_ADVANCED_PROFILE_NAME,
+    interface=PLAN_RUN_EXECUTION_INTERFACE,
+    description=(
+        "Reusable profile for engines with validation, status inspection, and "
+        "execution streaming."
+    ),
+    requirements=(
+        *PLAN_RUN_EXECUTION_PLANNED_PROFILE.requirements,
+        CapabilityRequirement(
+            capability_name=PLAN_RUN_EXECUTION_INPUT_VALIDATION,
+            required_operations=("input.validate",),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAN_RUN_EXECUTION_EXECUTION_STATUS,
+            required_operations=("execution.status",),
+        ),
+        CapabilityRequirement(
+            capability_name=PLAN_RUN_EXECUTION_EXECUTION_STREAM,
+            required_operations=("execution.subscribe", "execution.tail"),
+        ),
+    ),
+)
+
 __all__ = (
+    "PLAN_RUN_EXECUTION_ADVANCED_PROFILE",
+    "PLAN_RUN_EXECUTION_ADVANCED_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_CATALOG",
+    "PLAN_RUN_EXECUTION_CORE_PROFILE",
+    "PLAN_RUN_EXECUTION_CORE_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_EXECUTION_STATUS",
     "PLAN_RUN_EXECUTION_EXECUTION_STREAM",
     "PLAN_RUN_EXECUTION_INPUT_VALIDATION",
     "PLAN_RUN_EXECUTION_INTERFACE",
+    "PLAN_RUN_EXECUTION_PLANNED_PROFILE",
+    "PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_PLANNING",
     "PLAN_RUN_EXECUTION_RUN",
 )

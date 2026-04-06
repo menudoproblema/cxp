@@ -63,6 +63,23 @@ Los símbolos nuevos y explícitos para este catálogo son `PLAN_RUN_EXECUTION_*
 - `execution_status`
 - `execution_stream`
 
+## Perfiles Reutilizables
+- `plan-run-core`: exige `run`.
+- `plan-run-planned`: extiende `plan-run-core` y exige `planning`.
+- `plan-run-advanced`: extiende `plan-run-planned` y exige `input_validation`, `execution_status` y `execution_stream`.
+
+## Flujo de Consumo Recomendado
+Un consumidor de `execution/plan-run` suele trabajar en dos pasos:
+
+1. elegir un perfil reutilizable que refleje el minimo operativo que necesita;
+2. validar un `ComponentCapabilitySnapshot` contra ese perfil antes de asumir operaciones concretas.
+
+En la practica:
+
+- `plan-run-core` sirve para engines que solo necesitan ejecutar;
+- `plan-run-planned` sirve para tooling que necesita explicar o simular antes de correr;
+- `plan-run-advanced` sirve para orquestadores que esperan validacion previa, inspeccion de estado y streaming de ejecucion.
+
 ## Procedencia
 Este catálogo toma como referencia semánticas comunes de engines con ejecución
 materializada, planificación tipada, validación previa y seguimiento de la

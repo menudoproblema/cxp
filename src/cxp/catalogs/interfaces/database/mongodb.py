@@ -89,6 +89,7 @@ MONGODB_SEARCH_TIER = 'search'
 MONGODB_PLATFORM_TIER = 'platform'
 
 MONGODB_CORE_PROFILE_NAME = 'mongodb-core'
+MONGODB_TEXT_SEARCH_PROFILE_NAME = 'mongodb-text-search'
 MONGODB_SEARCH_PROFILE_NAME = 'mongodb-search'
 MONGODB_PLATFORM_PROFILE_NAME = 'mongodb-platform'
 MONGODB_AGGREGATE_RICH_PROFILE_NAME = 'mongodb-aggregate-rich'
@@ -534,6 +535,23 @@ MONGODB_CORE_PROFILE = CapabilityProfile(
     ),
 )
 
+MONGODB_TEXT_SEARCH_PROFILE = CapabilityProfile(
+    name=MONGODB_TEXT_SEARCH_PROFILE_NAME,
+    interface=MONGODB_INTERFACE,
+    description=(
+        'Reusable profile for tests and resources that need textual $search '
+        'without requiring vector search.'
+    ),
+    requirements=(
+        *MONGODB_CORE_PROFILE.requirements,
+        CapabilityRequirement(
+            capability_name=MONGODB_SEARCH,
+            required_operations=(MONGODB_AGGREGATE,),
+            required_metadata_keys=('operators', 'aggregateStage'),
+        ),
+    ),
+)
+
 MONGODB_SEARCH_PROFILE = CapabilityProfile(
     name=MONGODB_SEARCH_PROFILE_NAME,
     interface=MONGODB_INTERFACE,
@@ -640,6 +658,8 @@ __all__ = (
     'MONGODB_READ',
     'MONGODB_REPLACE_ONE',
     'MONGODB_SEARCH',
+    'MONGODB_TEXT_SEARCH_PROFILE',
+    'MONGODB_TEXT_SEARCH_PROFILE_NAME',
     'MONGODB_SEARCH_PROFILE',
     'MONGODB_SEARCH_PROFILE_NAME',
     'MONGODB_SEARCH_TIER',
