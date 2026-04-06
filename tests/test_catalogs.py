@@ -4,6 +4,12 @@ from pytest import raises
 from cxp import (
     EXECUTION_ENGINE_CATALOG,
     EXECUTION_ENGINE_FAMILY_CATALOG,
+    MongoAggregationMetadata,
+    MongoCollationMetadata,
+    MongoPersistenceMetadata,
+    MongoSearchMetadata,
+    MongoTopologyDiscoveryMetadata,
+    MongoVectorSearchMetadata,
     MONGODB_AGGREGATE,
     MONGODB_COUNT_DOCUMENTS,
     MONGODB_DELETE_MANY,
@@ -37,6 +43,7 @@ from cxp import (
     CapabilityDescriptor,
     get_catalog,
 )
+from cxp.catalogs.base import _metadata_key_set
 
 
 def test_default_registry_exposes_mongodb_catalog():
@@ -395,6 +402,91 @@ def test_public_api_reexports_complete_mongodb_contract() -> None:
     assert MONGODB_START_SESSION == "start_session"
     assert MONGODB_UPDATE_MANY == "update_many"
     assert MONGODB_UPDATE_ONE == "update_one"
+    assert MongoAggregationMetadata(supportedStages=("$match",)).supportedStages == (
+        "$match",
+    )
+    assert MongoSearchMetadata(operators=("text",)).aggregateStage == "$search"
+    assert MongoVectorSearchMetadata(similarities=("cosine",)).aggregateStage == "$vectorSearch"
+    assert MongoCollationMetadata().backend == {}
+    assert MongoPersistenceMetadata(persistent=True, storageEngine="sqlite").storageEngine == "sqlite"
+    assert MongoTopologyDiscoveryMetadata(topologyType="single", serverCount=1).serverCount == 1
+
+
+def test_mongodb_search_profile_supports_consumer_style_snapshot_validation() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="provider",
+        capabilities=(
+            CapabilityDescriptor(
+                name="read",
+                level="supported",
+                operations=tuple(
+                    CapabilityOperationBinding(name)
+                    for name in (
+                        "find",
+                        "find_one",
+                        "count_documents",
+                        "estimated_document_count",
+                        "distinct",
+                    )
+                ),
+            ),
+            CapabilityDescriptor(
+                name="write",
+                level="supported",
+                operations=tuple(
+                    CapabilityOperationBinding(name)
+                    for name in (
+                        "insert_one",
+                        "insert_many",
+                        "update_one",
+                        "update_many",
+                        "replace_one",
+                        "delete_one",
+                        "delete_many",
+                        "bulk_write",
+                    )
+                ),
+            ),
+            CapabilityDescriptor(
+                name="aggregation",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata=MongoAggregationMetadata(
+                    supportedStages=("$match", "$search", "$vectorSearch"),
+                    supportedExpressionOperators=("$eq",),
+                ),
+            ),
+            CapabilityDescriptor(
+                name="search",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata=MongoSearchMetadata(operators=("text", "compound")),
+            ),
+            CapabilityDescriptor(
+                name="vector_search",
+                level="supported",
+                operations=(CapabilityOperationBinding("aggregate"),),
+                metadata=MongoVectorSearchMetadata(similarities=("cosine",)),
+            ),
+        ),
+    )
+
+    validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_SEARCH_PROFILE,
+    )
+
+    assert validation.is_valid() is True
+    assert validation.missing_capabilities == ()
+    assert validation.invalid_metadata == ()
+
+
+def test_metadata_key_set_supports_mappings_structs_and_fallback_values() -> None:
+    assert _metadata_key_set({"supportedStages": []}) == frozenset({"supportedStages"})
+    assert _metadata_key_set(MongoSearchMetadata(operators=("text",))) == frozenset(
+        {"operators", "aggregateStage"}
+    )
+    assert _metadata_key_set(1) == frozenset()
 
 
 def test_default_registry_exposes_transport_and_application_catalogs():

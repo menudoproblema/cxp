@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from threading import RLock
 
 import msgspec
@@ -597,7 +597,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
                     )
                 )
 
-            descriptor_metadata = descriptor.metadata
+            descriptor_metadata = _metadata_key_set(descriptor.metadata)
             for metadata_key in requirement.required_metadata_keys:
                 if metadata_key not in descriptor_metadata:
                     missing_metadata_keys.append(
@@ -1172,3 +1172,12 @@ def _merge_field_requirements(
         if existing.description is None and field.description is not None:
             merged[field.name] = field
     return tuple(merged[name] for name in sorted(merged))
+
+
+def _metadata_key_set(metadata: object) -> frozenset[str]:
+    if isinstance(metadata, Mapping):
+        return frozenset(str(key) for key in metadata)
+    struct_fields = getattr(type(metadata), "__struct_fields__", None)
+    if struct_fields is not None:
+        return frozenset(str(field_name) for field_name in struct_fields)
+    return frozenset()

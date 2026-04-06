@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Nothing yet.
+- Added a runnable `database/mongodb` consumer example that validates search-capable snapshots and canonical `db.client.search*` telemetry.
+- Re-exported the canonical MongoDB metadata schema types through `cxp.catalogs.interfaces.database`, `cxp.catalogs`, and the root `cxp` API.
+- Made profile validation accept typed metadata structs as well as mapping-shaped metadata.
 
 ## 2.0.0 - 2026-04-06
 

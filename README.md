@@ -298,6 +298,7 @@ The repository includes runnable examples:
 - [`examples/sync_provider.py`](examples/sync_provider.py)
 - [`examples/async_provider.py`](examples/async_provider.py)
 - [`examples/async_telemetry_stream.py`](examples/async_telemetry_stream.py)
+- [`examples/mongodb_profiles.py`](examples/mongodb_profiles.py)
 - [`examples/component_descriptors.py`](examples/component_descriptors.py)
 
 You can run them directly from the repository root:
@@ -306,6 +307,7 @@ You can run them directly from the repository root:
 python examples/sync_provider.py
 python examples/async_provider.py
 python examples/async_telemetry_stream.py
+python examples/mongodb_profiles.py
 python examples/component_descriptors.py
 ```
 

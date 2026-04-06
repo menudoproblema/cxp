@@ -798,6 +798,57 @@ def test_mongodb_catalog_requires_stage_specific_search_metadata() -> None:
     )
 
 
+def test_mongodb_catalog_validates_consumer_style_search_snapshot() -> None:
+    snapshot = TelemetrySnapshot(
+        provider_id="example-mongodb",
+        spans=(
+            TelemetrySpan(
+                trace_id="trace-search",
+                span_id="span-search",
+                parent_span_id=None,
+                name="db.client.search",
+                start_time=1.0,
+                end_time=1.3,
+                attributes={
+                    "db.system.name": "mongodb",
+                    "db.operation.name": "aggregate",
+                    "db.namespace.name": "docs.articles",
+                    "db.pipeline.stage.name": "$search",
+                    "db.search.operator": "compound",
+                },
+            ),
+        ),
+        metrics=(
+            TelemetryMetric(
+                name="db.client.search.duration",
+                value=0.3,
+                unit="s",
+                labels={
+                    "db.system.name": "mongodb",
+                    "db.operation.name": "aggregate",
+                    "db.operation.outcome": "success",
+                    "db.pipeline.stage.name": "$search",
+                },
+            ),
+        ),
+        events=(
+            TelemetryEvent(
+                event_type="db.client.search.completed",
+                payload={
+                    "db.system.name": "mongodb",
+                    "db.operation.name": "aggregate",
+                    "db.namespace.name": "docs.articles",
+                    "db.operation.outcome": "success",
+                    "db.pipeline.stage.name": "$search",
+                    "db.search.operator": "compound",
+                },
+            ),
+        ),
+    )
+
+    assert MONGODB_CATALOG.is_telemetry_snapshot_compliant(snapshot, ("search",))
+
+
 def test_catalog_registry_rejects_conflicting_shared_metric_definitions() -> None:
     registry = CatalogRegistry()
 

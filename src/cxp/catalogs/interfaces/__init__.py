@@ -170,6 +170,12 @@ from cxp.catalogs.interfaces.cosecha import (
     COSECHA_REPORTER_START,
 )
 from cxp.catalogs.interfaces.database import (
+    MongoAggregationMetadata,
+    MongoCollationMetadata,
+    MongoPersistenceMetadata,
+    MongoSearchMetadata,
+    MongoTopologyDiscoveryMetadata,
+    MongoVectorSearchMetadata,
     MONGODB_AGGREGATE,
     MONGODB_AGGREGATE_RICH_PROFILE,
     MONGODB_AGGREGATE_RICH_PROFILE_NAME,
@@ -244,6 +250,12 @@ from cxp.catalogs.interfaces.transport import (
 )
 
 __all__ = (
+    "MongoAggregationMetadata",
+    "MongoCollationMetadata",
+    "MongoPersistenceMetadata",
+    "MongoSearchMetadata",
+    "MongoTopologyDiscoveryMetadata",
+    "MongoVectorSearchMetadata",
     "COSECHA_ENGINE_CATALOG",
     "COSECHA_ENGINE_COLLECT",
     "COSECHA_ENGINE_DEFINITION_KNOWLEDGE",

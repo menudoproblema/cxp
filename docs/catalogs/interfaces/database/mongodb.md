@@ -96,6 +96,35 @@ Y las capabilities especializadas exigen campos extra:
 - `mongodb-platform`: extiende `mongodb-core` y exige `transactions`, `change_streams`, `collation`, `persistence` y `topology_discovery`.
 - `mongodb-aggregate-rich`: perfil puntual para tests que necesitan metadata rica de agregacion.
 
+## Flujo De Consumo Recomendado
+Un consumidor normal de `database/mongodb` suele hacer tres pasos:
+
+1. elegir un perfil reutilizable como `mongodb-core`, `mongodb-search` o `mongodb-platform`;
+2. validar un `ComponentCapabilitySnapshot` contra ese perfil para saber si el provider sirve para el caso;
+3. validar la telemetria emitida contra las capabilities que realmente quiere observar.
+
+En la practica, esto permite responder preguntas como:
+
+- "¿puedo ejecutar tests de search sobre este provider?"
+- "¿publica `aggregate` y metadata suficiente para ese subset?"
+- "¿la telemetria emitida usa de verdad las señales `db.client.search*`?"
+
+El ejemplo [examples/mongodb_profiles.py](../../../examples/mongodb_profiles.py) muestra exactamente ese flujo:
+
+- construye un snapshot MongoDB realista;
+- lo valida contra `mongodb-search`;
+- valida una `TelemetrySnapshot` con señales `db.client.search*`.
+
+## Metadata Schemas Canonicos
+Cuando un consumidor quiera construir metadata tipada en vez de diccionarios sin forma, el catalogo tambien publica estos schemas:
+
+- `MongoAggregationMetadata`
+- `MongoSearchMetadata`
+- `MongoVectorSearchMetadata`
+- `MongoCollationMetadata`
+- `MongoPersistenceMetadata`
+- `MongoTopologyDiscoveryMetadata`
+
 ## Regla de Nombres
 Los providers deben usar estos nombres exactos cuando quieran una negociacion interoperable a traves de `database/mongodb`.
 
