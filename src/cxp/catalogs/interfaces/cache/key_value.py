@@ -46,7 +46,9 @@ _CACHE_TELEMETRY = CapabilityTelemetry(
 CACHE_KV_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=CACHE_KV_INTERFACE,
-        description="Canonical catalog for key-value cache providers (Redis, Memcached).",
+        description=(
+            "Canonical catalog for key-value cache providers (Redis, Memcached)."
+        ),
         capabilities=(
             CatalogCapability(
                 name=CACHE_KV_READ_WRITE,

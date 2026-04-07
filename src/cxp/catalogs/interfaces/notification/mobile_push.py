@@ -67,7 +67,9 @@ MOBILE_PUSH_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=PUSH_TOPIC_MANAGEMENT,
-                description="Ability to subscribe/unsubscribe devices to interest topics.",
+                description=(
+                    "Ability to subscribe/unsubscribe devices to interest topics."
+                ),
                 operations=(
                     CatalogOperation(
                         name="mobile.topic_subscribe",
@@ -86,7 +88,9 @@ MOBILE_PUSH_CATALOG = register_catalog(
             ConformanceTier(
                 name="cross-platform",
                 required_capabilities=(PUSH_FCM_SUPPORT, PUSH_APNS_SUPPORT),
-                description="Provider capable of reaching both Android and iOS devices.",
+                description=(
+                    "Provider capable of reaching both Android and iOS devices."
+                ),
             ),
         ),
     ),

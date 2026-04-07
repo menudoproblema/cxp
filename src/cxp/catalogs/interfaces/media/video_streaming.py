@@ -4,10 +4,10 @@ import msgspec
 
 from cxp.catalogs.base import (
     CapabilityCatalog,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
-    CapabilityTelemetry,
     TelemetryMetricSpec,
     register_catalog,
 )
@@ -16,14 +16,14 @@ from cxp.catalogs.common import (
     UNIT_BITS_PER_SEC,
     UNIT_SECONDS,
 )
-from cxp.catalogs.results import (
-    MediaManifest,
-    TranscodingJob,
-)
 from cxp.catalogs.interfaces.execution.plan_run import (
     PLAN_RUN_EXECUTION_INTERFACE,
     PLAN_RUN_OP_CANCEL,
     PLAN_RUN_OP_STATUS,
+)
+from cxp.catalogs.results import (
+    MediaManifest,
+    TranscodingJob,
 )
 
 VIDEO_STREAMING_INTERFACE = "media/video-streaming"
@@ -92,12 +92,17 @@ VIDEO_STREAMING_CATALOG = register_catalog(
                         name=PLAN_RUN_OP_STATUS,
                         result_type="media.job_status",
                         result_schema=TranscodingJob,
-                        description="Query the status of a transcoding job (satisfies execution base).",
+                        description=(
+                            "Query the status of a transcoding job "
+                            "(satisfies execution base)."
+                        ),
                     ),
                     CatalogOperation(
                         name=PLAN_RUN_OP_CANCEL,
                         result_type="media.job_cancelled",
-                        description="Request cancellation of a running transcoding job.",
+                        description=(
+                            "Request cancellation of a running transcoding job."
+                        ),
                     ),
                 ),
             ),

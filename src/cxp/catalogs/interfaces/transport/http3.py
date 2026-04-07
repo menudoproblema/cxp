@@ -34,7 +34,9 @@ HTTP3_TRANSPORT_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=HTTP3_CONNECTION_MIGRATION,
-                description="Ability to survive IP/Port changes without dropping requests.",
+                description=(
+                    "Ability to survive IP/Port changes without dropping requests."
+                ),
             ),
         ),
         tiers=(

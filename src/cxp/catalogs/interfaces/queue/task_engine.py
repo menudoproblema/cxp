@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-import msgspec
-
 from cxp.catalogs.base import (
     CapabilityCatalog,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
-    CapabilityTelemetry,
     TelemetryMetricSpec,
     register_catalog,
 )
 from cxp.catalogs.common import (
-    CXP_RESOURCE_NAME,
     CXP_OPERATION_STATUS,
+    CXP_RESOURCE_NAME,
 )
 from cxp.catalogs.results import TaskStatus
 
@@ -46,7 +44,9 @@ _QUEUE_TELEMETRY = CapabilityTelemetry(
 QUEUE_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=QUEUE_INTERFACE,
-        description="Canonical catalog for task queues and background processing engines.",
+        description=(
+            "Canonical catalog for task queues and background processing engines."
+        ),
         capabilities=(
             CatalogCapability(
                 name=QUEUE_TASK_SUBMISSION,
@@ -73,7 +73,9 @@ QUEUE_CATALOG = register_catalog(
                     CatalogOperation(
                         name=QUEUE_OP_CANCEL,
                         result_type="queue.task_cancelled",
-                        description="Request cancellation of an enqueued or running task.",
+                        description=(
+                            "Request cancellation of an enqueued or running task."
+                        ),
                     ),
                 ),
             ),
