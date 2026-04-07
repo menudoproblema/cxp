@@ -51,7 +51,9 @@ MESSAGING_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=MESSAGING_REQUEST_REPLY,
-                description="One-to-one synchronous communication pattern (for Commands).",
+                description=(
+                    "One-to-one synchronous communication pattern (for Commands)."
+                ),
                 operations=(
                     CatalogOperation(
                         name=MESSAGING_OP_REQUEST,

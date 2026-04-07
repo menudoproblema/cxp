@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from cxp.catalogs.base import (
-    CapabilityTelemetry,
     CapabilityCatalog,
     CapabilityProfile,
     CapabilityRequirement,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,

@@ -7,8 +7,8 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.results import HttpResponse, TlsCertificate
 from cxp.catalogs.inputs import HttpDispatch
+from cxp.catalogs.results import HttpResponse, TlsCertificate
 
 HTTP_TRANSPORT_INTERFACE = "transport/http"
 HTTP_TRANSPORT_FAMILY_INTERFACE = "transport/http-family"
@@ -21,7 +21,10 @@ HTTP_TRANSPORT_FAMILY_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=HTTP_TRANSPORT_FAMILY_INTERFACE,
         abstract=True,
-        description="Abstract base for all HTTP transport versions, including security and streaming.",
+        description=(
+            "Abstract base for all HTTP transport versions, including security "
+            "and streaming."
+        ),
         capabilities=(
             CatalogCapability(
                 name="request_dispatch",

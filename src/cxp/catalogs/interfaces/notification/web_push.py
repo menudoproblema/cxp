@@ -4,10 +4,10 @@ import msgspec
 
 from cxp.catalogs.base import (
     CapabilityCatalog,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
-    CapabilityTelemetry,
     TelemetryMetricSpec,
     register_catalog,
 )
@@ -15,11 +15,11 @@ from cxp.catalogs.common import (
     CXP_RESOURCE_NAME,
     PUSH_OUTCOME,
 )
-from cxp.catalogs.results import PushResult
 from cxp.catalogs.interfaces.notification.family import (
     NOTIFICATION_INTERFACE,
     NOTIFICATION_OP_SEND,
 )
+from cxp.catalogs.results import PushResult
 
 WEB_PUSH_INTERFACE = "notification/web-push"
 

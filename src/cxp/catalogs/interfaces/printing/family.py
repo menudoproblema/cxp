@@ -74,7 +74,10 @@ PRINTING_CATALOG = register_catalog(
         tiers=(
             ConformanceTier(
                 name="core",
-                required_capabilities=(PRINTING_JOB_SUBMISSION, PRINTING_STATUS_MONITORING),
+                required_capabilities=(
+                    PRINTING_JOB_SUBMISSION,
+                    PRINTING_STATUS_MONITORING,
+                ),
                 description="Basic functional printer or print server.",
             ),
         ),

@@ -9,11 +9,6 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.common import (
-    CXP_RESOURCE_NAME,
-    CXP_OPERATION_NAME,
-    CXP_OPERATION_STATUS,
-)
 from cxp.catalogs.results import (
     AuthClaims,
     UserProfile,

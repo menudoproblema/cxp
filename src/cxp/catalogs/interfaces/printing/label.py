@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import msgspec
-
 from cxp.catalogs.base import (
     CapabilityCatalog,
     CatalogCapability,
@@ -9,8 +7,8 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.results import LabelMetadata
 from cxp.catalogs.interfaces.printing.family import PRINTING_INTERFACE
+from cxp.catalogs.results import LabelMetadata
 
 LABEL_PRINTING_INTERFACE = "printing/label"
 

@@ -5,7 +5,6 @@ import msgspec
 from cxp.catalogs.base import (
     CapabilityCatalog,
     CatalogCapability,
-    CatalogOperation,
     ConformanceTier,
     register_catalog,
 )

@@ -7,17 +7,11 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.common import (
-    DB_SYSTEM,
-    DB_OPERATION,
-    DB_NAMESPACE,
-    CXP_OPERATION_STATUS,
-)
+from cxp.catalogs.inputs import DbQueryInput
 from cxp.catalogs.results import (
     DbCursor,
     DbWriteResult,
 )
-from cxp.catalogs.inputs import DbQueryInput
 
 DATABASE_INTERFACE = "database/common"
 
@@ -44,7 +38,10 @@ DATABASE_CATALOG = register_catalog(
         capabilities=(
             CatalogCapability(
                 name=DATABASE_CONNECTIVITY,
-                description="Managing connections and session state with the database provider.",
+                description=(
+                    "Managing connections and session state with the database "
+                    "provider."
+                ),
                 operations=(
                     CatalogOperation(
                         name=DATABASE_OP_CONNECT,

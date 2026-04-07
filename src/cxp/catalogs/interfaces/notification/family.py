@@ -20,13 +20,16 @@ NOTIFICATION_CATALOG = register_catalog(
         interface=NOTIFICATION_INTERFACE,
         abstract=True,
         description=(
-            "Abstract base for all notification delivery providers (WebPush, FCM, SMS, Email). "
-            "Defines the core contract for reaching endpoints or devices."
+            "Abstract base for all notification delivery providers "
+            "(WebPush, FCM, SMS, Email). Defines the core contract for "
+            "reaching endpoints or devices."
         ),
         capabilities=(
             CatalogCapability(
                 name="delivery",
-                description="Atomic delivery of a message to a single endpoint or device.",
+                description=(
+                    "Atomic delivery of a message to a single endpoint or device."
+                ),
                 operations=(
                     CatalogOperation(
                         name=NOTIFICATION_OP_SEND,
@@ -38,7 +41,9 @@ NOTIFICATION_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name="batch_delivery",
-                description="Efficient delivery of notifications to multiple endpoints.",
+                description=(
+                    "Efficient delivery of notifications to multiple endpoints."
+                ),
             ),
         ),
         tiers=(

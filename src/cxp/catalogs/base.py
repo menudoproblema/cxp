@@ -146,7 +146,9 @@ class TelemetryValidationResult(msgspec.Struct, frozen=True):
             )
 
         if self.unknown_events:
-            messages.append("Unknown telemetry events: " + ", ".join(self.unknown_events))
+            messages.append(
+                "Unknown telemetry events: " + ", ".join(self.unknown_events)
+            )
 
         if self.missing_span_attributes:
             messages.append(
@@ -552,7 +554,10 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         profile: CapabilityProfile,
     ) -> CapabilityProfileValidationResult:
         self._ensure_concrete("profile validation")
-        if snapshot.identity is not None and snapshot.identity.interface != self.interface:
+        if (
+            snapshot.identity is not None
+            and snapshot.identity.interface != self.interface
+        ):
             return CapabilityProfileValidationResult(
                 interface_mismatch=snapshot.identity.interface,
                 expected_interface=self.interface,
@@ -735,7 +740,10 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             for field in event_spec.required_payload_keys:
                 if field.name not in event.payload:
                     missing_event_payload_keys.append(f"{event.event_type}.{field.name}")
-            if event_spec.severity is not None and event.severity != event_spec.severity:
+            if (
+                event_spec.severity is not None
+                and event.severity != event_spec.severity
+            ):
                 invalid_event_severities.append(
                     f"{event.event_type}: expected {event_spec.severity!r}, "
                     f"got {event.severity!r}"
@@ -977,7 +985,9 @@ class CatalogRegistry:
     ) -> None:
         span_specs: dict[str, tuple[str, frozenset[str]]] = {}
         metric_specs: dict[str, tuple[str, str | None, frozenset[str]]] = {}
-        event_specs: dict[str, tuple[str, TelemetrySeverity | None, frozenset[str]]] = {}
+        event_specs: dict[
+            str, tuple[str, TelemetrySeverity | None, frozenset[str]]
+        ] = {}
 
         for capability in catalog.capabilities:
             if capability.telemetry is None:
