@@ -7,6 +7,30 @@ import cxp.catalogs.interfaces
 import cxp.catalogs.interfaces.cosecha.engine
 
 
+def _assert_public_attr(module: object, symbol: str) -> None:
+    assert hasattr(module, symbol)
+
+
+def _assert_module_exports(module: object, symbol: str) -> None:
+    _assert_public_attr(module, symbol)
+    assert symbol in module.__all__
+
+
+def test_asgi_lifespan_operations_are_exported_across_public_modules() -> None:
+    lifespan_symbols = (
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_FAILED",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_FAILED",
+    )
+
+    for module in (cxp, cxp.catalogs, cxp.catalogs.interfaces):
+        for symbol in lifespan_symbols:
+            _assert_module_exports(module, symbol)
+
+
 def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
     root_and_catalog_symbols = (
         "catalog_satisfies_interface",
@@ -63,6 +87,12 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "PLAYWRIGHT_BROWSER_INTERFACE",
         "PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE",
         "PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE_NAME",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_FAILED",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_FAILED",
         "MONGODB_TEXT_SEARCH_PROFILE",
         "MONGODB_TEXT_SEARCH_PROFILE_NAME",
     )
@@ -85,6 +115,12 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "WSGI_APPLICATION_INTERFACE",
         "ASGI_APPLICATION_CATALOG",
         "ASGI_APPLICATION_INTERFACE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_STARTUP_FAILED",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_RECEIVE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_COMPLETE",
+        "ASGI_APPLICATION_LIFESPAN_SHUTDOWN_FAILED",
         "EXECUTION_ENGINE_CATALOG",
         "EXECUTION_ENGINE_EXECUTION_STATUS",
         "EXECUTION_ENGINE_EXECUTION_STREAM",
@@ -119,10 +155,10 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
 
     for module in (cxp, cxp.catalogs):
         for symbol in root_and_catalog_symbols:
-            assert hasattr(module, symbol)
+            _assert_public_attr(module, symbol)
 
     for symbol in interface_symbols:
-        assert hasattr(cxp.catalogs.interfaces, symbol)
+        _assert_module_exports(cxp.catalogs.interfaces, symbol)
 
 
 def test_legacy_http_application_symbols_are_no_longer_exported() -> None:
@@ -180,3 +216,15 @@ def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:
         "COSECHA_ENGINE_TEST_LIFECYCLE"
         in cxp.catalogs.interfaces.cosecha.engine.__all__
     )
+
+
+def test_compliance_bridge_symbols_are_exported_from_root_package() -> None:
+    for symbol in (
+        "CatalogComplianceReport",
+        "NegotiatedCatalogDecision",
+        "evaluate_capability_matrix_against_catalog",
+        "evaluate_handshake_response_against_catalog",
+        "negotiate_with_provider_catalog_report",
+        "negotiate_with_async_provider_catalog_report",
+    ):
+        _assert_module_exports(cxp, symbol)

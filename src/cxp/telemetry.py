@@ -81,11 +81,53 @@ class TelemetrySnapshot(msgspec.Struct, frozen=True):
 
 
 class TelemetryContext:
-    """Helper para propagar contexto (trace_id) en la telemetría."""
+    """Helper para propagar contexto técnico y operacional en telemetría."""
 
-    def __init__(self, trace_id: str | None = None) -> None:
+    def __init__(
+        self,
+        trace_id: str | None = None,
+        *,
+        request_id: str | None = None,
+        session_id: str | None = None,
+        operation_id: str | None = None,
+        parent_operation_id: str | None = None,
+    ) -> None:
         self.trace_id = trace_id
+        self.request_id = request_id
+        self.session_id = session_id
+        self.operation_id = operation_id
+        self.parent_operation_id = parent_operation_id
         self._generated_trace_id: str | None = None
+
+    def _context_fields(self) -> dict[str, str]:
+        fields: dict[str, str] = {}
+        if self.request_id is not None:
+            fields["cxp.request.id"] = self.request_id
+        if self.session_id is not None:
+            fields["cxp.session.id"] = self.session_id
+        if self.operation_id is not None:
+            fields["cxp.operation.id"] = self.operation_id
+        if self.parent_operation_id is not None:
+            fields["cxp.parent.operation.id"] = self.parent_operation_id
+        return fields
+
+    def _merge_mapping(
+        self,
+        values: Mapping[str, Any] | None,
+    ) -> Mapping[str, Any]:
+        merged: dict[str, Any] = self._context_fields()
+        if values is not None:
+            merged.update(values)
+        return merged
+
+    def _merge_labels(
+        self,
+        labels: Mapping[str, str] | None,
+    ) -> Mapping[str, str]:
+        merged = self._context_fields()
+        if labels is not None:
+            merged.update(labels)
+        return merged
 
     def _effective_trace_id(self) -> str:
         if self.trace_id is not None:
@@ -106,8 +148,23 @@ class TelemetryContext:
         return TelemetryEvent(
             event_type=event_type,
             severity=severity,
-            payload=payload or {},
+            payload=self._merge_mapping(payload),
             trace_id=self._effective_trace_id(),
+        )
+
+    def create_metric(
+        self,
+        name: str,
+        value: float | int,
+        unit: str | None = None,
+        labels: Mapping[str, str] | None = None,
+    ) -> TelemetryMetric:
+        """Crea una métrica inyectando los IDs contextuales del contexto."""
+        return TelemetryMetric(
+            name=name,
+            value=value,
+            unit=unit,
+            labels=self._merge_labels(labels),
         )
 
     def create_span(
@@ -128,7 +185,7 @@ class TelemetryContext:
             name=name,
             start_time=start_time,
             end_time=end_time,
-            attributes=attributes or {},
+            attributes=self._merge_mapping(attributes),
         )
 
 
@@ -204,10 +261,13 @@ class TelemetryBuffer:
             return
 
         if item_kind == "event":
+            assert isinstance(item, TelemetryEvent)
             self._events.append(item)
         elif item_kind == "metric":
+            assert isinstance(item, TelemetryMetric)
             self._metrics.append(item)
         else:
+            assert isinstance(item, TelemetrySpan)
             self._spans.append(item)
         self._items_order.append(item_kind)
 

@@ -14,6 +14,7 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 - [Arquitectura](./architecture.md)
 - [Integración](./integration.md)
 - [Protocolo de Capacidades](./protocol/capabilities.md)
+- [Compliance Bridge](./protocol/compliance.md)
 - [Descriptores de Capacidades](./protocol/descriptors.md)
 - [Protocolo de Telemetría](./protocol/telemetry.md)
 - [Catálogos](./catalogs/index.md)

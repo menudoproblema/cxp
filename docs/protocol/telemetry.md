@@ -55,6 +55,8 @@ La API actual también incluye:
 
 - `TelemetrySnapshot.heartbeat(...)`: crea un snapshot periódico de forma rápida.
 - `TelemetryContext`: propaga `trace_id` al crear eventos. Si no recibe uno explícito, genera un identificador estable y lo reutiliza para eventos y spans del mismo contexto.
+- `TelemetryContext.create_metric(...)`: crea métricas aplicando el mismo
+  contexto operacional.
 - `TelemetryContext.create_span(...)`: crea spans cerrados asociados al `trace_id`.
 - `TelemetryBuffer`: acumula eventos, métricas y spans antes de generar un snapshot. Puede configurarse con `max_items` para evitar crecimiento indefinido.
 
@@ -74,6 +76,56 @@ buffer.record_span(
 buffer.record_metric("ops", 1)
 snapshot = buffer.flush(status="healthy", is_heartbeat=True)
 ```
+
+## Telemetría Contextual
+Además de `trace_id`, CXP define una convención compartida para correlación
+operacional transversal:
+
+- `cxp.request.id`
+- `cxp.session.id`
+- `cxp.operation.id`
+- `cxp.parent.operation.id`
+
+Estos campos no sustituyen a `trace_id`, `span_id` ni `parent_span_id`.
+
+Su papel es distinto:
+
+- `trace_id/span_id` mantienen la correlación técnica de tracing;
+- los campos `cxp.*.id` permiten correlacionar request, sesión y operación
+  entre dominios semánticamente distintos.
+
+En v1 esta convención es aditiva:
+
+- `TelemetryContext` puede inyectarla automáticamente;
+- los catálogos first-party no están obligados a exigirla de forma global;
+- `validate_telemetry_snapshot(...)` no la impone por defecto.
+
+```python
+from cxp import TelemetryContext
+
+context = TelemetryContext(
+    trace_id="trace-123",
+    request_id="req-42",
+    session_id="sess-9",
+    operation_id="op-15",
+    parent_operation_id="op-root",
+)
+
+event = context.create_event("browser.action.started")
+span = context.create_span(
+    "browser.action",
+    start_time=1.0,
+    end_time=1.2,
+)
+metric = context.create_metric(
+    "browser.action.duration",
+    0.2,
+    unit="s",
+)
+```
+
+`TelemetryContext` rellena esos campos solo cuando faltan. Si el caller pasa una
+clave explícitamente en `payload`, `attributes` o `labels`, ese valor prevalece.
 
 Si necesitas controlar qué ocurre al superar la capacidad, `TelemetryBuffer` soporta estas políticas:
 

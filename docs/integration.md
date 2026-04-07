@@ -52,10 +52,13 @@ La negociación se realiza mediante los ayudantes proporcionados:
 
 ```python
 from cxp import (
+    evaluate_handshake_response_against_catalog,
     negotiate_with_async_provider,
     negotiate_with_async_provider_catalog,
+    negotiate_with_async_provider_catalog_report,
     negotiate_with_provider,
     negotiate_with_provider_catalog,
+    negotiate_with_provider_catalog_report,
 )
 
 # Caso síncrono
@@ -73,6 +76,16 @@ response = await negotiate_with_async_provider_catalog(
     async_provider,
     catalog,
 )
+
+# Caso síncrono obteniendo decisión + report de cumplimiento
+decision = negotiate_with_provider_catalog_report(request, provider, catalog)
+
+# Caso asíncrono obteniendo decisión + report de cumplimiento
+decision = await negotiate_with_async_provider_catalog_report(
+    request,
+    async_provider,
+    catalog,
+)
 ```
 
 La negociación valida `protocol_version`. Si el provider no soporta la versión pedida, la respuesta se rechaza explícitamente.
@@ -81,6 +94,32 @@ Si faltan solo `optional_capabilities`, la negociación responde con estado `deg
 Si quieres que la respuesta quede validada también contra el catálogo canónico, usa las variantes `*_catalog(...)`.
 Cuando falten capabilities requeridas u opcionales, la respuesta también lo expone de forma estructurada en `missing_required_capabilities` y `missing_optional_capabilities`.
 El request no debe repetir una misma capability en `required_capabilities` y `optional_capabilities`; CXP lo rechaza explícitamente.
+
+### Helper Estricto vs Helper de Decisión
+`negotiate_with_provider_catalog(...)` y `negotiate_with_async_provider_catalog(...)`
+siguen siendo la vía estricta actual: si el catálogo no se cumple, la respuesta
+se fuerza a `rejected`.
+
+Cuando el orquestador necesita decidir por sí mismo qué hacer con un provider,
+usa:
+
+- `negotiate_with_provider_catalog_report(...)`
+- `negotiate_with_async_provider_catalog_report(...)`
+
+Estos helpers devuelven un `NegotiatedCatalogDecision` con:
+
+- `response`: el resultado original del handshake;
+- `compliance`: un `CatalogComplianceReport` con `compliant`, `reason`,
+  `messages` y `validation`.
+
+Si ya tienes una respuesta de handshake y solo quieres evaluarla, puedes usar:
+
+```python
+report = evaluate_handshake_response_against_catalog(response, catalog)
+```
+
+Ese bridge no convierte el catálogo en parte obligatoria del core. Solo empaqueta
+la validación existente en una forma directamente utilizable por el orquestador.
 
 ## Cuándo Usar `CapabilityMatrix`
 Usa `CapabilityMatrix` cuando necesites:
@@ -200,7 +239,7 @@ response = await negotiate_with_async_provider(request, MongoProvider())
 ## Responsabilidades del Orquestador
 1. Construir un `HandshakeRequest`.
 2. Negociar contra el adaptador del proveedor (usando la versión `async` si el proveedor lo requiere).
-3. Validar la respuesta contra el catálogo con `validate_capability_matrix()`, `validate_capability_names()`, `satisfied_tiers()` o `invalid_capability_metadata()` cuando aplique, o directamente negociar con `negotiate_with_provider_catalog()` / `negotiate_with_async_provider_catalog()`.
+3. Validar la respuesta contra el catálogo con `validate_capability_matrix()`, `validate_capability_names()`, `satisfied_tiers()` o `invalid_capability_metadata()` cuando aplique, o directamente usar `negotiate_with_provider_catalog()` / `negotiate_with_async_provider_catalog()` si quieres rechazo estricto, o `*_catalog_report()` si quieres una decisión estructurada.
 4. Si el provider publica descriptores ricos, recogerlos mediante `collect_provider_capability_snapshot()` o `collect_provider_capability_snapshot_async()`.
 5. Validarlos contra el catálogo con `validate_component_snapshot()` o `is_component_snapshot_compliant()`.
 6. Consumir `TelemetrySnapshot` periódicamente.

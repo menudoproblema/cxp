@@ -79,6 +79,94 @@ def test_telemetry_context_creates_spans_with_trace_id() -> None:
     assert span.duration == 0.25
 
 
+def test_telemetry_context_injects_contextual_ids_into_event_payload() -> None:
+    context = TelemetryContext(
+        trace_id="trace-123",
+        request_id="req-1",
+        session_id="sess-1",
+        operation_id="op-1",
+        parent_operation_id="op-root",
+    )
+    event = context.create_event("command_started")
+
+    assert event.trace_id == "trace-123"
+    assert event.payload == {
+        "cxp.request.id": "req-1",
+        "cxp.session.id": "sess-1",
+        "cxp.operation.id": "op-1",
+        "cxp.parent.operation.id": "op-root",
+    }
+
+
+def test_telemetry_context_injects_contextual_ids_into_span_attributes() -> None:
+    context = TelemetryContext(
+        trace_id="trace-123",
+        request_id="req-1",
+        session_id="sess-1",
+        operation_id="op-1",
+    )
+    span = context.create_span(
+        "mongo.command",
+        start_time=1.0,
+        end_time=1.25,
+    )
+
+    assert span.trace_id == "trace-123"
+    assert span.attributes == {
+        "cxp.request.id": "req-1",
+        "cxp.session.id": "sess-1",
+        "cxp.operation.id": "op-1",
+    }
+
+
+def test_telemetry_context_create_metric_injects_contextual_ids_into_labels() -> None:
+    context = TelemetryContext(
+        trace_id="trace-123",
+        request_id="req-1",
+        session_id="sess-1",
+        operation_id="op-1",
+    )
+    metric = context.create_metric("ops", 2, unit="1")
+
+    assert metric.name == "ops"
+    assert metric.value == 2
+    assert metric.unit == "1"
+    assert metric.labels == {
+        "cxp.request.id": "req-1",
+        "cxp.session.id": "sess-1",
+        "cxp.operation.id": "op-1",
+    }
+
+
+def test_telemetry_context_explicit_values_override_context_values() -> None:
+    context = TelemetryContext(
+        trace_id="trace-123",
+        request_id="req-1",
+        session_id="sess-1",
+        operation_id="op-1",
+    )
+    event = context.create_event(
+        "command_started",
+        payload={"cxp.operation.id": "op-2", "custom": "value"},
+    )
+    span = context.create_span(
+        "mongo.command",
+        start_time=1.0,
+        end_time=1.25,
+        attributes={"cxp.request.id": "req-2"},
+    )
+    metric = context.create_metric(
+        "ops",
+        2,
+        labels={"cxp.session.id": "sess-2"},
+    )
+
+    assert event.payload["cxp.operation.id"] == "op-2"
+    assert event.payload["custom"] == "value"
+    assert span.attributes["cxp.request.id"] == "req-2"
+    assert metric.labels["cxp.session.id"] == "sess-2"
+
+
 def test_telemetry_context_generates_consistent_trace_id_when_missing() -> None:
     context = TelemetryContext()
     event = context.create_event("command_started")

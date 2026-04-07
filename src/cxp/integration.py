@@ -5,7 +5,12 @@ from inspect import isawaitable
 from typing import cast
 
 from cxp.capabilities import CapabilityMatrix
-from cxp.catalogs.base import CapabilityCatalog
+from cxp.catalogs.base import (
+    CapabilityCatalog,
+    catalog_satisfies_interface,
+    get_catalog,
+)
+from cxp.compliance import CatalogComplianceReport, NegotiatedCatalogDecision
 from cxp.contracts import (
     AsyncCapabilityProvider,
     AsyncCapabilitySnapshotProvider,
@@ -32,10 +37,14 @@ __all__ = (
     "collect_provider_capability_snapshot_async",
     "collect_provider_telemetry",
     "collect_provider_telemetry_async",
+    "evaluate_capability_matrix_against_catalog",
+    "evaluate_handshake_response_against_catalog",
     "negotiate_with_async_provider",
     "negotiate_with_async_provider_catalog",
+    "negotiate_with_async_provider_catalog_report",
     "negotiate_with_provider",
     "negotiate_with_provider_catalog",
+    "negotiate_with_provider_catalog_report",
     "stream_provider_telemetry",
     "stream_provider_telemetry_async",
 )
@@ -56,6 +65,24 @@ def negotiate_with_provider_catalog(
         required_tier=required_tier,
         validate_metadata=validate_metadata,
     )
+
+
+def negotiate_with_provider_catalog_report(
+    request: HandshakeRequest,
+    provider: CapabilityProvider,
+    catalog: CapabilityCatalog,
+    *,
+    required_tier: str | None = None,
+    validate_metadata: bool = True,
+) -> NegotiatedCatalogDecision:
+    response = negotiate_with_provider(request, provider)
+    compliance = evaluate_handshake_response_against_catalog(
+        response,
+        catalog,
+        required_tier=required_tier,
+        validate_metadata=validate_metadata,
+    )
+    return NegotiatedCatalogDecision(response=response, compliance=compliance)
 
 
 def negotiate_with_provider(
@@ -99,6 +126,24 @@ async def negotiate_with_async_provider_catalog(
         required_tier=required_tier,
         validate_metadata=validate_metadata,
     )
+
+
+async def negotiate_with_async_provider_catalog_report(
+    request: HandshakeRequest,
+    provider: AsyncCapabilityProvider,
+    catalog: CapabilityCatalog,
+    *,
+    required_tier: str | None = None,
+    validate_metadata: bool = True,
+) -> NegotiatedCatalogDecision:
+    response = await negotiate_with_async_provider(request, provider)
+    compliance = evaluate_handshake_response_against_catalog(
+        response,
+        catalog,
+        required_tier=required_tier,
+        validate_metadata=validate_metadata,
+    )
+    return NegotiatedCatalogDecision(response=response, compliance=compliance)
 
 
 def collect_provider_capability_snapshot(
@@ -199,7 +244,12 @@ def _supported_protocol_versions(
 
 
 def _validate_telemetry_snapshot(
-    provider: TelemetryProvider | AsyncTelemetryProvider,
+    provider: (
+        TelemetryProvider
+        | AsyncTelemetryProvider
+        | TelemetryStreamProvider
+        | AsyncTelemetryStreamProvider
+    ),
     snapshot: TelemetrySnapshot | None,
 ) -> TelemetrySnapshot | None:
     if snapshot is None:
@@ -249,16 +299,17 @@ def _validate_handshake_response_against_catalog(
     if response.status == "rejected":
         return response
 
-    validation = catalog.validate_capability_matrix(
-        response.offered_capabilities,
+    report = evaluate_handshake_response_against_catalog(
+        response,
+        catalog,
         required_tier=required_tier,
         validate_metadata=validate_metadata,
     )
-    if validation.is_valid():
+    if report.compliant:
         return response
 
     reasons = [response.reason] if response.reason is not None else []
-    reasons.extend(validation.messages())
+    reasons.extend(report.messages)
     return HandshakeResponse(
         provider_identity=response.provider_identity,
         status="rejected",
@@ -267,4 +318,100 @@ def _validate_handshake_response_against_catalog(
         missing_required_capabilities=response.missing_required_capabilities,
         missing_optional_capabilities=response.missing_optional_capabilities,
         protocol_version=response.protocol_version,
+    )
+
+
+def evaluate_capability_matrix_against_catalog(
+    offered_interface: str,
+    capability_matrix: CapabilityMatrix,
+    catalog: CapabilityCatalog,
+    *,
+    required_tier: str | None = None,
+    validate_metadata: bool = True,
+) -> CatalogComplianceReport:
+    catalog_interface = catalog.interface
+    interfaces_are_compatible = (
+        offered_interface == catalog_interface
+        or catalog_satisfies_interface(offered_interface, catalog_interface)
+    )
+    if not interfaces_are_compatible:
+        reason = (
+            "Interface mismatch: provider exposes "
+            f"{offered_interface!r} but catalog requires {catalog_interface!r}"
+        )
+        return CatalogComplianceReport(
+            compliant=False,
+            catalog_interface=catalog_interface,
+            offered_interface=offered_interface,
+            required_tier=required_tier,
+            reason=reason,
+            messages=(reason,),
+            validation=None,
+        )
+
+    validation_catalog = catalog
+    if catalog.abstract:
+        offered_catalog = get_catalog(offered_interface)
+        if offered_catalog is not None and not offered_catalog.abstract:
+            validation_catalog = offered_catalog
+
+    if validation_catalog.abstract:
+        reason = (
+            "Abstract catalog "
+            f"{catalog_interface!r} cannot validate capability matrices for "
+            f"provider interface {offered_interface!r} without a registered "
+            "concrete catalog"
+        )
+        return CatalogComplianceReport(
+            compliant=False,
+            catalog_interface=catalog_interface,
+            offered_interface=offered_interface,
+            required_tier=required_tier,
+            reason=reason,
+            messages=(reason,),
+            validation=None,
+        )
+
+    validation = validation_catalog.validate_capability_matrix(
+        capability_matrix,
+        required_tier=required_tier,
+        validate_metadata=validate_metadata,
+    )
+    messages = validation.messages()
+    return CatalogComplianceReport(
+        compliant=validation.is_valid(),
+        catalog_interface=catalog_interface,
+        offered_interface=offered_interface,
+        required_tier=required_tier,
+        reason="; ".join(messages) if messages else None,
+        messages=messages,
+        validation=validation,
+    )
+
+
+def evaluate_handshake_response_against_catalog(
+    response: HandshakeResponse,
+    catalog: CapabilityCatalog,
+    *,
+    required_tier: str | None = None,
+    validate_metadata: bool = True,
+) -> CatalogComplianceReport:
+    if response.status == "rejected":
+        messages = (response.reason,) if response.reason is not None else ()
+        return CatalogComplianceReport(
+            compliant=False,
+            catalog_interface=catalog.interface,
+            offered_interface=response.provider_identity.interface,
+            required_tier=required_tier,
+            reason=response.reason,
+            messages=messages,
+            validation=None,
+        )
+
+    return evaluate_capability_matrix_against_catalog(
+        response.provider_identity.interface,
+        response.offered_capabilities,
+        catalog,
+        required_tier=required_tier,
+        validate_metadata=validate_metadata,
     )
