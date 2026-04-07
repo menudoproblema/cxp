@@ -1,13 +1,14 @@
-import cxp.catalogs.interfaces.cache as _cache_interfaces
-import cxp.catalogs.interfaces.identity as _identity_interfaces
-import cxp.catalogs.interfaces.media as _media_interfaces
-import cxp.catalogs.interfaces.messaging as _messaging_interfaces
-import cxp.catalogs.interfaces.notification as _notification_interfaces
-import cxp.catalogs.interfaces.printing as _printing_interfaces
-import cxp.catalogs.interfaces.queue as _queue_interfaces
-import cxp.catalogs.interfaces.runtime as _runtime_interfaces
-import cxp.catalogs.interfaces.storage as _storage_interfaces
-
+# Side-effect imports: subpackages register their catalogs in
+# DEFAULT_CATALOG_REGISTRY at import time.
+import cxp.catalogs.interfaces.cache as _cache_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.identity as _identity_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.media as _media_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.messaging as _messaging_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.notification as _notification_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.printing as _printing_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.queue as _queue_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.runtime as _runtime_interfaces  # noqa: F401
+import cxp.catalogs.interfaces.storage as _storage_interfaces  # noqa: F401
 from cxp.catalogs.interfaces.application import (
     ASGI_APPLICATION_CATALOG,
     ASGI_APPLICATION_EARLY_HINTS,
@@ -34,10 +35,10 @@ from cxp.catalogs.interfaces.application import (
     ASGI_APPLICATION_LIFESPAN,
     ASGI_APPLICATION_LIFESPAN_PROFILE,
     ASGI_APPLICATION_LIFESPAN_PROFILE_NAME,
+    ASGI_APPLICATION_LIFESPAN_SCOPE_INSPECT,
     ASGI_APPLICATION_LIFESPAN_SHUTDOWN_COMPLETE,
     ASGI_APPLICATION_LIFESPAN_SHUTDOWN_FAILED,
     ASGI_APPLICATION_LIFESPAN_SHUTDOWN_RECEIVE,
-    ASGI_APPLICATION_LIFESPAN_SCOPE_INSPECT,
     ASGI_APPLICATION_LIFESPAN_STARTUP_COMPLETE,
     ASGI_APPLICATION_LIFESPAN_STARTUP_FAILED,
     ASGI_APPLICATION_LIFESPAN_STARTUP_RECEIVE,
@@ -190,12 +191,6 @@ from cxp.catalogs.interfaces.cosecha import (
     COSECHA_REPORTER_START,
 )
 from cxp.catalogs.interfaces.database import (
-    MongoAggregationMetadata,
-    MongoCollationMetadata,
-    MongoPersistenceMetadata,
-    MongoSearchMetadata,
-    MongoTopologyDiscoveryMetadata,
-    MongoVectorSearchMetadata,
     MONGODB_AGGREGATE,
     MONGODB_AGGREGATE_RICH_PROFILE,
     MONGODB_AGGREGATE_RICH_PROFILE_NAME,
@@ -226,12 +221,12 @@ from cxp.catalogs.interfaces.database import (
     MONGODB_READ,
     MONGODB_REPLACE_ONE,
     MONGODB_SEARCH,
-    MONGODB_TEXT_SEARCH_PROFILE,
-    MONGODB_TEXT_SEARCH_PROFILE_NAME,
     MONGODB_SEARCH_PROFILE,
     MONGODB_SEARCH_PROFILE_NAME,
     MONGODB_SEARCH_TIER,
     MONGODB_START_SESSION,
+    MONGODB_TEXT_SEARCH_PROFILE,
+    MONGODB_TEXT_SEARCH_PROFILE_NAME,
     MONGODB_TOPOLOGY_DISCOVERY,
     MONGODB_TRANSACTIONS,
     MONGODB_UPDATE_MANY,
@@ -240,6 +235,12 @@ from cxp.catalogs.interfaces.database import (
     MONGODB_WATCH,
     MONGODB_WITH_TRANSACTION,
     MONGODB_WRITE,
+    MongoAggregationMetadata,
+    MongoCollationMetadata,
+    MongoPersistenceMetadata,
+    MongoSearchMetadata,
+    MongoTopologyDiscoveryMetadata,
+    MongoVectorSearchMetadata,
 )
 from cxp.catalogs.interfaces.execution import (
     EXECUTION_ENGINE_CATALOG,

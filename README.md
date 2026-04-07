@@ -28,12 +28,16 @@ pip install cxp
 ## Catalog Layers
 CXP includes a growing suite of first-party catalogs organized in six logical layers:
 
-1. **Computing**: `execution/plan-run`, `runtime/environment` (secrets/resources), `application/asgi`.
-2. **Persistence**: `database/sql`, `database/mongodb`, `storage/blob`, `cache/key-value`.
-3. **Communications**: `transport/http`, `transport/http-family`, `transport/websocket`, `messaging/event-bus`, `notification/common`.
+Each layer exposes a family catalog (the abstract contract) plus one or more concrete catalogs that satisfy it.
+
+1. **Computing**: `execution/plan-run`, `runtime/environment` (secrets/resources), and the `application/http` family with concrete `application/asgi`, `application/wsgi`, and `application/http-framework` catalogs.
+2. **Persistence**: `database/sql`, `database/mongodb` (both satisfying `database/common`), `storage/blob`, `cache/key-value`.
+3. **Communications**: `transport/http` (with the `transport/http-family` umbrella and `transport/websocket` sibling), `messaging/event-bus` (concrete: `messaging/nats`), and `notification/common` (concrete: `notification/web-push`, `notification/mobile-push`).
 4. **Queueing**: `queue/task-engine` for background processing.
-5. **Experience & Media**: `browser/automation` (Playwright), `media/video-streaming` (HLS/DASH).
-6. **Industrial**: `printing/manager` for Label and Production printing.
+5. **Experience & Media**: `browser/automation` (concrete: `browser/playwright`), `media/video-streaming` (HLS/DASH).
+6. **Industrial**: `printing/manager` (concrete: `printing/label` for Zebra/ZPL, `printing/production` for Konica Minolta).
+
+For the full list of registered interfaces and operations, see [docs/catalogs/index.md](docs/catalogs/index.md).
 
 ## Quick Start
 ```python

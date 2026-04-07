@@ -1,13 +1,8 @@
-from cxp.catalogs.interfaces.database.family import (
+# Side-effect import: registers the abstract `database/common` family catalog.
+from cxp.catalogs.interfaces.database.family import (  # noqa: F401
     DATABASE_CATALOG as _DATABASE_CATALOG,
 )
 from cxp.catalogs.interfaces.database.mongodb import (
-    MongoAggregationMetadata,
-    MongoCollationMetadata,
-    MongoPersistenceMetadata,
-    MongoSearchMetadata,
-    MongoTopologyDiscoveryMetadata,
-    MongoVectorSearchMetadata,
     MONGODB_AGGREGATE,
     MONGODB_AGGREGATE_RICH_PROFILE,
     MONGODB_AGGREGATE_RICH_PROFILE_NAME,
@@ -38,12 +33,12 @@ from cxp.catalogs.interfaces.database.mongodb import (
     MONGODB_READ,
     MONGODB_REPLACE_ONE,
     MONGODB_SEARCH,
-    MONGODB_TEXT_SEARCH_PROFILE,
-    MONGODB_TEXT_SEARCH_PROFILE_NAME,
     MONGODB_SEARCH_PROFILE,
     MONGODB_SEARCH_PROFILE_NAME,
     MONGODB_SEARCH_TIER,
     MONGODB_START_SESSION,
+    MONGODB_TEXT_SEARCH_PROFILE,
+    MONGODB_TEXT_SEARCH_PROFILE_NAME,
     MONGODB_TOPOLOGY_DISCOVERY,
     MONGODB_TRANSACTIONS,
     MONGODB_UPDATE_MANY,
@@ -52,8 +47,16 @@ from cxp.catalogs.interfaces.database.mongodb import (
     MONGODB_WATCH,
     MONGODB_WITH_TRANSACTION,
     MONGODB_WRITE,
+    MongoAggregationMetadata,
+    MongoCollationMetadata,
+    MongoPersistenceMetadata,
+    MongoSearchMetadata,
+    MongoTopologyDiscoveryMetadata,
+    MongoVectorSearchMetadata,
 )
-from cxp.catalogs.interfaces.database.sql import (
+
+# Side-effect import: registers the concrete `database/sql` catalog.
+from cxp.catalogs.interfaces.database.sql import (  # noqa: F401
     SQL_DATABASE_CATALOG as _SQL_DATABASE_CATALOG,
 )
 
