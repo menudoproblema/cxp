@@ -3,12 +3,15 @@
 Catálogo first-party para reporters de Cosecha.
 
 ## Propósito
-Modela la superficie común de reporters que proyectan resultados y generan salida humana o estructurada.
+Modela la superficie comun de reporters que proyectan resultados y
+declaran de forma explicita si generan salida humana o estructurada.
 
 ## Capabilities
 - `report_lifecycle`
 - `result_projection`
 - `artifact_output`
+- `structured_output`
+- `human_output`
 
 ## Metadata
 - `output_kind`

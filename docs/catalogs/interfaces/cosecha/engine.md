@@ -3,18 +3,24 @@
 Catálogo first-party para engines de Cosecha.
 
 ## Propósito
-Normaliza el vocabulario común de engines sin acoplarlo a Gherkin o Pytest como contratos separados.
+Normaliza el vocabulario comun de engines sin ocultar los origenes
+reales del conocimiento que publican.
 
 ## Capabilities
 - `engine_lifecycle`
 - `test_lifecycle`
 - `draft_validation`
 - `selection_labels`
-- `definition_knowledge`
+- `project_definition_knowledge`
+- `library_definition_knowledge`
+- `project_registry_knowledge`
 - `plan_explanation`
 - `static_definition_discovery`
 - `on_demand_definition_materialization`
 - `engine_dependency_knowledge`
+
+`selection_labels` incluye `run` como operacion publica ademas de las
+operaciones de planning.
 
 ## Telemetría
 La telemetría canónica actual es `span-only` e incluye:
