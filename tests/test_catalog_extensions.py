@@ -5,7 +5,13 @@ from cxp import catalog_satisfies_interface, get_catalog
 
 
 def test_all_interface_modules_import_cleanly() -> None:
-    root = Path(__file__).resolve().parent.parent / "src" / "cxp" / "catalogs" / "interfaces"
+    root = (
+        Path(__file__).resolve().parent.parent
+        / "src"
+        / "cxp"
+        / "catalogs"
+        / "interfaces"
+    )
     failures: list[tuple[str, str, str]] = []
 
     for path in sorted(root.rglob("*.py")):
@@ -80,9 +86,12 @@ def test_transport_http_catalog_remains_canonical_and_family_is_separate() -> No
 
 
 def test_async_domains_propagate_canonical_cancel_operations() -> None:
+    from cxp.catalogs.interfaces.execution.plan_run import PLAN_RUN_OP_CANCEL
     from cxp.catalogs.interfaces.media.video_streaming import VIDEO_STREAMING_CATALOG
     from cxp.catalogs.interfaces.queue.task_engine import QUEUE_CATALOG
-    from cxp.catalogs.interfaces.execution.plan_run import PLAN_RUN_OP_CANCEL
 
-    assert VIDEO_STREAMING_CATALOG.has_operation("transcoding", PLAN_RUN_OP_CANCEL) is True
+    assert (
+        VIDEO_STREAMING_CATALOG.has_operation("transcoding", PLAN_RUN_OP_CANCEL)
+        is True
+    )
     assert QUEUE_CATALOG.has_operation("monitoring", "queue.cancel") is True

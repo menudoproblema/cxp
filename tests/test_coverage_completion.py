@@ -37,7 +37,9 @@ def test_integration_abstract_validation_error() -> None:
 
 
 def test_telemetry_buffer_dropped_items() -> None:
-    buffer = TelemetryBuffer(provider_id="test", max_items=1, overflow_policy="drop_oldest")
+    buffer = TelemetryBuffer(
+        provider_id="test", max_items=1, overflow_policy="drop_oldest"
+    )
 
     assert buffer.dropped_items == 0
 

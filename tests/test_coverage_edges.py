@@ -6,9 +6,9 @@ import msgspec
 from pytest import raises
 
 from cxp import (
-    PLAN_RUN_EXECUTION_CATALOG,
     MONGODB_CATALOG,
     MONGODB_CORE_PROFILE,
+    PLAN_RUN_EXECUTION_CATALOG,
     SUPPORTED_PROTOCOL_VERSIONS,
     Capability,
     CapabilityCatalog,
@@ -17,7 +17,6 @@ from cxp import (
     CapabilityOperationBinding,
     CapabilityProfileDefinitionValidationResult,
     CapabilityProfileValidationResult,
-    CapabilityRequirement,
     CatalogCapability,
     CatalogOperation,
     CatalogRegistry,
@@ -34,16 +33,11 @@ from cxp import (
     TelemetryValidationResult,
 )
 from cxp.catalogs.base import (
-    CapabilityTelemetry,
-    TelemetryEventSpec,
     TelemetryFieldRequirement,
-    TelemetryMetricSpec,
-    TelemetrySpanSpec,
     _catalog_satisfies_interface,
     _merge_field_requirements,
 )
-from cxp.descriptors import DescriptorValidationResult
-from cxp.descriptors import UnknownCapabilityOperations
+from cxp.descriptors import DescriptorValidationResult, UnknownCapabilityOperations
 from cxp.integration import (
     _supported_protocol_versions,
     _validate_component_snapshot,
@@ -199,7 +193,10 @@ def test_catalog_helpers_cover_missing_capabilities_and_abstract_guards() -> Non
 
     assert catalog_capability.get_operation("missing") is None
     assert CatalogCapability(name="run").metadata_keys() == ()
-    assert CatalogCapability(name="run").validate_metadata(Capability(name="run")) is True
+    assert (
+        CatalogCapability(name="run").validate_metadata(Capability(name="run"))
+        is True
+    )
     assert catalog.capability_operation_names("missing") == ()
     assert catalog.has_operation("missing", "plan.analyze") is False
     assert catalog.get_operation("missing", "plan.analyze") is None
@@ -319,8 +316,10 @@ def test_catalog_profile_definition_and_component_compliance_edges() -> None:
     )
     assert definition_unknown.unknown_capabilities == ("read", "write", "aggregation")
 
-    definition_interface_mismatch = PLAN_RUN_EXECUTION_CATALOG.validate_profile_definition(
-        MONGODB_CORE_PROFILE,
+    definition_interface_mismatch = (
+        PLAN_RUN_EXECUTION_CATALOG.validate_profile_definition(
+            MONGODB_CORE_PROFILE,
+        )
     )
     assert definition_interface_mismatch.interface_mismatch == "database/mongodb"
 
@@ -406,7 +405,9 @@ def test_execution_engine_telemetry_validation_covers_strict_signal_paths() -> N
     )
 
 
-def test_execution_engine_telemetry_validation_ignores_unknown_metric_and_event_by_default() -> None:
+def test_execution_engine_telemetry_validation_ignores_unknown_metric_and_event_by_default() -> (  # noqa: E501
+    None
+):
     snapshot = TelemetrySnapshot(
         provider_id="pytest-engine",
         metrics=(TelemetryMetric(name="unknown.metric", value=1),),

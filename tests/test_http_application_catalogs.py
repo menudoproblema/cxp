@@ -6,6 +6,8 @@ from cxp import (
     ASGI_APPLICATION_INTERFACE,
     ASGI_APPLICATION_LIFESPAN,
     ASGI_APPLICATION_LIFESPAN_PROFILE,
+    ASGI_APPLICATION_REALTIME_PROFILE,
+    ASGI_APPLICATION_WEB_CORE_PROFILE,
     ASGI_APPLICATION_WEBSOCKET,
     ASGI_APPLICATION_WEBSOCKET_ACCEPT,
     ASGI_APPLICATION_WEBSOCKET_CLOSE,
@@ -14,8 +16,12 @@ from cxp import (
     ASGI_APPLICATION_WEBSOCKET_RECEIVE,
     ASGI_APPLICATION_WEBSOCKET_SCOPE_INSPECT,
     ASGI_APPLICATION_WEBSOCKET_SEND,
-    ASGI_APPLICATION_WEB_CORE_PROFILE,
-    ASGI_APPLICATION_REALTIME_PROFILE,
+    HTTP_APPLICATION_CATALOG,
+    HTTP_APPLICATION_FRAMEWORK_CATALOG,
+    WSGI_APPLICATION_CATALOG,
+    WSGI_APPLICATION_CORE_PROFILE,
+    WSGI_APPLICATION_FILE_WRAPPER_PROFILE,
+    WSGI_APPLICATION_INTERFACE,
     Capability,
     CapabilityCatalog,
     CapabilityDescriptor,
@@ -24,22 +30,19 @@ from cxp import (
     CatalogRegistry,
     ComponentCapabilitySnapshot,
     ComponentIdentity,
-    HTTP_APPLICATION_CATALOG,
-    HTTP_APPLICATION_FRAMEWORK_CATALOG,
-    WSGI_APPLICATION_CATALOG,
-    WSGI_APPLICATION_CORE_PROFILE,
-    WSGI_APPLICATION_FILE_WRAPPER_PROFILE,
-    WSGI_APPLICATION_INTERFACE,
+    HandshakeRequest,
     catalog_satisfies_interface,
     get_catalog,
     negotiate_capabilities,
-    HandshakeRequest,
 )
 
 
 def test_application_family_catalogs_are_registered() -> None:
     assert get_catalog("application/http") is HTTP_APPLICATION_CATALOG
-    assert get_catalog("application/http-framework") is HTTP_APPLICATION_FRAMEWORK_CATALOG
+    assert (
+        get_catalog("application/http-framework")
+        is HTTP_APPLICATION_FRAMEWORK_CATALOG
+    )
     assert get_catalog("application/wsgi") is WSGI_APPLICATION_CATALOG
     assert get_catalog("application/asgi") is ASGI_APPLICATION_CATALOG
 

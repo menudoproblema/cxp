@@ -37,10 +37,14 @@ def test_evaluate_capability_matrix_against_catalog_accepts_exact_interface() ->
     assert report.reason is None
 
 
-def test_evaluate_capability_matrix_against_catalog_accepts_family_compatibility() -> None:
+def test_evaluate_capability_matrix_against_catalog_accepts_family_compatibility() -> (
+    None
+):
     report = evaluate_capability_matrix_against_catalog(
         "browser/playwright",
-        CapabilityMatrix(capabilities=(Capability(name=PLAYWRIGHT_BROWSER_LIFECYCLE),)),
+        CapabilityMatrix(
+            capabilities=(Capability(name=PLAYWRIGHT_BROWSER_LIFECYCLE),)
+        ),
         BROWSER_AUTOMATION_CATALOG,
     )
 
@@ -97,7 +101,9 @@ def test_evaluate_capability_matrix_against_catalog_reports_invalid_metadata() -
     assert report.messages == ("Invalid metadata for capabilities: planning",)
 
 
-def test_evaluate_capability_matrix_against_catalog_reports_interface_mismatch() -> None:
+def test_evaluate_capability_matrix_against_catalog_reports_interface_mismatch() -> (
+    None
+):
     report = evaluate_capability_matrix_against_catalog(
         "database/mongodb",
         CapabilityMatrix(capabilities=(Capability(name="read"),)),
@@ -107,11 +113,12 @@ def test_evaluate_capability_matrix_against_catalog_reports_interface_mismatch()
     assert report.compliant is False
     assert report.validation is None
     assert report.messages == (
-        "Interface mismatch: provider exposes 'database/mongodb' but catalog requires 'browser/automation'",
+        "Interface mismatch: provider exposes 'database/mongodb' but catalog "
+        "requires 'browser/automation'",
     )
 
 
-def test_evaluate_handshake_response_against_catalog_preserves_rejected_handshake_reason(
+def test_evaluate_handshake_response_against_catalog_preserves_rejected_handshake_reason(  # noqa: E501
     mongo_request_factory,
     sync_mongo_provider_factory,
 ) -> None:

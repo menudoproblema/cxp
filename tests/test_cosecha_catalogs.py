@@ -159,7 +159,10 @@ def test_cosecha_selection_labels_rejects_plan_operations() -> None:
 
     assert validation.is_valid() is False
     assert len(validation.unknown_operations) == 1
-    assert validation.unknown_operations[0].capability_name == COSECHA_ENGINE_SELECTION_LABELS
+    assert (
+        validation.unknown_operations[0].capability_name
+        == COSECHA_ENGINE_SELECTION_LABELS
+    )
     assert validation.unknown_operations[0].operation_names == ('plan.analyze',)
 
 

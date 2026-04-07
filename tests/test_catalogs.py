@@ -4,13 +4,11 @@ from pytest import raises
 from cxp import (
     EXECUTION_ENGINE_CATALOG,
     EXECUTION_ENGINE_FAMILY_CATALOG,
-    MongoAggregationMetadata,
-    MongoCollationMetadata,
-    MongoPersistenceMetadata,
-    MongoSearchMetadata,
-    MongoTopologyDiscoveryMetadata,
-    MongoVectorSearchMetadata,
+    HTTP_APPLICATION_CATALOG,
+    HTTP_TRANSPORT_CATALOG,
     MONGODB_AGGREGATE,
+    MONGODB_CATALOG,
+    MONGODB_CORE_PROFILE,
     MONGODB_COUNT_DOCUMENTS,
     MONGODB_DELETE_MANY,
     MONGODB_DELETE_ONE,
@@ -18,36 +16,38 @@ from cxp import (
     MONGODB_ESTIMATED_DOCUMENT_COUNT,
     MONGODB_INSERT_MANY,
     MONGODB_INSERT_ONE,
+    MONGODB_PLATFORM_PROFILE,
     MONGODB_REPLACE_ONE,
+    MONGODB_SEARCH_PROFILE,
     MONGODB_START_SESSION,
+    MONGODB_TEXT_SEARCH_PROFILE,
     MONGODB_UPDATE_MANY,
     MONGODB_UPDATE_ONE,
-    CapabilityOperationBinding,
-    PLAN_RUN_EXECUTION_CATALOG,
-    HTTP_APPLICATION_CATALOG,
-    HTTP_TRANSPORT_CATALOG,
-    MONGODB_CATALOG,
-    MONGODB_CORE_PROFILE,
-    MONGODB_PLATFORM_PROFILE,
-    MONGODB_TEXT_SEARCH_PROFILE,
-    MONGODB_SEARCH_PROFILE,
     PLAN_RUN_EXECUTION_ADVANCED_PROFILE,
-    Capability,
-    CapabilityCatalog,
-    CapabilityMatrix,
-    CapabilityMatrixValidationResult,
-    CapabilityProfile,
-    CatalogCapability,
-    CatalogOperation,
-    CapabilityRequirement,
-    ConformanceTier,
-    ComponentCapabilitySnapshot,
-    CapabilityDescriptor,
-    get_catalog,
-    PLAYWRIGHT_BROWSER_CORE_PROFILE,
-    PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE,
+    PLAN_RUN_EXECUTION_CATALOG,
     PLAN_RUN_EXECUTION_CORE_PROFILE,
     PLAN_RUN_EXECUTION_PLANNED_PROFILE,
+    PLAYWRIGHT_BROWSER_CORE_PROFILE,
+    PLAYWRIGHT_BROWSER_OBSERVABLE_PROFILE,
+    Capability,
+    CapabilityCatalog,
+    CapabilityDescriptor,
+    CapabilityMatrix,
+    CapabilityMatrixValidationResult,
+    CapabilityOperationBinding,
+    CapabilityProfile,
+    CapabilityRequirement,
+    CatalogCapability,
+    CatalogOperation,
+    ComponentCapabilitySnapshot,
+    ConformanceTier,
+    MongoAggregationMetadata,
+    MongoCollationMetadata,
+    MongoPersistenceMetadata,
+    MongoSearchMetadata,
+    MongoTopologyDiscoveryMetadata,
+    MongoVectorSearchMetadata,
+    get_catalog,
 )
 from cxp.catalogs.base import _metadata_key_set
 
@@ -416,10 +416,23 @@ def test_public_api_reexports_complete_mongodb_contract() -> None:
         "$match",
     )
     assert MongoSearchMetadata(operators=("text",)).aggregateStage == "$search"
-    assert MongoVectorSearchMetadata(similarities=("cosine",)).aggregateStage == "$vectorSearch"
+    assert (
+        MongoVectorSearchMetadata(similarities=("cosine",)).aggregateStage
+        == "$vectorSearch"
+    )
     assert MongoCollationMetadata().backend == {}
-    assert MongoPersistenceMetadata(persistent=True, storageEngine="sqlite").storageEngine == "sqlite"
-    assert MongoTopologyDiscoveryMetadata(topologyType="single", serverCount=1).serverCount == 1
+    assert (
+        MongoPersistenceMetadata(
+            persistent=True, storageEngine="sqlite"
+        ).storageEngine
+        == "sqlite"
+    )
+    assert (
+        MongoTopologyDiscoveryMetadata(
+            topologyType="single", serverCount=1
+        ).serverCount
+        == 1
+    )
 
 
 def test_mongodb_search_profile_supports_consumer_style_snapshot_validation() -> None:
@@ -543,13 +556,17 @@ def test_mongodb_text_search_profile_does_not_require_vector_search() -> None:
         ),
     )
 
-    text_search_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
-        snapshot,
-        MONGODB_TEXT_SEARCH_PROFILE,
+    text_search_validation = (
+        MONGODB_CATALOG.validate_component_snapshot_against_profile(
+            snapshot,
+            MONGODB_TEXT_SEARCH_PROFILE,
+        )
     )
-    search_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
-        snapshot,
-        MONGODB_SEARCH_PROFILE,
+    search_validation = (
+        MONGODB_CATALOG.validate_component_snapshot_against_profile(
+            snapshot,
+            MONGODB_SEARCH_PROFILE,
+        )
     )
 
     assert text_search_validation.is_valid() is True
@@ -800,7 +817,9 @@ def test_catalog_capability_can_define_operations() -> None:
 
 def test_execution_engine_catalog_exposes_typed_operations() -> None:
     assert PLAN_RUN_EXECUTION_CATALOG.has_operation("planning", "plan.analyze")
-    assert PLAN_RUN_EXECUTION_CATALOG.has_operation("execution_stream", "execution.tail")
+    assert PLAN_RUN_EXECUTION_CATALOG.has_operation(
+        "execution_stream", "execution.tail"
+    )
 
     operation = PLAN_RUN_EXECUTION_CATALOG.get_operation("run", "run")
     assert operation is not None

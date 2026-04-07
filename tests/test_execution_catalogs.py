@@ -1,26 +1,32 @@
 from pytest import raises
 
 from cxp import (
-    CapabilityMatrix,
-    CapabilityCatalog,
-    CatalogRegistry,
-    ComponentIdentity,
+    EXECUTION_ENGINE_CATALOG,
     EXECUTION_ENGINE_FAMILY_CATALOG,
     EXECUTION_ENGINE_FAMILY_INTERFACE,
-    HandshakeRequest,
+    EXECUTION_ENGINE_INTERFACE,
     PLAN_RUN_EXECUTION_CATALOG,
     PLAN_RUN_EXECUTION_INTERFACE,
-    EXECUTION_ENGINE_CATALOG,
-    EXECUTION_ENGINE_INTERFACE,
+    CapabilityCatalog,
+    CapabilityMatrix,
+    CatalogRegistry,
+    ComponentIdentity,
+    HandshakeRequest,
     catalog_satisfies_interface,
     get_catalog,
     negotiate_capabilities,
 )
-from cxp.catalogs.interfaces.execution.plan_run import PLAN_RUN_OP_CANCEL, PLAN_RUN_OP_STATUS
+from cxp.catalogs.interfaces.execution.plan_run import (
+    PLAN_RUN_OP_CANCEL,
+    PLAN_RUN_OP_STATUS,
+)
 
 
 def test_execution_family_and_plan_run_catalogs_are_registered() -> None:
-    assert get_catalog(EXECUTION_ENGINE_FAMILY_INTERFACE) is EXECUTION_ENGINE_FAMILY_CATALOG
+    assert (
+        get_catalog(EXECUTION_ENGINE_FAMILY_INTERFACE)
+        is EXECUTION_ENGINE_FAMILY_CATALOG
+    )
     assert get_catalog(PLAN_RUN_EXECUTION_INTERFACE) is PLAN_RUN_EXECUTION_CATALOG
     assert EXECUTION_ENGINE_CATALOG is PLAN_RUN_EXECUTION_CATALOG
     assert EXECUTION_ENGINE_INTERFACE == PLAN_RUN_EXECUTION_INTERFACE
@@ -33,7 +39,10 @@ def test_execution_family_catalog_is_abstract() -> None:
 
 def test_execution_catalog_hierarchy_reports_plan_run_compatibility() -> None:
     assert catalog_satisfies_interface("execution/plan-run", "execution/engine")
-    assert catalog_satisfies_interface("execution/engine", "execution/plan-run") is False
+    assert (
+        catalog_satisfies_interface("execution/engine", "execution/plan-run")
+        is False
+    )
 
 
 def test_handshake_accepts_plan_run_for_execution_family() -> None:
