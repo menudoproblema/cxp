@@ -310,7 +310,11 @@ class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
 
 class CatalogOperation(msgspec.Struct, frozen=True):
     name: str
+    input_schema: CapabilityMetadataSchema = None  # Validation for request
     result_type: str | None = None
+    result_schema: CapabilityMetadataSchema = None # Validation for response
+    idempotent: bool = False                       # Safe to retry?
+    timeout_seconds: float | None = None           # Recommended timeout
     description: str | None = None
 
 
@@ -983,15 +987,15 @@ class CatalogRegistry:
                 field_names = frozenset(
                     field.name for field in span.required_attributes
                 )
-                existing = span_specs.get(span.name)
-                if existing is None:
+                existing_span = span_specs.get(span.name)
+                if existing_span is None:
                     span_specs[span.name] = (capability.name, field_names)
                     continue
-                if existing[1] != field_names:
+                if existing_span[1] != field_names:
                     msg = (
                         "Conflicting telemetry span definition for "
                         f"{span.name!r} in catalog {catalog.interface!r}: "
-                        f"{existing[0]!r} vs {capability.name!r}"
+                        f"{existing_span[0]!r} vs {capability.name!r}"
                     )
                     raise ValueError(msg)
 
@@ -999,19 +1003,22 @@ class CatalogRegistry:
                 label_names = frozenset(
                     field.name for field in metric.required_labels
                 )
-                existing = metric_specs.get(metric.name)
-                if existing is None:
+                existing_metric = metric_specs.get(metric.name)
+                if existing_metric is None:
                     metric_specs[metric.name] = (
                         capability.name,
                         metric.unit,
                         label_names,
                     )
                     continue
-                if existing[1] != metric.unit or existing[2] != label_names:
+                if (
+                    existing_metric[1] != metric.unit
+                    or existing_metric[2] != label_names
+                ):
                     msg = (
                         "Conflicting telemetry metric definition for "
                         f"{metric.name!r} in catalog {catalog.interface!r}: "
-                        f"{existing[0]!r} vs {capability.name!r}"
+                        f"{existing_metric[0]!r} vs {capability.name!r}"
                     )
                     raise ValueError(msg)
 
@@ -1019,19 +1026,22 @@ class CatalogRegistry:
                 payload_keys = frozenset(
                     field.name for field in event.required_payload_keys
                 )
-                existing = event_specs.get(event.event_type)
-                if existing is None:
+                existing_event = event_specs.get(event.event_type)
+                if existing_event is None:
                     event_specs[event.event_type] = (
                         capability.name,
                         event.severity,
                         payload_keys,
                     )
                     continue
-                if existing[1] != event.severity or existing[2] != payload_keys:
+                if (
+                    existing_event[1] != event.severity
+                    or existing_event[2] != payload_keys
+                ):
                     msg = (
                         "Conflicting telemetry event definition for "
                         f"{event.event_type!r} in catalog {catalog.interface!r}: "
-                        f"{existing[0]!r} vs {capability.name!r}"
+                        f"{existing_event[0]!r} vs {capability.name!r}"
                     )
                     raise ValueError(msg)
 

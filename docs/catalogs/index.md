@@ -1,166 +1,41 @@
-# Catálogos
+# Catálogos de Interfaces CXP
 
-## Propósito
-Un catálogo CXP define el vocabulario interoperable de una interfaz concreta.
+CXP organiza capacidades del sistema en catálogos semánticos estructurados por familias de interfaz. Estos catálogos pueden definir capacidades, operaciones, esquemas tipados opcionales y convenciones compartidas de telemetría sin ampliar el núcleo del protocolo.
 
-Su papel no es negociar capabilities ni ejecutar comportamiento. Su papel es definir nombres canónicos y tiers de conformidad para que providers y orquestadores hablen el mismo lenguaje de dominio.
+## 1. Capa de Computación y Ejecución
+Gestiona el ciclo de vida de tareas, colas de trabajo y el contexto de ejecución.
+- [Execution (Plan-Run)](interfaces/execution/plan-run.md): Interfaz base para cualquier tarea asíncrona.
+- [Queue (Task Engine)](interfaces/queue/task-engine.md): Procesamiento en background y tareas programadas.
+- [Runtime Environment](interfaces/runtime/environment.md): Gestión de secretos, configuración y recursos.
+- [Application (ASGI/WSGI)](interfaces/application/asgi.md): Servidores y frameworks web.
 
-En el estado actual del repositorio, la infraestructura genérica de catálogos está cerrada, pero los vocabularios concretos de dominio siguen siendo revisables. Eso significa que los catálogos existentes deben leerse como base de trabajo interoperable, no todavía como estándar definitivo.
+## 2. Capa de Persistencia (Data Layer)
+Gestión de estado y almacenamiento de datos.
+- [Database (SQL/NoSQL)](interfaces/database/index.md): Persistencia estructurada y documental.
+- [Storage (Blob)](interfaces/storage/blob.md): Almacenamiento de objetos y archivos.
+- [Cache (Key-Value)](interfaces/cache/key-value.md): Memoria rápida y estado efímero.
 
-## Responsabilidades
-- Asociar un nombre de `interface` estable a un dominio interoperable.
-- Definir nombres canónicos de capabilities para esa interfaz.
-- Definir tiers de conformidad cuando el dominio necesite perfiles comunes de soporte.
-- Dejar los detalles específicos del provider en metadata o extensiones de nivel superior.
+## 3. Capa de Seguridad e Identidad
+Validación de identidades y permisos.
+- [Auth Provider](interfaces/identity/auth-provider.md): Validación de tokens (JWT), perfiles de usuario y políticas (RBAC/ABAC).
 
-## No Responsabilidades
-- Un catálogo no implementa el handshake.
-- Un catálogo no ejecuta la lógica del provider.
-- Un catálogo no sustituye a la telemetría.
-- Un catálogo no transporta configuración específica de una implementación.
+## 4. Capa de Comunicaciones
+Movimiento de información y eventos.
+- [Transport (HTTP/WebSocket)](interfaces/transport/index.md): Semántica de red request/response (H1.1, H2, H3), WebSocket, SSE y TLS.
+- [Messaging (Event Bus)](interfaces/messaging/event-bus.md): Pub/Sub y colas de eventos con persistencia (ej. NATS JetStream).
+- [Notification (WebPush)](interfaces/notification/web-push.md): Notificaciones al usuario (Push, WebPush).
 
-## Modelo en Código
-La capa genérica de catálogos expone:
+## 5. Capa de Experiencia y Media
+Interacción con el usuario y contenido pesado.
+- [Browser (Automation)](interfaces/browser/automation.md): Control de navegadores (Playwright) incluyendo LocalStorage.
+- [Media (Streaming)](interfaces/media/video-streaming.md): Vídeo adaptativo (HLS/DASH) y transcodificación.
 
-- `CapabilityCatalog`
-- `CatalogCapability`
-- `CatalogOperation`
-- `ConformanceTier`
-- `CatalogRegistry`
+## 6. Capa Física e Industrial
+Orquestación de hardware y periféricos.
+- [Printing (Industrial)](interfaces/printing/industrial.md): Impresión de etiquetas (ZPL, Zebra) y acabados físicos (Konica Minolta).
 
-Además, un catálogo puede declararse como abstracto y expresar compatibilidad
-con otras interfaces mediante `satisfies_interfaces`.
-
-Los catálogos concretos de dominio se construyen sobre esa capa genérica y viven en código bajo `src/cxp/catalogs/interfaces/`.
-Los catálogos first-party se registran automáticamente en `DEFAULT_CATALOG_REGISTRY` al importar el paquete, y el registro ya no sobrescribe interfaces distintas de forma silenciosa: una duplicada conflictiva lanza error salvo que se use reemplazo explícito.
-La idempotencia del registro se apoya en la igualdad estructural de `msgspec.Struct`, incluyendo la identidad real de tipos usados como `metadata_schema`.
-
-Catálogos first-party actuales:
-
-- [`cosecha/engine`](./interfaces/cosecha/engine.md)
-- [`cosecha/reporter`](./interfaces/cosecha/reporter.md)
-- [`cosecha/plugin`](./interfaces/cosecha/plugin.md)
-- [`browser/automation`](./interfaces/browser/automation.md)
-- [`browser/playwright`](./interfaces/browser/playwright.md)
-- [`database/mongodb`](./interfaces/database/mongodb.md)
-- [`transport/http`](./interfaces/transport/http.md)
-- [`application/http`](./interfaces/application/http.md)
-- [`application/http-framework`](./interfaces/application/http-framework.md)
-- [`application/wsgi`](./interfaces/application/wsgi.md)
-- [`application/asgi`](./interfaces/application/asgi.md)
-- [`execution/engine`](./interfaces/execution/engine.md)
-- [`execution/plan-run`](./interfaces/execution/plan-run.md)
-
-Nota sobre execution:
-
-- `execution/engine` es una familia abstracta de compatibilidad.
-- `execution/plan-run` es el contrato first-party concreto.
-- Los aliases legacy `EXECUTION_ENGINE_*` siguen apuntando al contrato
-  concreto `execution/plan-run`.
-
-Nota sobre browser:
-
-- `browser/automation` es una familia abstracta de compatibilidad.
-- `browser/playwright` es el contrato first-party concreto actual.
-
-Nota sobre Cosecha:
-
-- `cosecha/engine`, `cosecha/reporter` y `cosecha/plugin` son contratos concretos.
-- Están pensados para extensiones propias de Cosecha y no participan en la validación de runtime profiles reservados como `application/*`, `database/*`, `execution/*` o `transport/*`.
-
-## Capabilities y Operaciones
-Un catálogo puede describir dos niveles:
-
-- `Capability`: área funcional interoperable.
-- `Operation`: acción tipada asociada a una capability.
-
-Esto permite modelar interfaces donde no basta con decir "qué puede hacer", sino también "qué operaciones concretas publica". Es especialmente útil en catálogos como `execution/plan-run`.
-
-La misma autoridad semántica del catálogo puede reutilizarse sobre la capa rica de descriptores:
-
-- `validate_capability_descriptors(...)`
-- `validate_component_snapshot(...)`
-- `is_component_snapshot_compliant(...)`
-
-Eso permite validar snapshots completos de componente sin convertir el catálogo en parte del handshake.
-
-Los catálogos abstractos existen para compatibilidad de familia y no deben
-usarse como objetivo de validación de capabilities.
-
-## Telemetría Asociada
-Un `CatalogCapability` también puede declarar semántica de telemetría asociada
-a esa capability.
-
-Eso permite definir spans, métricas y eventos canónicos esperables para una
-surface funcional dada, junto con los atributos o labels mínimos que deben
-acompañarlos.
-
-La validación de telemetría no forma parte del handshake. Es una validación
-opcional posterior sobre `TelemetrySnapshot`.
-
-## Metadata Tipada
-Una `CatalogCapability` también puede declarar un `metadata_schema`. Ese esquema actúa como contrato esperado para la metadata publicada por el provider en la `CapabilityMatrix`.
-
-La capa de catálogo expone helpers para validarlo tanto sobre `CapabilityMatrix` como sobre descriptores ricos:
-
-- `validate_capability_matrix(matrix, ...)`
-- `invalid_capability_metadata(matrix)`
-- `is_capability_matrix_compliant(matrix, ...)`
-- `validate_component_snapshot(snapshot)`
-- `is_component_snapshot_compliant(snapshot, ...)`
-
-`validate_capability_matrix(...)` devuelve un resultado rico con:
-
-- capabilities desconocidas;
-- metadata inválida;
-- tier requerido desconocido;
-- capabilities ausentes para satisfacer un tier requerido.
-
-```python
-import msgspec
-
-from cxp import Capability, CapabilityCatalog, CapabilityMatrix, CatalogCapability
-
-
-class PlanningMetadata(msgspec.Struct, frozen=True):
-    mode: str
-    explain: bool = False
-
-
-catalog = CapabilityCatalog(
-    interface="execution/plan-run",
-    capabilities=(
-        CatalogCapability(
-            name="planning",
-            metadata_schema=PlanningMetadata,
-        ),
-    ),
-)
-
-matrix = CapabilityMatrix(
-    capabilities=(
-        Capability(
-            name="planning",
-            metadata={"mode": "strict", "explain": True},
-        ),
-    ),
-)
-
-assert catalog.invalid_capability_metadata(matrix) == ()
-```
-
-## Validación Básica
-La API actual permite comprobar dos cosas:
-
-1. si un conjunto de nombres contiene capabilities desconocidas para el catálogo;
-2. qué tiers de conformidad satisface ese conjunto.
-
-```python
-from cxp import get_catalog
-
-catalog = get_catalog("database/mongodb")
-assert catalog is not None
-
-unknown = catalog.validate_capability_names(("read", "write", "custom_feature"))
-tiers = catalog.satisfied_tiers(("read", "write", "transactions", "aggregation", "change_streams"))
-```
+## Convenciones Compartidas
+Muchos catálogos reutilizan convenciones comunes para mantener coherencia entre proveedores:
+1. **Telemetría Compartida**: Reutilización de nombres de campos y unidades cuando aporta interoperabilidad.
+2. **Esquemas Tipados Opcionales**: Validación estructural en metadata o resultados cuando el dominio lo necesita.
+3. **Tiers de Conformidad**: Definición clara del nivel `core` y de superficies más avanzadas.

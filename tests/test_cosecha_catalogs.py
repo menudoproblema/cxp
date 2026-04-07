@@ -75,11 +75,6 @@ def test_cosecha_engine_catalog_validates_normalized_snapshot() -> None:
                     'label_sources': ['feature_tag', 'scenario_tag'],
                     'supports_glob_matching': True,
                 },
-                operations=(
-                    CapabilityOperationBinding('plan.analyze'),
-                    CapabilityOperationBinding('plan.explain'),
-                    CapabilityOperationBinding('plan.simulate'),
-                ),
             ),
             CapabilityDescriptor(
                 name=COSECHA_ENGINE_DEFINITION_KNOWLEDGE,
@@ -136,6 +131,36 @@ def test_cosecha_engine_catalog_validates_normalized_snapshot() -> None:
     )
 
     assert COSECHA_ENGINE_CATALOG.is_component_snapshot_compliant(snapshot)
+
+
+def test_cosecha_selection_labels_rejects_plan_operations() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name='gherkin',
+        identity=ComponentIdentity(
+            interface=COSECHA_ENGINE_INTERFACE,
+            provider='gherkin',
+            version='1',
+        ),
+        capabilities=(
+            CapabilityDescriptor(
+                name=COSECHA_ENGINE_SELECTION_LABELS,
+                level='supported',
+                metadata={
+                    'label_sources': ['feature_tag'],
+                },
+                operations=(
+                    CapabilityOperationBinding('plan.analyze'),
+                ),
+            ),
+        ),
+    )
+
+    validation = COSECHA_ENGINE_CATALOG.validate_component_snapshot(snapshot)
+
+    assert validation.is_valid() is False
+    assert len(validation.unknown_operations) == 1
+    assert validation.unknown_operations[0].capability_name == COSECHA_ENGINE_SELECTION_LABELS
+    assert validation.unknown_operations[0].operation_names == ('plan.analyze',)
 
 
 def test_cosecha_engine_catalog_rejects_legacy_dependency_operation_name() -> None:

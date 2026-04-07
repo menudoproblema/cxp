@@ -22,6 +22,7 @@ PLAN_RUN_EXECUTION_PLANNING = "planning"
 PLAN_RUN_EXECUTION_INPUT_VALIDATION = "input_validation"
 PLAN_RUN_EXECUTION_EXECUTION_STATUS = "execution_status"
 PLAN_RUN_EXECUTION_EXECUTION_STREAM = "execution_stream"
+PLAN_RUN_OP_STATUS = "execution.status"
 
 PLAN_RUN_EXECUTION_CORE_PROFILE_NAME = "plan-run-core"
 PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME = "plan-run-planned"
@@ -221,7 +222,7 @@ PLAN_RUN_EXECUTION_CATALOG = register_catalog(
                 ),
                 operations=(
                     CatalogOperation(
-                        name="execution.status",
+                        name=PLAN_RUN_OP_STATUS,
                         result_type="execution.status",
                         description="Read aggregate execution status.",
                     ),
@@ -346,4 +347,5 @@ __all__ = (
     "PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_PLANNING",
     "PLAN_RUN_EXECUTION_RUN",
+    "PLAN_RUN_OP_STATUS",
 )

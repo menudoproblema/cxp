@@ -43,6 +43,19 @@ HTTP_TRANSPORT_CATALOG = register_catalog(
     )
 )
 
+from cxp.catalogs.interfaces.transport.family import (  # noqa: E402
+    HTTP_TRANSPORT_FAMILY_CATALOG as _HTTP_TRANSPORT_FAMILY_CATALOG,
+)
+from cxp.catalogs.interfaces.transport.http2 import (  # noqa: E402
+    HTTP2_TRANSPORT_CATALOG as _HTTP2_TRANSPORT_CATALOG,
+)
+from cxp.catalogs.interfaces.transport.http3 import (  # noqa: E402
+    HTTP3_TRANSPORT_CATALOG as _HTTP3_TRANSPORT_CATALOG,
+)
+from cxp.catalogs.interfaces.transport.websocket import (  # noqa: E402
+    WEBSOCKET_CATALOG as _WEBSOCKET_CATALOG,
+)
+
 __all__ = (
     "HTTP_TRANSPORT_AUTH_PROPAGATION",
     "HTTP_TRANSPORT_CATALOG",
