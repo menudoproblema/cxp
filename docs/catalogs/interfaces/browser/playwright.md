@@ -81,6 +81,8 @@ en las señales mínimas con valor interoperable para un orquestador:
 ## Campos Requeridos Más Útiles
 Los campos mínimos compartidos más relevantes son:
 
+- `cxp.resource.name`
+- `cxp.resource.kind`
 - `browser.engine`
 - `browser.context.id`
 - `browser.page.id`
@@ -110,6 +112,16 @@ La intención es fijar un vocabulario estable y pequeño para:
 
 Los detalles específicos del provider deben seguir viviendo en metadata
 propietaria o en señales adicionales fuera del vocabulario canónico.
+
+## Confirmación de Acciones
+Las operaciones atómicas que antes eran puramente `void` devuelven ahora
+`ActionResult` cuando el contrato necesita confirmar un efecto:
+
+- `browser.close`
+- `context.close`
+- `element.click`, `element.fill`, `element.press`, `element.select_option`
+- `wait.for_selector`, `wait.for_url`
+- `dialog.accept`, `dialog.dismiss`
 
 ## Flujo de Consumo Recomendado
 Un consumidor de `browser/playwright` suele:

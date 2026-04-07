@@ -7,7 +7,7 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.results import WebSocketMessage
+from cxp.catalogs.results import ActionResult, WebSocketMessage
 
 WEBSOCKET_INTERFACE = "transport/websocket"
 
@@ -33,7 +33,8 @@ WEBSOCKET_CATALOG = register_catalog(
                     CatalogOperation(name=WS_OP_CONNECT, result_type="ws.session"),
                     CatalogOperation(
                         name=WS_OP_SEND,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Send a message to the remote peer.",
                     ),
                     CatalogOperation(
@@ -42,7 +43,11 @@ WEBSOCKET_CATALOG = register_catalog(
                         result_schema=WebSocketMessage,
                         description="Wait for and receive a message.",
                     ),
-                    CatalogOperation(name=WS_OP_CLOSE, result_type="none"),
+                    CatalogOperation(
+                        name=WS_OP_CLOSE,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
             CatalogCapability(

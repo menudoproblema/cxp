@@ -42,6 +42,22 @@ def test_extended_catalogs_are_registered_on_root_import() -> None:
         assert get_catalog(interface) is not None
 
 
+def test_runtime_environment_exposes_health_and_reload_capabilities() -> None:
+    runtime_catalog = get_catalog("runtime/environment")
+
+    assert runtime_catalog is not None
+    assert runtime_catalog.has_operation("health", "runtime.health_check") is True
+    assert runtime_catalog.has_operation("lifecycle", "runtime.reload") is True
+
+    managed_tier = runtime_catalog.get_tier("managed")
+    assert managed_tier is not None
+    assert managed_tier.required_capabilities == (
+        "configuration",
+        "health",
+        "lifecycle",
+    )
+
+
 def test_database_concrete_catalogs_satisfy_common_database_family() -> None:
     assert catalog_satisfies_interface("database/mongodb", "database/common")
     assert catalog_satisfies_interface("database/sql", "database/common")

@@ -75,9 +75,11 @@ Las reglas practicas son estas:
 
 Los campos comunes minimos para operaciones documentales son:
 
-- `db.system.name`
-- `db.operation.name`
-- `db.namespace.name`
+- `cxp.resource.name`
+- `cxp.resource.kind`
+- `db.system`
+- `db.operation`
+- `db.namespace`
 - `db.operation.outcome`
 
 Y las capabilities especializadas exigen campos extra:

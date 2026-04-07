@@ -3,7 +3,7 @@
 ## Interfaz Base
 - **Nombre:** `cache/key-value`
 - **Descripción:** Catálogo fidedigno para proveedores de caché en memoria (Redis, Memcached).
-- **Esquema de Resultado:** `CacheValue` (incluye soporte para comprobar si la clave existe y su TTL).
+- **Esquemas de Resultado:** `CacheValue` para lecturas y `ActionResult` para `SET` y `DELETE`.
 
 ### Capacidades
 1. **`read_write`**: (Requerida en `core`) Operaciones atómicas de GET, SET y DELETE.

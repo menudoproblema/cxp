@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from cxp.catalogs.base import (
     CapabilityCatalog,
-    CapabilityTelemetry,
     CapabilityProfile,
     CapabilityRequirement,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
@@ -14,7 +14,13 @@ from cxp.catalogs.base import (
     TelemetrySpanSpec,
     register_catalog,
 )
+from cxp.catalogs.common import (
+    CXP_RESOURCE_KIND,
+    CXP_RESOURCE_NAME,
+    UNIT_SECONDS,
+)
 from cxp.catalogs.interfaces.browser.family import BROWSER_AUTOMATION_INTERFACE
+from cxp.catalogs.results import ActionResult
 from cxp.telemetry import TelemetrySeverity
 
 PLAYWRIGHT_BROWSER_INTERFACE = "browser/playwright"
@@ -83,6 +89,22 @@ _BROWSER_SCREENSHOT_TARGET_FIELD = TelemetryFieldRequirement(
 _BROWSER_DIALOG_TYPE_FIELD = TelemetryFieldRequirement(name="browser.dialog.type")
 
 
+def _telemetry_fields(
+    *groups: tuple[TelemetryFieldRequirement, ...],
+) -> tuple[TelemetryFieldRequirement, ...]:
+    ordered: list[TelemetryFieldRequirement] = []
+    seen: set[str] = set()
+
+    for group in groups:
+        for field in group:
+            if field.name in seen:
+                continue
+            seen.add(field.name)
+            ordered.append(field)
+
+    return tuple(ordered)
+
+
 def _browser_telemetry(
     *,
     span_name: str,
@@ -99,7 +121,10 @@ def _browser_telemetry(
         spans=(
             TelemetrySpanSpec(
                 name=span_name,
-                required_attributes=span_attributes,
+                required_attributes=_telemetry_fields(
+                    (CXP_RESOURCE_NAME, CXP_RESOURCE_KIND, _BROWSER_ENGINE_FIELD),
+                    span_attributes,
+                ),
                 description=description,
             ),
         ),
@@ -107,7 +132,10 @@ def _browser_telemetry(
             TelemetryMetricSpec(
                 name=metric_name,
                 unit=metric_unit,
-                required_labels=metric_labels,
+                required_labels=_telemetry_fields(
+                    (CXP_RESOURCE_NAME, CXP_RESOURCE_KIND, _BROWSER_ENGINE_FIELD),
+                    metric_labels,
+                ),
                 description=f"{description} metric.",
             ),
         ),
@@ -115,7 +143,10 @@ def _browser_telemetry(
             TelemetryEventSpec(
                 event_type=event_type,
                 severity=event_severity,
-                required_payload_keys=event_payload_keys,
+                required_payload_keys=_telemetry_fields(
+                    (CXP_RESOURCE_NAME, CXP_RESOURCE_KIND, _BROWSER_ENGINE_FIELD),
+                    event_payload_keys,
+                ),
                 description=f"{description} event.",
             ),
         ),
@@ -138,16 +169,24 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     spans=(
                         TelemetrySpanSpec(
                             name="browser.launch",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_HEADLESS_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_HEADLESS_FIELD,
+                                ),
                             ),
                             description="Browser launch operation.",
                         ),
                         TelemetrySpanSpec(
                             name="browser.close",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                ),
                             ),
                             description="Browser close operation.",
                         ),
@@ -155,20 +194,28 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     metrics=(
                         TelemetryMetricSpec(
                             name="browser.launch.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_HEADLESS_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_HEADLESS_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Browser launch duration metric.",
                         ),
                         TelemetryMetricSpec(
                             name="browser.close.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Browser close duration metric.",
                         ),
@@ -176,25 +223,37 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     events=(
                         TelemetryEventSpec(
                             event_type="browser.session.launched",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_HEADLESS_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_HEADLESS_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.session.launch_failed",
                             severity="error",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_HEADLESS_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_HEADLESS_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.session.closed",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                     ),
@@ -207,7 +266,8 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_CLOSE,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Close a browser process.",
                     ),
                 ),
@@ -219,16 +279,24 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     spans=(
                         TelemetrySpanSpec(
                             name="browser.context.create",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                ),
                             ),
                             description="Browser context creation operation.",
                         ),
                         TelemetrySpanSpec(
                             name="browser.context.close",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_CONTEXT_ID_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_CONTEXT_ID_FIELD,
+                                ),
                             ),
                             description="Browser context close operation.",
                         ),
@@ -236,19 +304,27 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     metrics=(
                         TelemetryMetricSpec(
                             name="browser.context.create.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Browser context creation duration metric.",
                         ),
                         TelemetryMetricSpec(
                             name="browser.context.close.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Browser context close duration metric.",
                         ),
@@ -256,25 +332,37 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     events=(
                         TelemetryEventSpec(
                             event_type="browser.context.created",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_CONTEXT_ID_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_CONTEXT_ID_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.context.create_failed",
                             severity="error",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.context.closed",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_CONTEXT_ID_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_CONTEXT_ID_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                     ),
@@ -287,7 +375,8 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_CONTEXT_CLOSE,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Close an existing browser context.",
                     ),
                 ),
@@ -403,22 +492,26 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_ELEMENT_CLICK,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Click an element.",
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_ELEMENT_FILL,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Fill an input element.",
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_ELEMENT_PRESS,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Press a key on an element.",
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_ELEMENT_SELECT_OPTION,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Select an option on a form control.",
                     ),
                 ),
@@ -450,12 +543,14 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_WAIT_FOR_SELECTOR,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Wait for a selector to satisfy a condition.",
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_WAIT_FOR_URL,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Wait for a URL match.",
                     ),
                     CatalogOperation(
@@ -509,21 +604,29 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     spans=(
                         TelemetrySpanSpec(
                             name="browser.request.observe",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                ),
                             ),
                             description="Network request observation activity.",
                         ),
                         TelemetrySpanSpec(
                             name="browser.response.observe",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                ),
                             ),
                             description="Network response observation activity.",
                         ),
@@ -531,21 +634,29 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     metrics=(
                         TelemetryMetricSpec(
                             name="browser.request.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Observed request duration metric.",
                         ),
                         TelemetryMetricSpec(
                             name="browser.response.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Observed response duration metric.",
                         ),
@@ -553,42 +664,58 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     events=(
                         TelemetryEventSpec(
                             event_type="browser.request.observed",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.response.observed",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.request.failed",
                             severity="error",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.response.failed",
                             severity="error",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_NETWORK_PHASE_FIELD,
-                                _BROWSER_REQUEST_URL_HOST_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_NETWORK_PHASE_FIELD,
+                                    _BROWSER_REQUEST_URL_HOST_FIELD,
+                                ),
                             ),
                         ),
                     ),
@@ -650,11 +777,15 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     spans=(
                         TelemetrySpanSpec(
                             name="browser.dialog.handle",
-                            required_attributes=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_DIALOG_TYPE_FIELD,
-                                _BROWSER_ACTION_NAME_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_DIALOG_TYPE_FIELD,
+                                    _BROWSER_ACTION_NAME_FIELD,
+                                ),
                             ),
                             description="Dialog handling activity.",
                         ),
@@ -662,12 +793,16 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     metrics=(
                         TelemetryMetricSpec(
                             name="browser.dialog.duration",
-                            unit="s",
-                            required_labels=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_DIALOG_TYPE_FIELD,
-                                _BROWSER_ACTION_NAME_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_DIALOG_TYPE_FIELD,
+                                    _BROWSER_ACTION_NAME_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                             description="Dialog handling duration metric.",
                         ),
@@ -675,20 +810,28 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                     events=(
                         TelemetryEventSpec(
                             event_type="browser.dialog.opened",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_DIALOG_TYPE_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_DIALOG_TYPE_FIELD,
+                                ),
                             ),
                         ),
                         TelemetryEventSpec(
                             event_type="browser.dialog.handled",
-                            required_payload_keys=(
-                                _BROWSER_ENGINE_FIELD,
-                                _BROWSER_PAGE_ID_FIELD,
-                                _BROWSER_DIALOG_TYPE_FIELD,
-                                _BROWSER_ACTION_NAME_FIELD,
-                                _BROWSER_OUTCOME_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _BROWSER_ENGINE_FIELD,
+                                    _BROWSER_PAGE_ID_FIELD,
+                                    _BROWSER_DIALOG_TYPE_FIELD,
+                                    _BROWSER_ACTION_NAME_FIELD,
+                                    _BROWSER_OUTCOME_FIELD,
+                                ),
                             ),
                         ),
                     ),
@@ -696,12 +839,14 @@ PLAYWRIGHT_BROWSER_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_DIALOG_ACCEPT,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Accept a dialog.",
                     ),
                     CatalogOperation(
                         name=PLAYWRIGHT_BROWSER_DIALOG_DISMISS,
-                        result_type="none",
+                        result_type="action.result",
+                        result_schema=ActionResult,
                         description="Dismiss a dialog.",
                     ),
                 ),

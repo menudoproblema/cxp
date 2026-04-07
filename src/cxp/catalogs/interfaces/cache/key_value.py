@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import msgspec
-
 from cxp.catalogs.base import (
     CapabilityCatalog,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
-    CapabilityTelemetry,
     TelemetryMetricSpec,
     register_catalog,
 )
 from cxp.catalogs.common import (
     CACHE_HIT,
     CXP_RESOURCE_NAME,
+    UNIT_SECONDS,
 )
-from cxp.catalogs.results import CacheValue
+from cxp.catalogs.results import ActionResult, CacheValue
 
 CACHE_KV_INTERFACE = "cache/key-value"
 
@@ -38,7 +37,7 @@ _CACHE_TELEMETRY = CapabilityTelemetry(
         ),
         TelemetryMetricSpec(
             name="cache.latency",
-            unit="s",
+            unit=UNIT_SECONDS,
             required_labels=(CXP_RESOURCE_NAME,),
         ),
     ),
@@ -60,8 +59,16 @@ CACHE_KV_CATALOG = register_catalog(
                         result_schema=CacheValue,
                         description="Retrieve a value by its key.",
                     ),
-                    CatalogOperation(name=CACHE_OP_SET, result_type="none"),
-                    CatalogOperation(name=CACHE_OP_DEL, result_type="none"),
+                    CatalogOperation(
+                        name=CACHE_OP_SET,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
+                    CatalogOperation(
+                        name=CACHE_OP_DEL,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
             CatalogCapability(

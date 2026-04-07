@@ -18,6 +18,14 @@ from cxp.catalogs.base import (
     TelemetrySpanSpec,
     register_catalog,
 )
+from cxp.catalogs.common import (
+    CXP_RESOURCE_KIND,
+    CXP_RESOURCE_NAME,
+    DB_NAMESPACE,
+    DB_OPERATION,
+    DB_SYSTEM,
+    UNIT_SECONDS,
+)
 from cxp.catalogs.interfaces.database.family import DATABASE_INTERFACE
 
 MONGODB_INTERFACE = "database/mongodb"
@@ -180,9 +188,9 @@ _TRANSACTION_OPERATION_NAMES = tuple(
     operation.name for operation in _TRANSACTION_OPERATIONS
 )
 
-_DB_SYSTEM_FIELD = TelemetryFieldRequirement(name="db.system.name")
-_DB_OPERATION_FIELD = TelemetryFieldRequirement(name="db.operation.name")
-_DB_NAMESPACE_FIELD = TelemetryFieldRequirement(name="db.namespace.name")
+_DB_SYSTEM_FIELD = DB_SYSTEM
+_DB_OPERATION_FIELD = DB_OPERATION
+_DB_NAMESPACE_FIELD = DB_NAMESPACE
 _DB_OUTCOME_FIELD = TelemetryFieldRequirement(name="db.operation.outcome")
 _DB_PIPELINE_STAGE_FIELD = TelemetryFieldRequirement(name="db.pipeline.stage.name")
 _DB_PIPELINE_STAGE_COUNT_FIELD = TelemetryFieldRequirement(
@@ -212,6 +220,22 @@ _DB_TRANSACTION_OUTCOME_FIELD = TelemetryFieldRequirement(
 )
 
 
+def _telemetry_fields(
+    *groups: tuple[TelemetryFieldRequirement, ...],
+) -> tuple[TelemetryFieldRequirement, ...]:
+    ordered: list[TelemetryFieldRequirement] = []
+    seen: set[str] = set()
+
+    for group in groups:
+        for field in group:
+            if field.name in seen:
+                continue
+            seen.add(field.name)
+            ordered.append(field)
+
+    return tuple(ordered)
+
+
 def _mongodb_operation_telemetry(
     *,
     span_name: str,
@@ -226,11 +250,15 @@ def _mongodb_operation_telemetry(
         spans=(
             TelemetrySpanSpec(
                 name=span_name,
-                required_attributes=(
-                    _DB_SYSTEM_FIELD,
-                    _DB_OPERATION_FIELD,
-                    _DB_NAMESPACE_FIELD,
-                    *extra_span_attributes,
+                required_attributes=_telemetry_fields(
+                    (
+                        CXP_RESOURCE_NAME,
+                        CXP_RESOURCE_KIND,
+                        _DB_SYSTEM_FIELD,
+                        _DB_OPERATION_FIELD,
+                        _DB_NAMESPACE_FIELD,
+                    ),
+                    extra_span_attributes,
                 ),
                 description=description,
             ),
@@ -238,12 +266,16 @@ def _mongodb_operation_telemetry(
         metrics=(
             TelemetryMetricSpec(
                 name=metric_name,
-                unit="s",
-                required_labels=(
-                    _DB_SYSTEM_FIELD,
-                    _DB_OPERATION_FIELD,
-                    _DB_OUTCOME_FIELD,
-                    *extra_metric_labels,
+                unit=UNIT_SECONDS,
+                required_labels=_telemetry_fields(
+                    (
+                        CXP_RESOURCE_NAME,
+                        CXP_RESOURCE_KIND,
+                        _DB_SYSTEM_FIELD,
+                        _DB_OPERATION_FIELD,
+                        _DB_OUTCOME_FIELD,
+                    ),
+                    extra_metric_labels,
                 ),
                 description=f"{description} duration metric.",
             ),
@@ -251,12 +283,16 @@ def _mongodb_operation_telemetry(
         events=(
             TelemetryEventSpec(
                 event_type=event_type,
-                required_payload_keys=(
-                    _DB_SYSTEM_FIELD,
-                    _DB_OPERATION_FIELD,
-                    _DB_NAMESPACE_FIELD,
-                    _DB_OUTCOME_FIELD,
-                    *extra_event_payload_keys,
+                required_payload_keys=_telemetry_fields(
+                    (
+                        CXP_RESOURCE_NAME,
+                        CXP_RESOURCE_KIND,
+                        _DB_SYSTEM_FIELD,
+                        _DB_OPERATION_FIELD,
+                        _DB_NAMESPACE_FIELD,
+                        _DB_OUTCOME_FIELD,
+                    ),
+                    extra_event_payload_keys,
                 ),
                 description=f"{description} completion event.",
             ),
@@ -427,10 +463,14 @@ MONGODB_CATALOG = register_catalog(
                     spans=(
                         TelemetrySpanSpec(
                             name="db.client.topology",
-                            required_attributes=(
-                                _DB_SYSTEM_FIELD,
-                                _DB_TOPOLOGY_TYPE_FIELD,
-                                _DB_TOPOLOGY_SERVER_COUNT_FIELD,
+                            required_attributes=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _DB_SYSTEM_FIELD,
+                                    _DB_TOPOLOGY_TYPE_FIELD,
+                                    _DB_TOPOLOGY_SERVER_COUNT_FIELD,
+                                ),
                             ),
                             description="Topology reporting span.",
                         ),
@@ -438,10 +478,14 @@ MONGODB_CATALOG = register_catalog(
                     metrics=(
                         TelemetryMetricSpec(
                             name="db.client.topology.duration",
-                            unit="s",
-                            required_labels=(
-                                _DB_SYSTEM_FIELD,
-                                _DB_TOPOLOGY_TYPE_FIELD,
+                            unit=UNIT_SECONDS,
+                            required_labels=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _DB_SYSTEM_FIELD,
+                                    _DB_TOPOLOGY_TYPE_FIELD,
+                                ),
                             ),
                             description="Topology reporting span duration metric.",
                         ),
@@ -449,9 +493,14 @@ MONGODB_CATALOG = register_catalog(
                     events=(
                         TelemetryEventSpec(
                             event_type="db.client.topology.discovered",
-                            required_payload_keys=(
-                                _DB_TOPOLOGY_TYPE_FIELD,
-                                _DB_TOPOLOGY_SERVER_COUNT_FIELD,
+                            required_payload_keys=_telemetry_fields(
+                                (
+                                    CXP_RESOURCE_NAME,
+                                    CXP_RESOURCE_KIND,
+                                    _DB_SYSTEM_FIELD,
+                                    _DB_TOPOLOGY_TYPE_FIELD,
+                                    _DB_TOPOLOGY_SERVER_COUNT_FIELD,
+                                ),
                             ),
                             description="Topology discovery completion event.",
                         ),

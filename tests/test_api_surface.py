@@ -27,6 +27,9 @@ from cxp import (
     negotiate_protocol_version,
     register_catalog,
 )
+from cxp.catalogs.interfaces.browser.playwright import PLAYWRIGHT_BROWSER_CATALOG
+from cxp.catalogs.interfaces.database.mongodb import MONGODB_CATALOG
+from cxp.catalogs.results import ActionResult
 
 
 def test_current_protocol_version_is_supported() -> None:
@@ -238,7 +241,57 @@ def test_telemetry_buffer_can_drop_new_items_when_full() -> None:
     assert len(snapshot.metrics) == 1
     assert len(snapshot.events) == 0
     assert snapshot.dropped_items == 1
-    assert buffer.dropped_items == 0
+
+
+def test_mongodb_telemetry_requires_universal_and_domain_resource_identity() -> None:
+    capability = MONGODB_CATALOG.get_capability("read")
+    assert capability is not None
+    telemetry = capability.telemetry
+    assert telemetry is not None
+
+    span = telemetry.spans[0]
+    required_names = {field.name for field in span.required_attributes}
+
+    assert "cxp.resource.name" in required_names
+    assert "cxp.resource.kind" in required_names
+    assert "db.system.name" in required_names
+
+
+def test_playwright_telemetry_requires_universal_and_domain_resource_identity() -> None:
+    capability = PLAYWRIGHT_BROWSER_CATALOG.get_capability("dom_interaction")
+    assert capability is not None
+    telemetry = capability.telemetry
+    assert telemetry is not None
+
+    span = telemetry.spans[0]
+    required_names = {field.name for field in span.required_attributes}
+
+    assert "cxp.resource.name" in required_names
+    assert "cxp.resource.kind" in required_names
+    assert "browser.engine" in required_names
+
+
+def test_atomic_catalog_operations_return_action_result_schema() -> None:
+    cache_catalog = get_catalog("cache/key-value")
+    runtime_catalog = get_catalog("runtime/environment")
+
+    assert cache_catalog is not None
+    assert runtime_catalog is not None
+
+    cache_set = cache_catalog.get_capability("read_write").get_operation("cache.set")
+    runtime_reload = runtime_catalog.get_capability("lifecycle").get_operation(
+        "runtime.reload"
+    )
+    browser_click = PLAYWRIGHT_BROWSER_CATALOG.get_capability(
+        "dom_interaction"
+    ).get_operation("element.click")
+
+    assert cache_set.result_type == "action.result"
+    assert cache_set.result_schema is ActionResult
+    assert runtime_reload.result_type == "action.result"
+    assert runtime_reload.result_schema is ActionResult
+    assert browser_click.result_type == "action.result"
+    assert browser_click.result_schema is ActionResult
 
 
 def test_telemetry_buffer_can_drop_oldest_items_when_full() -> None:

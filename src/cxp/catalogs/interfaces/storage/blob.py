@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import msgspec
-
 from cxp.catalogs.base import (
     CapabilityCatalog,
+    CapabilityTelemetry,
     CatalogCapability,
     CatalogOperation,
     ConformanceTier,
-    CapabilityTelemetry,
     TelemetryMetricSpec,
     register_catalog,
 )
@@ -17,6 +15,7 @@ from cxp.catalogs.common import (
     UNIT_BYTES,
 )
 from cxp.catalogs.results import (
+    ActionResult,
     BlobMetadata,
 )
 
@@ -51,8 +50,16 @@ STORAGE_BLOB_CATALOG = register_catalog(
                 description="Standard upload, delete and metadata management.",
                 telemetry=_BLOB_TELEMETRY,
                 operations=(
-                    CatalogOperation(name=BLOB_OP_UPLOAD, result_type="none"),
-                    CatalogOperation(name=BLOB_OP_DELETE, result_type="none"),
+                    CatalogOperation(
+                        name=BLOB_OP_UPLOAD,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
+                    CatalogOperation(
+                        name=BLOB_OP_DELETE,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                     CatalogOperation(
                         name=BLOB_OP_GET_META,
                         result_type="blob.metadata",

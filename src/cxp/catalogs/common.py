@@ -81,9 +81,9 @@ CXP_PAYLOAD_SIZE = TelemetryFieldRequirement(
 )
 
 # --- Shared Domain Fields ---
-DB_SYSTEM = TelemetryFieldRequirement(name="db.system")
-DB_OPERATION = TelemetryFieldRequirement(name="db.operation")
-DB_NAMESPACE = TelemetryFieldRequirement(name="db.namespace")
+DB_SYSTEM = TelemetryFieldRequirement(name="db.system.name")
+DB_OPERATION = TelemetryFieldRequirement(name="db.operation.name")
+DB_NAMESPACE = TelemetryFieldRequirement(name="db.namespace.name")
 
 HTTP_METHOD = TelemetryFieldRequirement(name="http.method")
 HTTP_STATUS = TelemetryFieldRequirement(name="http.status_code")

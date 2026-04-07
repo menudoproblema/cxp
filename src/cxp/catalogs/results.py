@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import msgspec
 from typing import Any
+
+import msgspec
 
 # --- Core Error Pattern ---
 
@@ -22,6 +23,13 @@ class AsyncWorkReport(msgspec.Struct, frozen=True):
     finished_at: str | None = None
     progress_percent: float | None = None
     error: CxpError | None = None
+    metadata: dict[str, Any] = msgspec.field(default_factory=dict)
+
+class ActionResult(msgspec.Struct, frozen=True):
+    """Acknowledgement envelope for side-effecting operations."""
+    success: bool = True
+    confirmed_at: str | None = None
+    action_id: str | None = None
     metadata: dict[str, Any] = msgspec.field(default_factory=dict)
 
 # --- Aliases for Domain Specificity ---
@@ -147,6 +155,13 @@ class ResourceReport(msgspec.Struct, frozen=True):
     disk_bytes: int | None = None
     metadata: dict[str, Any] = msgspec.field(default_factory=dict)
 
+
+class RuntimeHealthReport(msgspec.Struct, frozen=True):
+    status: str
+    is_ready: bool
+    checked_at: str
+    details: dict[str, Any] = msgspec.field(default_factory=dict)
+
 class PrinterStatus(msgspec.Struct, frozen=True):
     is_online: bool
     toner_levels: dict[str, float] = msgspec.field(default_factory=dict)
@@ -155,6 +170,7 @@ class PrinterStatus(msgspec.Struct, frozen=True):
 
 __all__ = (
     "AuthClaims",
+    "ActionResult",
     "AsyncWorkReport",
     "BlobMetadata",
     "BrowserSession",
@@ -173,6 +189,7 @@ __all__ = (
     "PrinterStatus",
     "PushResult",
     "ResourceReport",
+    "RuntimeHealthReport",
     "RunResult",
     "SecretValue",
     "TaskStatus",

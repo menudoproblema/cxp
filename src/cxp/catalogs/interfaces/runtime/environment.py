@@ -9,13 +9,11 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.common import (
-    CXP_RESOURCE_NAME,
-    CXP_RESOURCE_KIND,
-)
 from cxp.catalogs.results import (
-    SecretValue,
+    ActionResult,
     ResourceReport,
+    RuntimeHealthReport,
+    SecretValue,
 )
 
 RUNTIME_ENVIRONMENT_INTERFACE = "runtime/environment"
@@ -24,11 +22,15 @@ RUNTIME_ENVIRONMENT_INTERFACE = "runtime/environment"
 RUNTIME_SECRETS = "secrets"
 RUNTIME_CONFIG = "configuration"
 RUNTIME_RESOURCES = "resources"
+RUNTIME_HEALTH = "health"
+RUNTIME_LIFECYCLE = "lifecycle"
 
 # Operation Names (Standardized: RUNTIME_OP_{ACTION})
 RUNTIME_OP_READ_SECRET = "runtime.secret_read"
 RUNTIME_OP_READ_CONFIG = "runtime.config_read"
 RUNTIME_OP_RESOURCE_STATS = "runtime.resource_stats"
+RUNTIME_OP_HEALTH_CHECK = "runtime.health_check"
+RUNTIME_OP_RELOAD = "runtime.reload"
 
 class ConfigMetadata(msgspec.Struct, frozen=True):
     sources: tuple[str, ...]
@@ -72,12 +74,43 @@ RUNTIME_ENVIRONMENT_CATALOG = register_catalog(
                     ),
                 ),
             ),
+            CatalogCapability(
+                name=RUNTIME_HEALTH,
+                description="Readiness and health inspection for the runtime.",
+                operations=(
+                    CatalogOperation(
+                        name=RUNTIME_OP_HEALTH_CHECK,
+                        result_type="runtime.health_report",
+                        result_schema=RuntimeHealthReport,
+                    ),
+                ),
+            ),
+            CatalogCapability(
+                name=RUNTIME_LIFECYCLE,
+                description="Lifecycle control for managed runtimes.",
+                operations=(
+                    CatalogOperation(
+                        name=RUNTIME_OP_RELOAD,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
+                ),
+            ),
         ),
         tiers=(
             ConformanceTier(
                 name="core",
-                required_capabilities=(RUNTIME_CONFIG,),
+                required_capabilities=(RUNTIME_CONFIG, RUNTIME_HEALTH),
                 description="Basic observable environment.",
+            ),
+            ConformanceTier(
+                name="managed",
+                required_capabilities=(
+                    RUNTIME_CONFIG,
+                    RUNTIME_HEALTH,
+                    RUNTIME_LIFECYCLE,
+                ),
+                description="Environment with readiness checks and reload control.",
             ),
         ),
     ),
@@ -90,4 +123,8 @@ __all__ = (
     "RUNTIME_SECRETS",
     "RUNTIME_CONFIG",
     "RUNTIME_RESOURCES",
+    "RUNTIME_HEALTH",
+    "RUNTIME_LIFECYCLE",
+    "RUNTIME_OP_HEALTH_CHECK",
+    "RUNTIME_OP_RELOAD",
 )

@@ -9,11 +9,11 @@ from cxp.catalogs.base import (
     ConformanceTier,
     register_catalog,
 )
-from cxp.catalogs.results import PushResult
 from cxp.catalogs.interfaces.notification.family import (
     NOTIFICATION_INTERFACE,
     NOTIFICATION_OP_SEND,
 )
+from cxp.catalogs.results import ActionResult, PushResult
 
 MOBILE_PUSH_INTERFACE = "notification/mobile-push"
 
@@ -69,8 +69,16 @@ MOBILE_PUSH_CATALOG = register_catalog(
                 name=PUSH_TOPIC_MANAGEMENT,
                 description="Ability to subscribe/unsubscribe devices to interest topics.",
                 operations=(
-                    CatalogOperation(name="mobile.topic_subscribe", result_type="none"),
-                    CatalogOperation(name="mobile.topic_unsubscribe", result_type="none"),
+                    CatalogOperation(
+                        name="mobile.topic_subscribe",
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
+                    CatalogOperation(
+                        name="mobile.topic_unsubscribe",
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
         ),

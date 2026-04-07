@@ -19,6 +19,22 @@ from cxp import (
 )
 
 
+def _browser_payload(**payload: object) -> dict[str, object]:
+    return {
+        "cxp.resource.name": "playwright-provider",
+        "cxp.resource.kind": "browser",
+        **payload,
+    }
+
+
+def _mongodb_payload(**payload: object) -> dict[str, object]:
+    return {
+        "cxp.resource.name": "example-mongodb",
+        "cxp.resource.kind": "database",
+        **payload,
+    }
+
+
 def test_execution_engine_catalog_exposes_capability_telemetry() -> None:
     assert PLAN_RUN_EXECUTION_CATALOG.telemetry_span_names("run") == (
         "engine.run.execute",
@@ -86,10 +102,14 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.launch",
                 start_time=1.0,
                 end_time=1.4,
-                attributes={
-                    "browser.engine": "playwright",
-                    "browser.headless": True,
-                },
+                    attributes={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.headless": True,
+                            }
+                        ),
+                    },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -98,9 +118,9 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.context.create",
                 start_time=1.4,
                 end_time=1.6,
-                attributes={
-                    "browser.engine": "playwright",
-                },
+                    attributes={
+                        **_browser_payload(**{"browser.engine": "playwright"}),
+                    },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -109,10 +129,14 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.context.close",
                 start_time=2.0,
                 end_time=2.1,
-                attributes={
-                    "browser.engine": "playwright",
-                    "browser.context.id": "ctx-1",
-                },
+                    attributes={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.context.id": "ctx-1",
+                            }
+                        ),
+                    },
             ),
         ),
         metrics=(
@@ -120,58 +144,76 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.launch.duration",
                 value=0.4,
                 unit="s",
-                labels={
-                    "browser.engine": "playwright",
-                    "browser.headless": "true",
-                    "browser.outcome": "success",
-                },
+                    labels={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.headless": "true",
+                                "browser.outcome": "success",
+                            }
+                        ),
+                    },
             ),
             TelemetryMetric(
                 name="browser.context.create.duration",
                 value=0.2,
                 unit="s",
-                labels={
-                    "browser.engine": "playwright",
-                    "browser.outcome": "success",
-                },
+                    labels={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.outcome": "success",
+                            }
+                        ),
+                    },
             ),
             TelemetryMetric(
                 name="browser.context.close.duration",
                 value=0.1,
                 unit="s",
-                labels={
-                    "browser.engine": "playwright",
-                    "browser.outcome": "success",
-                },
+                    labels={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.outcome": "success",
+                            }
+                        ),
+                    },
             ),
         ),
         events=(
-            TelemetryEvent(
-                event_type="browser.session.launched",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.headless": True,
-                    "browser.outcome": "success",
-                },
+                TelemetryEvent(
+                    event_type="browser.session.launched",
+                    payload=_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.headless": True,
+                            "browser.outcome": "success",
+                        }
+                    ),
+                ),
+                TelemetryEvent(
+                    event_type="browser.context.created",
+                    payload=_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.context.id": "ctx-1",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                ),
+                TelemetryEvent(
+                    event_type="browser.context.closed",
+                    payload=_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.context.id": "ctx-1",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                ),
             ),
-            TelemetryEvent(
-                event_type="browser.context.created",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.context.id": "ctx-1",
-                    "browser.outcome": "success",
-                },
-            ),
-            TelemetryEvent(
-                event_type="browser.context.closed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.context.id": "ctx-1",
-                    "browser.outcome": "success",
-                },
-            ),
-        ),
-    )
+        )
 
     assert PLAYWRIGHT_BROWSER_CATALOG.is_telemetry_snapshot_compliant(
         snapshot,
@@ -215,12 +257,16 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.request.observe",
                 start_time=1.0,
                 end_time=1.2,
-                attributes={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.network.phase": "request",
-                    "browser.request.url.host": "example.com",
-                },
+                    attributes={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.page.id": "page-1",
+                                "browser.network.phase": "request",
+                                "browser.request.url.host": "example.com",
+                            }
+                        ),
+                    },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -229,12 +275,16 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.response.observe",
                 start_time=1.2,
                 end_time=1.5,
-                attributes={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.network.phase": "response",
-                    "browser.request.url.host": "example.com",
-                },
+                    attributes={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.page.id": "page-1",
+                                "browser.network.phase": "response",
+                                "browser.request.url.host": "example.com",
+                            }
+                        ),
+                    },
             ),
         ),
         metrics=(
@@ -242,46 +292,58 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.request.duration",
                 value=0.2,
                 unit="s",
-                labels={
-                    "browser.engine": "playwright",
-                    "browser.network.phase": "request",
-                    "browser.outcome": "success",
-                },
+                    labels={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.network.phase": "request",
+                                "browser.outcome": "success",
+                            }
+                        ),
+                    },
             ),
             TelemetryMetric(
                 name="browser.response.duration",
                 value=0.3,
                 unit="s",
-                labels={
-                    "browser.engine": "playwright",
-                    "browser.network.phase": "response",
-                    "browser.outcome": "success",
-                },
+                    labels={
+                        **_browser_payload(
+                            **{
+                                "browser.engine": "playwright",
+                                "browser.network.phase": "response",
+                                "browser.outcome": "success",
+                            }
+                        ),
+                    },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="browser.request.observed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.network.phase": "request",
-                    "browser.request.url.host": "example.com",
-                    "browser.outcome": "success",
-                },
+                    payload=_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.network.phase": "request",
+                            "browser.request.url.host": "example.com",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                ),
+                TelemetryEvent(
+                    event_type="browser.response.observed",
+                    payload=_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.network.phase": "response",
+                            "browser.request.url.host": "example.com",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                ),
             ),
-            TelemetryEvent(
-                event_type="browser.response.observed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.network.phase": "response",
-                    "browser.request.url.host": "example.com",
-                    "browser.outcome": "success",
-                },
-            ),
-        ),
-    )
+        )
 
     assert PLAYWRIGHT_BROWSER_CATALOG.is_telemetry_snapshot_compliant(
         snapshot,
@@ -440,9 +502,13 @@ def test_mongodb_catalog_validates_shared_operation_telemetry() -> None:
                 start_time=1.0,
                 end_time=1.5,
                 attributes={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "find",
-                    "db.namespace.name": "users.accounts",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "find",
+                            "db.namespace.name": "users.accounts",
+                        }
+                    ),
                 },
             ),
         ),
@@ -452,21 +518,27 @@ def test_mongodb_catalog_validates_shared_operation_telemetry() -> None:
                 value=0.5,
                 unit="s",
                 labels={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "find",
-                    "db.operation.outcome": "success",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "find",
+                            "db.operation.outcome": "success",
+                        }
+                    ),
                 },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="db.client.operation.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "find",
-                    "db.namespace.name": "users.accounts",
-                    "db.operation.outcome": "success",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "find",
+                        "db.namespace.name": "users.accounts",
+                        "db.operation.outcome": "success",
+                    }
+                ),
             ),
         ),
     )
@@ -483,10 +555,12 @@ def test_mongodb_catalog_reports_missing_required_event_payload_keys() -> None:
         events=(
             TelemetryEvent(
                 event_type="db.client.topology.discovered",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.topology.type": "replica_set",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.topology.type": "replica_set",
+                    }
+                ),
             ),
         ),
     )
@@ -514,11 +588,15 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 start_time=1.0,
                 end_time=2.0,
                 attributes={
-                    "browser.engine": "playwright",
-                    "browser.context.id": "ctx-1",
-                    "browser.page.id": "page-1",
-                    "browser.url.host": "example.com",
-                    "browser.url.path_template": "/signup",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.context.id": "ctx-1",
+                            "browser.page.id": "page-1",
+                            "browser.url.host": "example.com",
+                            "browser.url.path_template": "/signup",
+                        }
+                    ),
                 },
             ),
             TelemetrySpan(
@@ -529,10 +607,14 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 start_time=2.0,
                 end_time=2.2,
                 attributes={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.action.name": "click",
-                    "browser.locator.kind": "role",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.action.name": "click",
+                            "browser.locator.kind": "role",
+                        }
+                    ),
                 },
             ),
             TelemetrySpan(
@@ -543,9 +625,13 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 start_time=2.2,
                 end_time=2.5,
                 attributes={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.wait.condition": "response",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.wait.condition": "response",
+                        }
+                    ),
                 },
             ),
         ),
@@ -555,9 +641,13 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 value=1.0,
                 unit="s",
                 labels={
-                    "browser.engine": "playwright",
-                    "browser.url.host": "example.com",
-                    "browser.outcome": "success",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.url.host": "example.com",
+                            "browser.outcome": "success",
+                        }
+                    ),
                 },
             ),
             TelemetryMetric(
@@ -565,9 +655,13 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 value=0.2,
                 unit="s",
                 labels={
-                    "browser.engine": "playwright",
-                    "browser.action.name": "click",
-                    "browser.outcome": "success",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.action.name": "click",
+                            "browser.outcome": "success",
+                        }
+                    ),
                 },
             ),
             TelemetryMetric(
@@ -575,39 +669,49 @@ def test_playwright_catalog_validates_navigation_action_and_wait_telemetry() -> 
                 value=0.3,
                 unit="s",
                 labels={
-                    "browser.engine": "playwright",
-                    "browser.wait.condition": "response",
-                    "browser.outcome": "success",
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.wait.condition": "response",
+                            "browser.outcome": "success",
+                        }
+                    ),
                 },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="browser.navigation.completed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.url.host": "example.com",
-                    "browser.outcome": "success",
-                },
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.url.host": "example.com",
+                        "browser.outcome": "success",
+                    }
+                ),
             ),
             TelemetryEvent(
                 event_type="browser.action.completed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.action.name": "click",
-                    "browser.outcome": "success",
-                },
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.action.name": "click",
+                        "browser.outcome": "success",
+                    }
+                ),
             ),
             TelemetryEvent(
                 event_type="browser.wait.completed",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.wait.condition": "response",
-                    "browser.outcome": "success",
-                },
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.wait.condition": "response",
+                        "browser.outcome": "success",
+                    }
+                ),
             ),
         ),
     )
@@ -625,11 +729,13 @@ def test_playwright_catalog_reports_missing_network_payload_keys() -> None:
             TelemetryEvent(
                 event_type="browser.request.failed",
                 severity="error",
-                payload={
-                    "browser.engine": "playwright",
-                    "browser.page.id": "page-1",
-                    "browser.network.phase": "response",
-                },
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.network.phase": "response",
+                    }
+                ),
             ),
         ),
     )
@@ -657,10 +763,14 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 start_time=1.0,
                 end_time=1.4,
                 attributes={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.pipeline.stage.count": 3,
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.namespace.name": "users.accounts",
+                            "db.pipeline.stage.count": 3,
+                        }
+                    ),
                 },
             ),
             TelemetrySpan(
@@ -671,11 +781,15 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 start_time=2.0,
                 end_time=2.2,
                 attributes={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.pipeline.stage.name": "$search",
-                    "db.search.operator": "compound",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.namespace.name": "users.accounts",
+                            "db.pipeline.stage.name": "$search",
+                            "db.search.operator": "compound",
+                        }
+                    ),
                 },
             ),
             TelemetrySpan(
@@ -686,11 +800,15 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 start_time=3.0,
                 end_time=3.3,
                 attributes={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.pipeline.stage.name": "$vectorSearch",
-                    "db.vector_search.similarity": "cosine",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.namespace.name": "users.accounts",
+                            "db.pipeline.stage.name": "$vectorSearch",
+                            "db.vector_search.similarity": "cosine",
+                        }
+                    ),
                 },
             ),
         ),
@@ -700,9 +818,13 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 value=0.4,
                 unit="s",
                 labels={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.operation.outcome": "success",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.operation.outcome": "success",
+                        }
+                    ),
                 },
             ),
             TelemetryMetric(
@@ -710,10 +832,14 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 value=0.2,
                 unit="s",
                 labels={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$search",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.operation.outcome": "success",
+                            "db.pipeline.stage.name": "$search",
+                        }
+                    ),
                 },
             ),
             TelemetryMetric(
@@ -721,45 +847,55 @@ def test_mongodb_catalog_validates_aggregation_search_and_vector_telemetry() -> 
                 value=0.3,
                 unit="s",
                 labels={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.operation.outcome": "success",
-                    "db.vector_search.similarity": "cosine",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.operation.outcome": "success",
+                            "db.vector_search.similarity": "cosine",
+                        }
+                    ),
                 },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="db.client.aggregate.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.count": 3,
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "aggregate",
+                        "db.namespace.name": "users.accounts",
+                        "db.operation.outcome": "success",
+                        "db.pipeline.stage.count": 3,
+                    }
+                ),
             ),
             TelemetryEvent(
                 event_type="db.client.search.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$search",
-                    "db.search.operator": "compound",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "aggregate",
+                        "db.namespace.name": "users.accounts",
+                        "db.operation.outcome": "success",
+                        "db.pipeline.stage.name": "$search",
+                        "db.search.operator": "compound",
+                    }
+                ),
             ),
             TelemetryEvent(
                 event_type="db.client.vector_search.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$vectorSearch",
-                    "db.vector_search.similarity": "cosine",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "aggregate",
+                        "db.namespace.name": "users.accounts",
+                        "db.operation.outcome": "success",
+                        "db.pipeline.stage.name": "$vectorSearch",
+                        "db.vector_search.similarity": "cosine",
+                    }
+                ),
             ),
         ),
     )
@@ -776,13 +912,15 @@ def test_mongodb_catalog_requires_stage_specific_search_metadata() -> None:
         events=(
             TelemetryEvent(
                 event_type="db.client.search.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "users.accounts",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$search",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "aggregate",
+                        "db.namespace.name": "users.accounts",
+                        "db.operation.outcome": "success",
+                        "db.pipeline.stage.name": "$search",
+                    }
+                ),
             ),
         ),
     )
@@ -810,11 +948,15 @@ def test_mongodb_catalog_validates_consumer_style_search_snapshot() -> None:
                 start_time=1.0,
                 end_time=1.3,
                 attributes={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "docs.articles",
-                    "db.pipeline.stage.name": "$search",
-                    "db.search.operator": "compound",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.namespace.name": "docs.articles",
+                            "db.pipeline.stage.name": "$search",
+                            "db.search.operator": "compound",
+                        }
+                    ),
                 },
             ),
         ),
@@ -824,24 +966,30 @@ def test_mongodb_catalog_validates_consumer_style_search_snapshot() -> None:
                 value=0.3,
                 unit="s",
                 labels={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$search",
+                    **_mongodb_payload(
+                        **{
+                            "db.system.name": "mongodb",
+                            "db.operation.name": "aggregate",
+                            "db.operation.outcome": "success",
+                            "db.pipeline.stage.name": "$search",
+                        }
+                    ),
                 },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="db.client.search.completed",
-                payload={
-                    "db.system.name": "mongodb",
-                    "db.operation.name": "aggregate",
-                    "db.namespace.name": "docs.articles",
-                    "db.operation.outcome": "success",
-                    "db.pipeline.stage.name": "$search",
-                    "db.search.operator": "compound",
-                },
+                payload=_mongodb_payload(
+                    **{
+                        "db.system.name": "mongodb",
+                        "db.operation.name": "aggregate",
+                        "db.namespace.name": "docs.articles",
+                        "db.operation.outcome": "success",
+                        "db.pipeline.stage.name": "$search",
+                        "db.search.operator": "compound",
+                    }
+                ),
             ),
         ),
     )

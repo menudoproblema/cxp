@@ -10,6 +10,7 @@ from cxp.catalogs.base import (
     register_catalog,
 )
 from cxp.catalogs.interfaces.printing.family import PRINTING_INTERFACE
+from cxp.catalogs.results import ActionResult
 
 PRODUCTION_PRINTING_INTERFACE = "printing/production"
 
@@ -46,7 +47,11 @@ PRODUCTION_PRINTING_CATALOG = register_catalog(
                 name=PRODUCTION_COLOR_CALIBRATION,
                 description="Advanced color management and calibration.",
                 operations=(
-                    CatalogOperation(name="production.calibrate", result_type="none"),
+                    CatalogOperation(
+                        name="production.calibrate",
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
         ),

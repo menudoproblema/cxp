@@ -10,6 +10,7 @@ from cxp.catalogs.base import (
     register_catalog,
 )
 from cxp.catalogs.interfaces.database.family import DATABASE_INTERFACE
+from cxp.catalogs.results import ActionResult
 
 SQL_DATABASE_INTERFACE = "database/sql"
 
@@ -63,8 +64,16 @@ SQL_DATABASE_CATALOG = register_catalog(
                         result_type="sql.transaction",
                         description="Start a new transaction.",
                     ),
-                    CatalogOperation(name=SQL_OP_COMMIT, result_type="none"),
-                    CatalogOperation(name=SQL_OP_ROLLBACK, result_type="none"),
+                    CatalogOperation(
+                        name=SQL_OP_COMMIT,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
+                    CatalogOperation(
+                        name=SQL_OP_ROLLBACK,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
             CatalogCapability(

@@ -8,8 +8,9 @@ from cxp.catalogs.base import (
     register_catalog,
 )
 from cxp.catalogs.results import (
-    PrintJobStatus,
+    ActionResult,
     PrinterStatus,
+    PrintJobStatus,
 )
 
 PRINTING_INTERFACE = "printing/manager"
@@ -42,7 +43,11 @@ PRINTING_CATALOG = register_catalog(
                         name=PRINT_OP_SUBMIT,
                         result_type="print.job_id",
                     ),
-                    CatalogOperation(name=PRINT_OP_CANCEL, result_type="none"),
+                    CatalogOperation(
+                        name=PRINT_OP_CANCEL,
+                        result_type="action.result",
+                        result_schema=ActionResult,
+                    ),
                 ),
             ),
             CatalogCapability(
