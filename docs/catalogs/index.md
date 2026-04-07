@@ -18,7 +18,8 @@ Gestiona el ciclo de vida de tareas, colas de trabajo y el contexto de ejecució
 - [Execution (Plan-Run)](interfaces/execution/plan-run.md): Contrato concreto para ejecución materializada, planificación, validación y observabilidad.
 - [Queue (Task Engine)](interfaces/queue/task-engine.md): Procesamiento en background, monitorización y cancelación de tareas.
 - [Runtime Environment](interfaces/runtime/environment.md): Gestión de secretos, configuración y recursos.
-- [Application (ASGI/WSGI)](interfaces/application/asgi.md): Servidores y frameworks web.
+- [Application (ASGI/WSGI)](interfaces/application/asgi.md): Servidores y frameworks web de bajo nivel.
+- [HTTP Framework](interfaces/application/http-framework.md): Semántica de alto nivel para aplicaciones web (routing, validation).
 
 ## 2. Capa de Persistencia (Data Layer)
 Gestión de estado y almacenamiento de datos.
