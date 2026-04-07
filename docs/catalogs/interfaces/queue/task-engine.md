@@ -19,3 +19,8 @@
 
 ### Telemetría
 Define `queue.backlog.size` y `queue.tasks.processed` para escalado automático basado en la carga del sistema.
+
+### Operaciones Relevantes
+- `queue.enqueue`
+- `queue.status`
+- `queue.cancel`

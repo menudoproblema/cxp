@@ -61,3 +61,12 @@ def test_transport_http_catalog_remains_canonical_and_family_is_separate() -> No
     send_operation = request_dispatch.get_operation("http.send")
     assert send_operation is not None
     assert send_operation.idempotent is False
+
+
+def test_async_domains_propagate_canonical_cancel_operations() -> None:
+    from cxp.catalogs.interfaces.media.video_streaming import VIDEO_STREAMING_CATALOG
+    from cxp.catalogs.interfaces.queue.task_engine import QUEUE_CATALOG
+    from cxp.catalogs.interfaces.execution.plan_run import PLAN_RUN_OP_CANCEL
+
+    assert VIDEO_STREAMING_CATALOG.has_operation("transcoding", PLAN_RUN_OP_CANCEL) is True
+    assert QUEUE_CATALOG.has_operation("monitoring", "queue.cancel") is True

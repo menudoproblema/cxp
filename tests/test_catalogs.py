@@ -594,7 +594,10 @@ def test_plan_run_profiles_validate_progressive_execution_snapshots() -> None:
             CapabilityDescriptor(
                 name="execution_status",
                 level="supported",
-                operations=(CapabilityOperationBinding("execution.status"),),
+                operations=(
+                    CapabilityOperationBinding("execution.status"),
+                    CapabilityOperationBinding("execution.cancel"),
+                ),
             ),
             CapabilityDescriptor(
                 name="execution_stream",

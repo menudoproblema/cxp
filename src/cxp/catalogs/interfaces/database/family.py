@@ -11,7 +11,6 @@ from cxp.catalogs.common import (
     DB_SYSTEM,
     DB_OPERATION,
     DB_NAMESPACE,
-    CXP_DURATION,
     CXP_OPERATION_STATUS,
 )
 from cxp.catalogs.results import (

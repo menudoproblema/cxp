@@ -23,6 +23,7 @@ PLAN_RUN_EXECUTION_INPUT_VALIDATION = "input_validation"
 PLAN_RUN_EXECUTION_EXECUTION_STATUS = "execution_status"
 PLAN_RUN_EXECUTION_EXECUTION_STREAM = "execution_stream"
 PLAN_RUN_OP_STATUS = "execution.status"
+PLAN_RUN_OP_CANCEL = "execution.cancel"
 
 PLAN_RUN_EXECUTION_CORE_PROFILE_NAME = "plan-run-core"
 PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME = "plan-run-planned"
@@ -226,6 +227,11 @@ PLAN_RUN_EXECUTION_CATALOG = register_catalog(
                         result_type="execution.status",
                         description="Read aggregate execution status.",
                     ),
+                    CatalogOperation(
+                        name=PLAN_RUN_OP_CANCEL,
+                        result_type="execution.cancelled",
+                        description="Request cancellation of an in-progress execution.",
+                    ),
                 ),
             ),
             CatalogCapability(
@@ -324,7 +330,7 @@ PLAN_RUN_EXECUTION_ADVANCED_PROFILE = CapabilityProfile(
         ),
         CapabilityRequirement(
             capability_name=PLAN_RUN_EXECUTION_EXECUTION_STATUS,
-            required_operations=("execution.status",),
+            required_operations=(PLAN_RUN_OP_STATUS, PLAN_RUN_OP_CANCEL),
         ),
         CapabilityRequirement(
             capability_name=PLAN_RUN_EXECUTION_EXECUTION_STREAM,
@@ -347,5 +353,6 @@ __all__ = (
     "PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_PLANNING",
     "PLAN_RUN_EXECUTION_RUN",
+    "PLAN_RUN_OP_CANCEL",
     "PLAN_RUN_OP_STATUS",
 )

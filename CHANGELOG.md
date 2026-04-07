@@ -1,35 +1,21 @@
 # Changelog
 
-## Unreleased
-
-- Added reusable profiles for `execution/plan-run` and `browser/playwright`, plus consumer-oriented documentation for picking and validating them.
-- Added `mongodb-text-search` as a reusable `database/mongodb` profile for textual `$search` without requiring `vector_search`.
-- Added a runnable `database/mongodb` consumer example that validates search-capable snapshots and canonical `db.client.search*` telemetry.
-- Re-exported the canonical MongoDB metadata schema types through `cxp.catalogs.interfaces.database`, `cxp.catalogs`, and the root `cxp` API.
-- Made profile validation accept typed metadata structs as well as mapping-shaped metadata.
-
-## 2.0.0 - 2026-04-06
-
-- Added abstract interface-family support in catalogs via `abstract` and `satisfies_interfaces`.
-- Added first-party `application/wsgi` and `application/asgi` catalogs, and moved the previous high-level HTTP framework semantics to `application/http-framework`.
-- Added the abstract browser automation family `browser/automation` and the concrete `browser/playwright` catalog with canonical capabilities for navigation, locators, DOM actions, waits, script evaluation, network observation, screenshots, and dialogs.
-- Updated the handshake so a concrete interface can satisfy an abstract family interface only when both interfaces are backed by registered catalogs. For example, `application/asgi` can satisfy a request for `application/http`.
-- Added capability-linked telemetry semantics and telemetry snapshot validation in catalogs, with first-party telemetry conventions for `execution/plan-run` and `database/mongodb`.
-- Added canonical browser automation telemetry for `browser/playwright`, including launch/close lifecycle operations, context management, navigation, locator resolution, DOM interaction, waits, screenshots, dialogs, and network observation.
-- Added first-party normalized catalogs for Cosecha extensions: `cosecha/engine`, `cosecha/reporter`, and `cosecha/plugin`.
-- Added canonical `span-only` telemetry conventions for Cosecha engines, reporters, and plugins, including normalized knowledge/planning semantics for engines and lifecycle/output semantics for reporters and plugins.
-- Refined `database/mongodb` telemetry so `aggregation`, `search`, and `vector_search` use their own canonical signals instead of overloading the generic document-operation span, and added stage-specific required fields for search/vector telemetry.
-- Split execution catalogs into an abstract `execution/engine` family and a concrete `execution/plan-run` contract.
-- Kept the legacy `EXECUTION_ENGINE_*` symbols and `cxp.catalogs.interfaces.execution.engine` import path as compatibility aliases for the concrete `execution/plan-run` contract.
-- In `execution/plan-run`, `core` now requires only `run`, `planned` captures run-plus-planning, `draft_validation` was renamed to `input_validation`, and live observability was split into `execution_status` and `execution_stream`.
-
 ## 1.0.0
 
 - Stabilized the core handshake contract around `ComponentIdentity`, `CapabilityMatrix`, and protocol-version negotiation.
-- Added first-party catalogs for `database/mongodb`, `transport/http`, `application/http`, and `execution/engine`.
+- Introduced abstract interface-family support in catalogs via `abstract` and `satisfies_interfaces`.
+- Established richer catalog metadata with optional `input_schema`, `result_schema`, idempotency flags, and suggested timeouts.
+- Standardized shared telemetry vocabulary, units, and operational statuses in `common.py`.
+- Introduced structured error reporting via `CxpError` as an optional semantic envelope for catalogs that adopt it.
+- Added a comprehensive suite of first-party catalogs organized in six logical layers:
+    - **Computing**: `execution/plan-run` (base for all async tasks), `runtime/environment` (secrets/resources), `application/asgi` and `application/wsgi`.
+    - **Persistence**: `database/sql`, `database/mongodb` (satisfying `database/common`), `storage/blob` (with versioning), and `cache/key-value`.
+    - **Communications**: `transport/http`, `transport/http-family`, `transport/websocket`, `messaging/event-bus` (NATS/JetStream), and `notification/common` (WebPush, Mobile Push).
+    - **Queueing**: `queue/task-engine` for background processing.
+    - **Experience & Media**: `browser/automation` (Playwright with LocalStorage support) and `media/video-streaming` (HLS/DASH/Transcoding).
+    - **Industrial**: `printing/manager` for Label (Zebra/ZPL) and Production (Konica Minolta) printing with physical finishing support.
+- Added a Compliance Bridge API for catalog-aware negotiation reports without changing the core handshake shape.
+- Added contextual telemetry propagation in `TelemetryContext` for `cxp.request.id`, `cxp.session.id`, `cxp.operation.id`, and `cxp.parent.operation.id`.
 - Added rich component descriptors with `CapabilityDescriptor`, `ComponentCapabilitySnapshot`, and `ComponentDependencyRule`.
-- Added sync and async provider helpers for capability negotiation, capability snapshots, telemetry collection, and telemetry streaming.
-- Added typed validation results for capability matrices and descriptor snapshots.
-- Added bounded telemetry buffering with overflow policies and dropped-item accounting.
-- Added catalog-aware negotiation helpers that validate handshake responses against canonical catalogs.
-- Aligned documentation, examples, packaging metadata, and test coverage for the `1.0.0` release.
+- Added sync and async provider helpers for capability negotiation, telemetry collection, and streaming.
+- Added runnable high-fidelity examples and comprehensive documentation for all interface catalogs.

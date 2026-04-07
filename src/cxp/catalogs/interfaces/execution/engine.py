@@ -10,6 +10,8 @@ from cxp.catalogs.interfaces.execution.plan_run import (
     PLAN_RUN_EXECUTION_INTERFACE,
     PLAN_RUN_EXECUTION_PLANNING,
     PLAN_RUN_EXECUTION_RUN,
+    PLAN_RUN_OP_CANCEL,
+    PLAN_RUN_OP_STATUS,
 )
 
 # Compatibility aliases for the pre-family execution catalog API.
@@ -31,4 +33,6 @@ __all__ = (
     "EXECUTION_ENGINE_INTERFACE",
     "EXECUTION_ENGINE_PLANNING",
     "EXECUTION_ENGINE_RUN",
+    "PLAN_RUN_OP_CANCEL",
+    "PLAN_RUN_OP_STATUS",
 )

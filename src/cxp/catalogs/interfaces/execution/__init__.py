@@ -23,6 +23,8 @@ from cxp.catalogs.interfaces.execution.plan_run import (
     PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME,
     PLAN_RUN_EXECUTION_PLANNING,
     PLAN_RUN_EXECUTION_RUN,
+    PLAN_RUN_OP_CANCEL,
+    PLAN_RUN_OP_STATUS,
 )
 
 __all__ = (
@@ -48,4 +50,6 @@ __all__ = (
     "PLAN_RUN_EXECUTION_PLANNED_PROFILE_NAME",
     "PLAN_RUN_EXECUTION_PLANNING",
     "PLAN_RUN_EXECUTION_RUN",
+    "PLAN_RUN_OP_CANCEL",
+    "PLAN_RUN_OP_STATUS",
 )

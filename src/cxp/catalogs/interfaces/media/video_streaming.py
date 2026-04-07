@@ -13,7 +13,6 @@ from cxp.catalogs.base import (
 )
 from cxp.catalogs.common import (
     CXP_RESOURCE_NAME,
-    CXP_DURATION,
     UNIT_BITS_PER_SEC,
     UNIT_SECONDS,
 )
@@ -23,6 +22,7 @@ from cxp.catalogs.results import (
 )
 from cxp.catalogs.interfaces.execution.plan_run import (
     PLAN_RUN_EXECUTION_INTERFACE,
+    PLAN_RUN_OP_CANCEL,
     PLAN_RUN_OP_STATUS,
 )
 
@@ -93,6 +93,11 @@ VIDEO_STREAMING_CATALOG = register_catalog(
                         result_type="media.job_status",
                         result_schema=TranscodingJob,
                         description="Query the status of a transcoding job (satisfies execution base).",
+                    ),
+                    CatalogOperation(
+                        name=PLAN_RUN_OP_CANCEL,
+                        result_type="media.job_cancelled",
+                        description="Request cancellation of a running transcoding job.",
                     ),
                 ),
             ),

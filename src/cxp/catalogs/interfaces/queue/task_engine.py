@@ -70,6 +70,11 @@ QUEUE_CATALOG = register_catalog(
                         result_schema=TaskStatus,
                         description="Query the current state of a task.",
                     ),
+                    CatalogOperation(
+                        name=QUEUE_OP_CANCEL,
+                        result_type="queue.task_cancelled",
+                        description="Request cancellation of an enqueued or running task.",
+                    ),
                 ),
             ),
             CatalogCapability(

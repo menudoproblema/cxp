@@ -12,8 +12,7 @@
 
 ### Capacidades
 1. **`vapid_configuration`**: (Requerida en `core`) Permite al orquestador validar si las claves públicas y subjects están correctamente configurados (VapidMetadata).
-2. **`delivery`**: (Requerida en `core`) Envío de notificaciones al endpoint del navegador. Emite métricas unificadas `push.notifications.sent` y latencia.
-3. **`batch_send`**: Envío eficiente y masivo.
+2. **`delivery`**: (Requerida en `core`) Envío de notificaciones al endpoint del navegador. Emite la métrica `push.web.sent`.
 
 ### Tiers
 - **`core`**: Proveedor WebPush estándar y fidedigno, con VAPID y soporte para delivery unificado.

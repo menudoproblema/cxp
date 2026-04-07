@@ -4,12 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cxp"
-version = "2.0.0"
+version = "1.0.0"
 description = "Capability Exchange Protocol"
 readme = "README.md"
 requires-python = ">=3.12"
-license = "MIT"
-license-files = ["LICENSE"]
+license = { text = "MIT" }
 authors = [
   { name = "Vicente Ruiz" }
 ]
@@ -53,6 +52,7 @@ dev = [
 
 [tool.setuptools]
 package-dir = { "" = "src" }
+license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

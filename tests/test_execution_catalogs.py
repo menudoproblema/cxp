@@ -16,6 +16,7 @@ from cxp import (
     get_catalog,
     negotiate_capabilities,
 )
+from cxp.catalogs.interfaces.execution.plan_run import PLAN_RUN_OP_CANCEL, PLAN_RUN_OP_STATUS
 
 
 def test_execution_family_and_plan_run_catalogs_are_registered() -> None:
@@ -93,6 +94,17 @@ def test_execution_registry_rejects_unknown_or_cyclic_hierarchy() -> None:
                 satisfies_interfaces=("execution/missing",),
             )
         )
+
+
+def test_plan_run_status_capability_exposes_status_and_cancel_operations() -> None:
+    assert (
+        PLAN_RUN_EXECUTION_CATALOG.has_operation("execution_status", PLAN_RUN_OP_STATUS)
+        is True
+    )
+    assert (
+        PLAN_RUN_EXECUTION_CATALOG.has_operation("execution_status", PLAN_RUN_OP_CANCEL)
+        is True
+    )
 
     registry = CatalogRegistry(
         catalogs=(

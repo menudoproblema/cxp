@@ -2,10 +2,21 @@
 
 CXP organiza capacidades del sistema en catálogos semánticos estructurados por familias de interfaz. Estos catálogos pueden definir capacidades, operaciones, esquemas tipados opcionales y convenciones compartidas de telemetría sin ampliar el núcleo del protocolo.
 
-## 1. Capa de Computación y Ejecución
+## 1. Familias Abstractas
+Definen vocabulario común y relaciones de compatibilidad entre interfaces concretas.
+- `application/http`
+- `browser/automation`
+- `database/common`
+- `execution/engine`
+- `messaging/event-bus`
+- `notification/common`
+- `printing/manager`
+- `transport/http-family`
+
+## 2. Capa de Computación y Ejecución
 Gestiona el ciclo de vida de tareas, colas de trabajo y el contexto de ejecución.
-- [Execution (Plan-Run)](interfaces/execution/plan-run.md): Interfaz base para cualquier tarea asíncrona.
-- [Queue (Task Engine)](interfaces/queue/task-engine.md): Procesamiento en background y tareas programadas.
+- [Execution (Plan-Run)](interfaces/execution/plan-run.md): Contrato concreto para ejecución materializada, planificación, validación y observabilidad.
+- [Queue (Task Engine)](interfaces/queue/task-engine.md): Procesamiento en background, monitorización y cancelación de tareas.
 - [Runtime Environment](interfaces/runtime/environment.md): Gestión de secretos, configuración y recursos.
 - [Application (ASGI/WSGI)](interfaces/application/asgi.md): Servidores y frameworks web.
 
@@ -36,6 +47,6 @@ Orquestación de hardware y periféricos.
 
 ## Convenciones Compartidas
 Muchos catálogos reutilizan convenciones comunes para mantener coherencia entre proveedores:
-1. **Telemetría Compartida**: Reutilización de nombres de campos y unidades cuando aporta interoperabilidad.
-2. **Esquemas Tipados Opcionales**: Validación estructural en metadata o resultados cuando el dominio lo necesita.
+1. **Telemetría Compartida**: Reutilización creciente de nombres de campos y unidades cuando aporta interoperabilidad.
+2. **Esquemas Tipados Opcionales**: Validación estructural en metadata, entradas o resultados cuando el dominio lo necesita.
 3. **Tiers de Conformidad**: Definición clara del nivel `core` y de superficies más avanzadas.
