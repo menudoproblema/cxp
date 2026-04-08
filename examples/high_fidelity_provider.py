@@ -18,7 +18,6 @@ from cxp.catalogs.interfaces.storage.blob import (
 from cxp.catalogs.results import BlobMetadata
 from cxp.telemetry import TelemetryContext
 
-
 PROVIDER_DESCRIPTOR = {
     "interfaces": (
         {

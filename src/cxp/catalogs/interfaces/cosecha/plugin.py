@@ -179,7 +179,10 @@ COSECHA_PLUGIN_CATALOG = register_catalog(
                     COSECHA_PLUGIN_TIMING_SUMMARY,
                     COSECHA_PLUGIN_TELEMETRY_EXPORT,
                 ),
-                description="Plugin that contributes both timing and telemetry sidecars.",
+                description=(
+                    "Plugin that contributes both timing and telemetry "
+                    "sidecars."
+                ),
             ),
             ConformanceTier(
                 name=COSECHA_PLUGIN_TIMING_SIDECAR_TIER,

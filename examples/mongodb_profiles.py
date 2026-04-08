@@ -5,20 +5,19 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from cxp import (
+    MONGODB_CATALOG,
+    MONGODB_SEARCH_PROFILE,
     CapabilityDescriptor,
     CapabilityOperationBinding,
     ComponentCapabilitySnapshot,
     MongoAggregationMetadata,
     MongoSearchMetadata,
     MongoVectorSearchMetadata,
-    MONGODB_CATALOG,
-    MONGODB_SEARCH_PROFILE,
     TelemetryEvent,
     TelemetryMetric,
     TelemetrySnapshot,
     TelemetrySpan,
 )
-
 
 snapshot = ComponentCapabilitySnapshot(
     component_name="local-mongodb",
