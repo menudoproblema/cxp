@@ -98,7 +98,10 @@ COSECHA_RUNTIME_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_RUNTIME_LIVE_EXECUTION_OBSERVABILITY,
-                description="Expose a volatile live execution projection for the active session.",
+                description=(
+                    "Expose a volatile live execution projection for the "
+                    "active session."
+                ),
                 metadata_schema=LiveExecutionMetadata,
                 operations=(
                     CatalogOperation(

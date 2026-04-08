@@ -121,7 +121,10 @@ COSECHA_REPORTER_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_REPORTER_RESULT_PROJECTION,
-                description="Project test starts and results into reporter-specific views.",
+                description=(
+                    "Project test starts and results into reporter-specific "
+                    "views."
+                ),
                 metadata_schema=ResultProjectionMetadata,
                 telemetry=CapabilityTelemetry(
                     spans=(
@@ -208,7 +211,9 @@ COSECHA_REPORTER_CATALOG = register_catalog(
                     COSECHA_REPORTER_RESULT_PROJECTION,
                     COSECHA_REPORTER_ARTIFACT_OUTPUT,
                 ),
-                description="Reporter that writes a final artifact or persisted output.",
+                description=(
+                    "Reporter that writes a final artifact or persisted output."
+                ),
             ),
             ConformanceTier(
                 name=COSECHA_REPORTER_STRUCTURED_TIER,

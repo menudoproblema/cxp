@@ -1,3 +1,10 @@
+from cxp import (
+    CapabilityDescriptor,
+    CapabilityOperationBinding,
+    ComponentCapabilitySnapshot,
+    ComponentIdentity,
+    get_catalog,
+)
 from cxp.catalogs.interfaces.cosecha import (
     COSECHA_ENGINE_CATALOG,
     COSECHA_ENGINE_DEPENDENCY_KNOWLEDGE,
@@ -21,25 +28,27 @@ from cxp.catalogs.interfaces.cosecha import (
     COSECHA_INSTRUMENTATION_STRUCTURED_SUMMARY,
     COSECHA_PLUGIN_CATALOG,
     COSECHA_PLUGIN_INTERFACE,
+    COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE,
+    COSECHA_PLUGIN_REPORTING_SIDECAR_TIER,
     COSECHA_PLUGIN_TELEMETRY_EXPORT,
+    COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE,
+    COSECHA_PLUGIN_TELEMETRY_SIDECAR_TIER,
+    COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE,
+    COSECHA_PLUGIN_TIMING_SIDECAR_TIER,
+    COSECHA_PLUGIN_TIMING_SUMMARY,
     COSECHA_REPORTER_ARTIFACT_OUTPUT,
     COSECHA_REPORTER_ARTIFACT_PROFILE,
+    COSECHA_REPORTER_ARTIFACT_TIER,
     COSECHA_REPORTER_CATALOG,
     COSECHA_REPORTER_HUMAN_OUTPUT,
     COSECHA_REPORTER_HUMAN_PROFILE,
+    COSECHA_REPORTER_HUMAN_TIER,
     COSECHA_REPORTER_INTERFACE,
     COSECHA_REPORTER_RESULT_PROJECTION,
-    COSECHA_REPORTER_STRUCTURED_PROFILE,
     COSECHA_REPORTER_STRUCTURED_OUTPUT,
+    COSECHA_REPORTER_STRUCTURED_PROFILE,
     COSECHA_RUNTIME_CATALOG,
     COSECHA_RUNTIME_INTERFACE,
-)
-from cxp import (
-    CapabilityDescriptor,
-    CapabilityOperationBinding,
-    ComponentCapabilitySnapshot,
-    ComponentIdentity,
-    get_catalog,
 )
 
 
@@ -325,6 +334,19 @@ def test_cosecha_reporter_catalog_allows_human_and_artifact_output_together() ->
         snapshot,
         COSECHA_REPORTER_HUMAN_PROFILE,
     )
+    human_tier_validation = COSECHA_REPORTER_CATALOG.validate_capability_set(
+        tuple(capability.name for capability in snapshot.capabilities),
+        required_tier=COSECHA_REPORTER_HUMAN_TIER,
+    )
+    artifact_tier_validation = (
+        COSECHA_REPORTER_CATALOG.validate_capability_set(
+            tuple(capability.name for capability in snapshot.capabilities),
+            required_tier=COSECHA_REPORTER_ARTIFACT_TIER,
+        )
+    )
+
+    assert human_tier_validation.is_valid()
+    assert artifact_tier_validation.is_valid()
 
 
 def test_cosecha_plugin_catalog_supports_declared_optional_capabilities() -> None:
@@ -356,6 +378,104 @@ def test_cosecha_plugin_catalog_supports_declared_optional_capabilities() -> Non
     )
 
     assert COSECHA_PLUGIN_CATALOG.is_component_snapshot_compliant(snapshot)
+    telemetry_tier_validation = COSECHA_PLUGIN_CATALOG.validate_capability_set(
+        tuple(capability.name for capability in snapshot.capabilities),
+        required_tier=COSECHA_PLUGIN_TELEMETRY_SIDECAR_TIER,
+    )
+
+    assert telemetry_tier_validation.is_valid()
+    assert COSECHA_PLUGIN_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE,
+    )
+
+
+def test_cosecha_plugin_catalog_supports_timing_sidecars_independently() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="timing",
+        identity=ComponentIdentity(
+            interface=COSECHA_PLUGIN_INTERFACE,
+            provider="timing",
+            version="1",
+        ),
+        capabilities=(
+            CapabilityDescriptor(name="plugin_lifecycle", level="supported"),
+            CapabilityDescriptor(
+                name="surface_publication",
+                level="supported",
+                metadata={"provided_surfaces": ["reporter"]},
+            ),
+            CapabilityDescriptor(
+                name="capability_requirements",
+                level="supported",
+                metadata={"required_capabilities": []},
+            ),
+            CapabilityDescriptor(
+                name=COSECHA_PLUGIN_TIMING_SUMMARY,
+                level="supported",
+                metadata={"output_formats": ["table"]},
+            ),
+        ),
+    )
+
+    assert COSECHA_PLUGIN_CATALOG.is_component_snapshot_compliant(snapshot)
+    timing_tier_validation = COSECHA_PLUGIN_CATALOG.validate_capability_set(
+        tuple(capability.name for capability in snapshot.capabilities),
+        required_tier=COSECHA_PLUGIN_TIMING_SIDECAR_TIER,
+    )
+    reporting_tier_validation = COSECHA_PLUGIN_CATALOG.validate_capability_set(
+        tuple(capability.name for capability in snapshot.capabilities),
+        required_tier=COSECHA_PLUGIN_REPORTING_SIDECAR_TIER,
+    )
+
+    assert timing_tier_validation.is_valid()
+    assert COSECHA_PLUGIN_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE,
+    )
+    assert reporting_tier_validation.is_valid() is False
+    assert reporting_tier_validation.missing_tier_capabilities == (
+        COSECHA_PLUGIN_TELEMETRY_EXPORT,
+    )
+
+
+def test_cosecha_plugin_reporting_sidecar_profile_requires_both_sidecars() -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="combined-sidecar",
+        identity=ComponentIdentity(
+            interface=COSECHA_PLUGIN_INTERFACE,
+            provider="combined-sidecar",
+            version="1",
+        ),
+        capabilities=(
+            CapabilityDescriptor(name="plugin_lifecycle", level="supported"),
+            CapabilityDescriptor(
+                name="surface_publication",
+                level="supported",
+                metadata={"provided_surfaces": ["reporter"]},
+            ),
+            CapabilityDescriptor(
+                name="capability_requirements",
+                level="supported",
+                metadata={"required_capabilities": []},
+            ),
+            CapabilityDescriptor(
+                name=COSECHA_PLUGIN_TIMING_SUMMARY,
+                level="supported",
+                metadata={"output_formats": ["table"]},
+            ),
+            CapabilityDescriptor(
+                name=COSECHA_PLUGIN_TELEMETRY_EXPORT,
+                level="supported",
+                metadata={"output_formats": ["jsonl"]},
+            ),
+        ),
+    )
+
+    assert COSECHA_PLUGIN_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE,
+    )
 
 
 def test_cosecha_runtime_catalog_validates_observable_runtime() -> None:
@@ -397,7 +517,7 @@ def test_cosecha_runtime_catalog_validates_observable_runtime() -> None:
     assert COSECHA_RUNTIME_CATALOG.is_component_snapshot_compliant(snapshot)
 
 
-def test_cosecha_instrumentation_catalog_validates_structured_coverage_summary() -> None:
+def test_cosecha_instrumentation_catalog_validates_coverage_summary() -> None:
     snapshot = ComponentCapabilitySnapshot(
         component_name="coverage",
         identity=ComponentIdentity(
@@ -481,7 +601,7 @@ def test_cosecha_engine_planning_profile_does_not_require_run_labels() -> None:
     )
 
 
-def test_cosecha_reporter_structured_profile_requires_output_kind_only_on_structured_capability() -> None:
+def test_cosecha_reporter_structured_profile_requires_output_kind() -> None:
     snapshot = ComponentCapabilitySnapshot(
         component_name="json",
         identity=ComponentIdentity(

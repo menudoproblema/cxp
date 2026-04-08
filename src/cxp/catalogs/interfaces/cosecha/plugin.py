@@ -30,10 +30,18 @@ COSECHA_PLUGIN_AFTER_SESSION_CLOSED = "plugin.after_session_closed"
 
 COSECHA_PLUGIN_CORE_TIER = "core"
 COSECHA_PLUGIN_CONSTRAINED_TIER = "constrained"
+COSECHA_PLUGIN_TIMING_SIDECAR_TIER = "timing_sidecar"
+COSECHA_PLUGIN_TELEMETRY_SIDECAR_TIER = "telemetry_sidecar"
 COSECHA_PLUGIN_REPORTING_SIDECAR_TIER = "reporting_sidecar"
 
 COSECHA_PLUGIN_CORE_PROFILE_NAME = "cosecha-plugin-core"
 COSECHA_PLUGIN_CONSTRAINED_PROFILE_NAME = "cosecha-plugin-constrained"
+COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE_NAME = (
+    "cosecha-plugin-timing-sidecar"
+)
+COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE_NAME = (
+    "cosecha-plugin-telemetry-sidecar"
+)
 COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE_NAME = (
     "cosecha-plugin-reporting-sidecar"
 )
@@ -169,8 +177,29 @@ COSECHA_PLUGIN_CATALOG = register_catalog(
                     COSECHA_PLUGIN_SURFACE_PUBLICATION,
                     COSECHA_PLUGIN_CAPABILITY_REQUIREMENTS,
                     COSECHA_PLUGIN_TIMING_SUMMARY,
+                    COSECHA_PLUGIN_TELEMETRY_EXPORT,
                 ),
-                description="Plugin that contributes a reporting sidecar summary.",
+                description="Plugin that contributes both timing and telemetry sidecars.",
+            ),
+            ConformanceTier(
+                name=COSECHA_PLUGIN_TIMING_SIDECAR_TIER,
+                required_capabilities=(
+                    COSECHA_PLUGIN_LIFECYCLE,
+                    COSECHA_PLUGIN_SURFACE_PUBLICATION,
+                    COSECHA_PLUGIN_CAPABILITY_REQUIREMENTS,
+                    COSECHA_PLUGIN_TIMING_SUMMARY,
+                ),
+                description="Plugin that contributes a timing reporting sidecar.",
+            ),
+            ConformanceTier(
+                name=COSECHA_PLUGIN_TELEMETRY_SIDECAR_TIER,
+                required_capabilities=(
+                    COSECHA_PLUGIN_LIFECYCLE,
+                    COSECHA_PLUGIN_SURFACE_PUBLICATION,
+                    COSECHA_PLUGIN_CAPABILITY_REQUIREMENTS,
+                    COSECHA_PLUGIN_TELEMETRY_EXPORT,
+                ),
+                description="Plugin that contributes a telemetry export sidecar.",
             ),
         ),
     )
@@ -209,20 +238,38 @@ COSECHA_PLUGIN_CONSTRAINED_PROFILE = CapabilityProfile(
     description="Profile for plugins that publish capability requirements.",
 )
 
-COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE = CapabilityProfile(
-    name=COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE_NAME,
+COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE = CapabilityProfile(
+    name=COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE_NAME,
     interface=COSECHA_PLUGIN_INTERFACE,
     requirements=(
         CapabilityRequirement(
             capability_name=COSECHA_PLUGIN_TIMING_SUMMARY,
             required_metadata_keys=("output_formats",),
         ),
+    ),
+    description="Profile for plugins that publish timing sidecars.",
+)
+
+COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE = CapabilityProfile(
+    name=COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE_NAME,
+    interface=COSECHA_PLUGIN_INTERFACE,
+    requirements=(
         CapabilityRequirement(
             capability_name=COSECHA_PLUGIN_TELEMETRY_EXPORT,
             required_metadata_keys=("output_formats",),
         ),
     ),
-    description="Profile for plugins that publish reporting or telemetry sidecars.",
+    description="Profile for plugins that publish telemetry sidecars.",
+)
+
+COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE = CapabilityProfile(
+    name=COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE_NAME,
+    interface=COSECHA_PLUGIN_INTERFACE,
+    requirements=(
+        *COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE.requirements,
+        *COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE.requirements,
+    ),
+    description="Profile for plugins that publish both timing and telemetry sidecars.",
 )
 
 __all__ = (
@@ -244,7 +291,13 @@ __all__ = (
     "COSECHA_PLUGIN_REPORTING_SIDECAR_TIER",
     "COSECHA_PLUGIN_START",
     "COSECHA_PLUGIN_SURFACE_PUBLICATION",
+    "COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE",
+    "COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE_NAME",
+    "COSECHA_PLUGIN_TELEMETRY_SIDECAR_TIER",
     "COSECHA_PLUGIN_TELEMETRY_EXPORT",
+    "COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE",
+    "COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE_NAME",
+    "COSECHA_PLUGIN_TIMING_SIDECAR_TIER",
     "COSECHA_PLUGIN_TIMING_SUMMARY",
     "CapabilityRequirementsMetadata",
     "PluginOutputMetadata",

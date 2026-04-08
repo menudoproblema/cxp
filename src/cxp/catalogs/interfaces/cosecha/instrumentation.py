@@ -72,7 +72,10 @@ COSECHA_INSTRUMENTATION_CATALOG = register_catalog(
         capabilities=(
             CatalogCapability(
                 name=COSECHA_INSTRUMENTATION_BOOTSTRAP,
-                description="Prepare bootstrap contributions for an instrumented session.",
+                description=(
+                    "Prepare bootstrap contributions for an instrumented "
+                    "session."
+                ),
                 telemetry=_instrumentation_span(
                     "instrumentation.prepare",
                     "Instrumentation bootstrap preparation span.",
@@ -86,7 +89,9 @@ COSECHA_INSTRUMENTATION_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
-                description="Collect a session summary produced by the instrumentation.",
+                description=(
+                    "Collect a session summary produced by the instrumentation."
+                ),
                 metadata_schema=InstrumentationSummaryMetadata,
                 telemetry=_instrumentation_span(
                     "instrumentation.collect",
@@ -121,7 +126,10 @@ COSECHA_INSTRUMENTATION_CATALOG = register_catalog(
                     COSECHA_INSTRUMENTATION_BOOTSTRAP,
                     COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
                 ),
-                description="Instrumentation that prepares and collects a session summary.",
+                description=(
+                    "Instrumentation that prepares and collects a session "
+                    "summary."
+                ),
             ),
             ConformanceTier(
                 name=COSECHA_INSTRUMENTATION_STRUCTURED_TIER,

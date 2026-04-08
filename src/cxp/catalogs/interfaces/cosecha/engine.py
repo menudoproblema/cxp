@@ -85,6 +85,8 @@ class SelectionLabelsMetadata(msgspec.Struct, frozen=True):
 
 
 class DefinitionKnowledgeMetadata(msgspec.Struct, frozen=True):
+    # Kept as a tuple for forward compatibility with engines that may expose
+    # multiple knowledge origins through a single descriptor in the future.
     knowledge_origin_kind: tuple[str, ...]
     knowledge_scopes: tuple[str, ...]
     supports_fresh_resolution: bool = False
@@ -324,7 +326,10 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE,
-                description="Publish project registry entries and indexed declarative context.",
+                description=(
+                    "Publish project registry entries and indexed declarative "
+                    "context."
+                ),
                 metadata_schema=RegistryKnowledgeMetadata,
                 operations=(
                     CatalogOperation(
@@ -381,7 +386,10 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_ENGINE_STATIC_DEFINITION_DISCOVERY,
-                description="Discover tests or definitions without executing the full engine.",
+                description=(
+                    "Discover tests or definitions without executing the full "
+                    "engine."
+                ),
                 metadata_schema=StaticDefinitionDiscoveryMetadata,
                 operations=(
                     CatalogOperation(
@@ -407,7 +415,10 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             ),
             CatalogCapability(
                 name=COSECHA_ENGINE_DEPENDENCY_KNOWLEDGE,
-                description="Publish dependency rules between engines within a mixed plan.",
+                description=(
+                    "Publish dependency rules between engines within a mixed "
+                    "plan."
+                ),
                 telemetry=_engine_span(
                     "engine.dependencies.describe",
                     _ENGINE_NAME_FIELD,
@@ -469,7 +480,10 @@ COSECHA_ENGINE_CATALOG = register_catalog(
                     COSECHA_ENGINE_DEPENDENCY_KNOWLEDGE,
                     COSECHA_ENGINE_ON_DEMAND_DEFINITION_MATERIALIZATION,
                 ),
-                description="Engine integrated with knowledge and cross-engine coordination.",
+                description=(
+                    "Engine integrated with knowledge and cross-engine "
+                    "coordination."
+                ),
             ),
         ),
     )
@@ -586,7 +600,10 @@ COSECHA_ENGINE_INTEGRATED_PROFILE = CapabilityProfile(
             required_operations=(COSECHA_ENGINE_DEPENDENCIES_DESCRIBE,),
         ),
     ),
-    description="Integrated engine profile with dependency and multi-source knowledge semantics.",
+    description=(
+        "Integrated engine profile with dependency and multi-source knowledge "
+        "semantics."
+    ),
 )
 
 __all__ = (
