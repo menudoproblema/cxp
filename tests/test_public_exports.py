@@ -225,8 +225,13 @@ def test_legacy_execution_engine_symbols_are_not_exported_by_submodules() -> Non
 def test_package_version_matches_project_metadata() -> None:
     pyproject = Path(__file__).resolve().parent.parent / "pyproject.toml"
     project = tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]
+    dynamic = tomllib.loads(pyproject.read_text(encoding="utf-8"))["tool"][
+        "setuptools"
+    ]["dynamic"]
 
-    assert cxp.__version__ == project["version"]
+    assert project["dynamic"] == ["version"]
+    assert dynamic["version"]["attr"] == "cxp._version.__version__"
+    assert cxp.__version__ == "3.0.0"
 
 
 def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:

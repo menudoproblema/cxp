@@ -49,8 +49,17 @@ class ResultProjectionMetadata(msgspec.Struct, frozen=True):
 
 
 class ArtifactOutputMetadata(msgspec.Struct, frozen=True):
-    output_kind: str
     artifact_formats: tuple[str, ...] = ()
+
+
+class StructuredOutputMetadata(msgspec.Struct, frozen=True):
+    output_kind: str = "structured"
+    artifact_formats: tuple[str, ...] = ()
+    supports_engine_specific_projection: bool = False
+
+
+class HumanOutputMetadata(msgspec.Struct, frozen=True):
+    output_kind: str
     supports_engine_specific_projection: bool = False
 
 
@@ -163,7 +172,7 @@ COSECHA_REPORTER_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_REPORTER_STRUCTURED_OUTPUT,
                 description="Emit machine-readable structured output.",
-                metadata_schema=ArtifactOutputMetadata,
+                metadata_schema=StructuredOutputMetadata,
                 operations=(
                     CatalogOperation(
                         name=COSECHA_REPORTER_PRINT_REPORT,
@@ -174,7 +183,7 @@ COSECHA_REPORTER_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_REPORTER_HUMAN_OUTPUT,
                 description="Emit human-oriented rendered output.",
-                metadata_schema=ArtifactOutputMetadata,
+                metadata_schema=HumanOutputMetadata,
                 operations=(
                     CatalogOperation(
                         name=COSECHA_REPORTER_PRINT_REPORT,
@@ -252,10 +261,7 @@ COSECHA_REPORTER_ARTIFACT_PROFILE = CapabilityProfile(
     requirements=(
         CapabilityRequirement(
             capability_name=COSECHA_REPORTER_ARTIFACT_OUTPUT,
-            required_metadata_keys=(
-                "output_kind",
-                "artifact_formats",
-            ),
+            required_metadata_keys=("artifact_formats",),
         ),
     ),
     description="Artifact-writing reporter profile.",
@@ -310,5 +316,7 @@ __all__ = (
     "COSECHA_REPORTER_STRUCTURED_PROFILE",
     "COSECHA_REPORTER_STRUCTURED_PROFILE_NAME",
     "COSECHA_REPORTER_STRUCTURED_TIER",
+    "HumanOutputMetadata",
     "ResultProjectionMetadata",
+    "StructuredOutputMetadata",
 )

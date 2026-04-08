@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cxp"
-version = "1.0.0"
+dynamic = ["version"]
 description = "Capability Exchange Protocol"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -53,6 +53,9 @@ dev = [
 [tool.setuptools]
 package-dir = { "" = "src" }
 license-files = ["LICENSE"]
+
+[tool.setuptools.dynamic]
+version = { attr = "cxp._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

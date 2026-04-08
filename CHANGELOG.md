@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0
+## 3.0.0
 
 - Stabilized the core handshake contract around `ComponentIdentity`, `CapabilityMatrix`, and protocol-version negotiation.
 - Introduced abstract interface-family support in catalogs via `abstract` and `satisfies_interfaces`.

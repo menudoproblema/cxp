@@ -85,9 +85,14 @@ class SelectionLabelsMetadata(msgspec.Struct, frozen=True):
 
 
 class DefinitionKnowledgeMetadata(msgspec.Struct, frozen=True):
-    knowledge_origin_kind: str
+    knowledge_origin_kind: tuple[str, ...]
     knowledge_scopes: tuple[str, ...]
     supports_fresh_resolution: bool = False
+    supports_knowledge_base_projection: bool = False
+
+
+class RegistryKnowledgeMetadata(msgspec.Struct, frozen=True):
+    registry_scopes: tuple[str, ...]
     supports_knowledge_base_projection: bool = False
 
 
@@ -320,7 +325,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE,
                 description="Publish project registry entries and indexed declarative context.",
-                metadata_schema=DefinitionKnowledgeMetadata,
+                metadata_schema=RegistryKnowledgeMetadata,
                 operations=(
                     CatalogOperation(
                         name=COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS,
@@ -445,6 +450,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
                     COSECHA_ENGINE_LIFECYCLE,
                     COSECHA_ENGINE_TEST_LIFECYCLE,
                     COSECHA_ENGINE_DRAFT_VALIDATION,
+                    COSECHA_ENGINE_SELECTION_LABELS,
                     COSECHA_ENGINE_PROJECT_DEFINITION_KNOWLEDGE,
                     COSECHA_ENGINE_STATIC_DEFINITION_DISCOVERY,
                     COSECHA_ENGINE_PLAN_EXPLANATION,
@@ -528,7 +534,6 @@ COSECHA_ENGINE_PLANNING_PROFILE = CapabilityProfile(
         CapabilityRequirement(
             capability_name=COSECHA_ENGINE_SELECTION_LABELS,
             required_operations=(
-                COSECHA_ENGINE_RUN,
                 COSECHA_ENGINE_PLAN_ANALYZE,
                 COSECHA_ENGINE_PLAN_EXPLAIN,
                 COSECHA_ENGINE_PLAN_SIMULATE,
@@ -569,10 +574,7 @@ COSECHA_ENGINE_INTEGRATED_PROFILE = CapabilityProfile(
             required_operations=(
                 COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS,
             ),
-            required_metadata_keys=(
-                "knowledge_origin_kind",
-                "knowledge_scopes",
-            ),
+            required_metadata_keys=("registry_scopes",),
         ),
         CapabilityRequirement(
             capability_name=COSECHA_ENGINE_ON_DEMAND_DEFINITION_MATERIALIZATION,
@@ -631,6 +633,7 @@ __all__ = (
     "COSECHA_ENGINE_TEST_START",
     "DefinitionKnowledgeMetadata",
     "OnDemandDefinitionMaterializationMetadata",
+    "RegistryKnowledgeMetadata",
     "SelectionLabelsMetadata",
     "StaticDefinitionDiscoveryMetadata",
 )
