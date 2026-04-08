@@ -21,10 +21,16 @@ from cxp.catalogs.interfaces.cosecha import (
     COSECHA_ENGINE_TEST_EXECUTE,
     COSECHA_ENGINE_TEST_LIFECYCLE,
     COSECHA_ENGINE_TEST_PHASE,
+    COSECHA_INSTRUMENTATION_ACTIVATE,
     COSECHA_INSTRUMENTATION_BOOTSTRAP,
     COSECHA_INSTRUMENTATION_CATALOG,
+    COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE,
+    COSECHA_INSTRUMENTATION_COMPOSABLE_TIER,
     COSECHA_INSTRUMENTATION_INTERFACE,
     COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
+    COSECHA_INSTRUMENTATION_SLOT_PROCESS_ARGV,
+    COSECHA_INSTRUMENTATION_SLOT_PY_SETTRACE,
+    COSECHA_INSTRUMENTATION_STRATEGY_PROCESS_WRAPPER,
     COSECHA_INSTRUMENTATION_STRUCTURED_SUMMARY,
     COSECHA_PLUGIN_CATALOG,
     COSECHA_PLUGIN_INTERFACE,
@@ -529,8 +535,23 @@ def test_cosecha_instrumentation_catalog_validates_coverage_summary() -> None:
             CapabilityDescriptor(
                 name=COSECHA_INSTRUMENTATION_BOOTSTRAP,
                 level="supported",
+                metadata={
+                    "bootstrap_strategy": (
+                        COSECHA_INSTRUMENTATION_STRATEGY_PROCESS_WRAPPER
+                    ),
+                    "runtime_slots": [
+                        COSECHA_INSTRUMENTATION_SLOT_PROCESS_ARGV,
+                        COSECHA_INSTRUMENTATION_SLOT_PY_SETTRACE,
+                    ],
+                    "activation_triggers": [
+                        {"kind": "cli_flag", "name": "--cov"},
+                    ],
+                },
                 operations=(
                     CapabilityOperationBinding("instrumentation.prepare"),
+                    CapabilityOperationBinding(
+                        COSECHA_INSTRUMENTATION_ACTIVATE,
+                    ),
                 ),
             ),
             CapabilityDescriptor(
@@ -559,6 +580,67 @@ def test_cosecha_instrumentation_catalog_validates_coverage_summary() -> None:
     assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_compliant(
         snapshot,
     )
+    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_compliant(
+        snapshot,
+        required_tier=COSECHA_INSTRUMENTATION_COMPOSABLE_TIER,
+    )
+    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE,
+    )
+
+
+def test_cosecha_instrumentation_catalog_uses_profile_for_strict_composable_validation(
+) -> None:
+    snapshot = ComponentCapabilitySnapshot(
+        component_name="broken-composable",
+        identity=ComponentIdentity(
+            interface=COSECHA_INSTRUMENTATION_INTERFACE,
+            provider="broken-composable",
+            version="1",
+        ),
+        capabilities=(
+            CapabilityDescriptor(
+                name=COSECHA_INSTRUMENTATION_BOOTSTRAP,
+                level="supported",
+                metadata={
+                    "bootstrap_strategy": (
+                        COSECHA_INSTRUMENTATION_STRATEGY_PROCESS_WRAPPER
+                    ),
+                    "runtime_slots": [COSECHA_INSTRUMENTATION_SLOT_PROCESS_ARGV],
+                    "activation_triggers": [
+                        {"kind": "cli_flag", "name": "--broken"},
+                    ],
+                },
+                operations=(
+                    CapabilityOperationBinding("instrumentation.prepare"),
+                ),
+            ),
+            CapabilityDescriptor(
+                name=COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
+                level="supported",
+                metadata={
+                    "instrumentation_name": "broken-composable",
+                    "summary_kind": "broken",
+                },
+                operations=(
+                    CapabilityOperationBinding("instrumentation.collect"),
+                ),
+            ),
+        ),
+    )
+
+    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_compliant(
+        snapshot,
+    )
+    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_compliant(
+        snapshot,
+        required_tier=COSECHA_INSTRUMENTATION_COMPOSABLE_TIER,
+    )
+    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_profile_compliant(
+        snapshot,
+        COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE,
+    ) is False
 
 
 def test_cosecha_engine_planning_profile_does_not_require_run_labels() -> None:

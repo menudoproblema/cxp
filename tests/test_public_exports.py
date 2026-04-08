@@ -60,6 +60,9 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "COSECHA_RUNTIME_INTERFACE",
         "COSECHA_RUNTIME_LIVE_EXECUTION_OBSERVABILITY",
         "COSECHA_INSTRUMENTATION_CATALOG",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE_NAME",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_TIER",
         "COSECHA_INSTRUMENTATION_INTERFACE",
         "COSECHA_INSTRUMENTATION_STRUCTURED_SUMMARY",
         "BROWSER_AUTOMATION_CATALOG",
@@ -129,6 +132,9 @@ def test_family_and_concrete_catalog_symbols_are_publicly_exported() -> None:
         "COSECHA_RUNTIME_INTERFACE",
         "COSECHA_RUNTIME_LIVE_EXECUTION_OBSERVABILITY",
         "COSECHA_INSTRUMENTATION_CATALOG",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE_NAME",
+        "COSECHA_INSTRUMENTATION_COMPOSABLE_TIER",
         "COSECHA_INSTRUMENTATION_INTERFACE",
         "COSECHA_INSTRUMENTATION_STRUCTURED_SUMMARY",
         "BROWSER_AUTOMATION_CATALOG",
@@ -235,7 +241,7 @@ def test_package_version_matches_project_metadata() -> None:
 
     assert project["dynamic"] == ["version"]
     assert dynamic["version"]["attr"] == "cxp._version.__version__"
-    assert cxp.__version__ == "3.0.0"
+    assert cxp.__version__ == "3.1.0"
 
 
 def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:

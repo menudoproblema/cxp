@@ -1,6 +1,6 @@
 # CXP: Capability Exchange Protocol
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![Version](https://img.shields.io/badge/version-3.1.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12+-green)
 [![CI](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml/badge.svg)](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml)
 

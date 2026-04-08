@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+- Added a richer `cosecha/instrumentation` contract with bootstrap metadata validation for strategy, runtime slots, and activation triggers.
+- Added the composable instrumentation profile and its public exports so orchestration layers can negotiate strict composition requirements explicitly.
+- Added the `instrumentation.activate` operation plus public constants for declared bootstrap strategies and runtime slots.
+- Clarified the architecture distinction between tier-level capability presence and profile-level strict validation for Cosecha instrumentation negotiation.
+
 ## 3.0.0
 
 - Stabilized the core handshake contract around `ComponentIdentity`, `CapabilityMatrix`, and protocol-version negotiation.
