@@ -17,9 +17,11 @@ HTTP3_QUIC_TRANSPORT = "quic_transport"
 HTTP3_ZERO_RTT = "zero_rtt_handshake"
 HTTP3_CONNECTION_MIGRATION = "connection_migration"
 
+
 class Http3Metadata(msgspec.Struct, frozen=True):
     quic_version: str
     supports_0rtt: bool = False
+
 
 HTTP3_TRANSPORT_CATALOG = register_catalog(
     CapabilityCatalog(

@@ -21,19 +21,11 @@ COSECHA_ENGINE_LIFECYCLE = "engine_lifecycle"
 COSECHA_ENGINE_TEST_LIFECYCLE = "test_lifecycle"
 COSECHA_ENGINE_DRAFT_VALIDATION = "draft_validation"
 COSECHA_ENGINE_SELECTION_LABELS = "selection_labels"
-COSECHA_ENGINE_PROJECT_DEFINITION_KNOWLEDGE = (
-    "project_definition_knowledge"
-)
-COSECHA_ENGINE_LIBRARY_DEFINITION_KNOWLEDGE = (
-    "library_definition_knowledge"
-)
-COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE = (
-    "project_registry_knowledge"
-)
+COSECHA_ENGINE_PROJECT_DEFINITION_KNOWLEDGE = "project_definition_knowledge"
+COSECHA_ENGINE_LIBRARY_DEFINITION_KNOWLEDGE = "library_definition_knowledge"
+COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE = "project_registry_knowledge"
 COSECHA_ENGINE_PLAN_EXPLANATION = "plan_explanation"
-COSECHA_ENGINE_STATIC_DEFINITION_DISCOVERY = (
-    "static_definition_discovery"
-)
+COSECHA_ENGINE_STATIC_DEFINITION_DISCOVERY = "static_definition_discovery"
 COSECHA_ENGINE_ON_DEMAND_DEFINITION_MATERIALIZATION = (
     "on_demand_definition_materialization"
 )
@@ -51,9 +43,7 @@ COSECHA_ENGINE_DRAFT_VALIDATE = "draft.validate"
 COSECHA_ENGINE_DEFINITION_RESOLVE = "definition.resolve"
 COSECHA_ENGINE_KNOWLEDGE_QUERY_TESTS = "knowledge.query_tests"
 COSECHA_ENGINE_KNOWLEDGE_QUERY_DEFINITIONS = "knowledge.query_definitions"
-COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS = (
-    "knowledge.query_registry_items"
-)
+COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS = "knowledge.query_registry_items"
 COSECHA_ENGINE_PLAN_ANALYZE = "plan.analyze"
 COSECHA_ENGINE_PLAN_EXPLAIN = "plan.explain"
 COSECHA_ENGINE_PLAN_SIMULATE = "plan.simulate"
@@ -73,9 +63,7 @@ _ENGINE_NAME_FIELD = TelemetryFieldRequirement(name="cosecha.engine.name")
 _OPERATION_NAME_FIELD = TelemetryFieldRequirement(name="cosecha.operation.name")
 _OUTCOME_FIELD = TelemetryFieldRequirement(name="cosecha.outcome")
 _NODE_ID_FIELD = TelemetryFieldRequirement(name="cosecha.node.id")
-_NODE_STABLE_ID_FIELD = TelemetryFieldRequirement(
-    name="cosecha.node.stable_id"
-)
+_NODE_STABLE_ID_FIELD = TelemetryFieldRequirement(name="cosecha.node.stable_id")
 _PHASE_FIELD = TelemetryFieldRequirement(name="cosecha.phase")
 
 
@@ -327,8 +315,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE,
                 description=(
-                    "Publish project registry entries and indexed declarative "
-                    "context."
+                    "Publish project registry entries and indexed declarative context."
                 ),
                 metadata_schema=RegistryKnowledgeMetadata,
                 operations=(
@@ -387,8 +374,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_ENGINE_STATIC_DEFINITION_DISCOVERY,
                 description=(
-                    "Discover tests or definitions without executing the full "
-                    "engine."
+                    "Discover tests or definitions without executing the full engine."
                 ),
                 metadata_schema=StaticDefinitionDiscoveryMetadata,
                 operations=(
@@ -416,8 +402,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_ENGINE_DEPENDENCY_KNOWLEDGE,
                 description=(
-                    "Publish dependency rules between engines within a mixed "
-                    "plan."
+                    "Publish dependency rules between engines within a mixed plan."
                 ),
                 telemetry=_engine_span(
                     "engine.dependencies.describe",
@@ -481,8 +466,7 @@ COSECHA_ENGINE_CATALOG = register_catalog(
                     COSECHA_ENGINE_ON_DEMAND_DEFINITION_MATERIALIZATION,
                 ),
                 description=(
-                    "Engine integrated with knowledge and cross-engine "
-                    "coordination."
+                    "Engine integrated with knowledge and cross-engine coordination."
                 ),
             ),
         ),
@@ -575,9 +559,7 @@ COSECHA_ENGINE_INTEGRATED_PROFILE = CapabilityProfile(
     requirements=(
         CapabilityRequirement(
             capability_name=COSECHA_ENGINE_LIBRARY_DEFINITION_KNOWLEDGE,
-            required_operations=(
-                COSECHA_ENGINE_KNOWLEDGE_QUERY_DEFINITIONS,
-            ),
+            required_operations=(COSECHA_ENGINE_KNOWLEDGE_QUERY_DEFINITIONS,),
             required_metadata_keys=(
                 "knowledge_origin_kind",
                 "knowledge_scopes",
@@ -585,9 +567,7 @@ COSECHA_ENGINE_INTEGRATED_PROFILE = CapabilityProfile(
         ),
         CapabilityRequirement(
             capability_name=COSECHA_ENGINE_PROJECT_REGISTRY_KNOWLEDGE,
-            required_operations=(
-                COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS,
-            ),
+            required_operations=(COSECHA_ENGINE_KNOWLEDGE_QUERY_REGISTRY_ITEMS,),
             required_metadata_keys=("registry_scopes",),
         ),
         CapabilityRequirement(

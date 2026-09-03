@@ -226,10 +226,7 @@ def test_legacy_execution_engine_symbols_are_not_exported_by_submodules() -> Non
         cxp.catalogs.interfaces.execution.engine,
     ):
         assert hasattr(module, "EXECUTION_ENGINE_DRAFT_VALIDATION") is False
-        assert (
-            hasattr(module, "EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY")
-            is False
-        )
+        assert hasattr(module, "EXECUTION_ENGINE_LIVE_EXECUTION_OBSERVABILITY") is False
 
 
 def test_package_version_matches_project_metadata() -> None:
@@ -241,14 +238,11 @@ def test_package_version_matches_project_metadata() -> None:
 
     assert project["dynamic"] == ["version"]
     assert dynamic["version"]["attr"] == "cxp._version.__version__"
-    assert cxp.__version__ == "3.1.0"
+    assert cxp.__version__ == "4.0.0"
 
 
 def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:
-    assert (
-        "COSECHA_ENGINE_LIFECYCLE"
-        in cxp.catalogs.interfaces.cosecha.engine.__all__
-    )
+    assert "COSECHA_ENGINE_LIFECYCLE" in cxp.catalogs.interfaces.cosecha.engine.__all__
     assert (
         "COSECHA_ENGINE_TEST_LIFECYCLE"
         in cxp.catalogs.interfaces.cosecha.engine.__all__

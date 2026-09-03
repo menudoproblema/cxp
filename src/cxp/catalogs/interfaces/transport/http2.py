@@ -19,9 +19,11 @@ HTTP2_MULTIPLEXING = "multiplexing"
 HTTP2_SERVER_PUSH = "server_push"
 HTTP2_HEADER_COMPRESSION = "header_compression"
 
+
 class Http2Metadata(msgspec.Struct, frozen=True):
     max_concurrent_streams: int = 100
     initial_window_size_bytes: int = 65535
+
 
 HTTP2_TRANSPORT_CATALOG = register_catalog(
     CapabilityCatalog(

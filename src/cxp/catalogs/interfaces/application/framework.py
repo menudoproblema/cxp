@@ -17,9 +17,7 @@ HTTP_APPLICATION_FRAMEWORK_CORE_TIER = "core"
 HTTP_APPLICATION_FRAMEWORK_CATALOG = register_catalog(
     CapabilityCatalog(
         interface=HTTP_APPLICATION_FRAMEWORK_INTERFACE,
-        description=(
-            "Canonical catalog for high-level HTTP framework semantics."
-        ),
+        description=("Canonical catalog for high-level HTTP framework semantics."),
         capabilities=(
             CatalogCapability(name=HTTP_APPLICATION_FRAMEWORK_ROUTING),
             CatalogCapability(name=HTTP_APPLICATION_FRAMEWORK_SCHEMA_VALIDATION),

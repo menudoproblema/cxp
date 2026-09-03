@@ -1,0 +1,35 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "software-service",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "service.compute",
+        "description": "Generic software computation; declares limits, not current capacity.",
+        "properties": {
+          "max_items": {
+            "kind": "integer",
+            "description": "Maximum items per request."
+          },
+          "formats": {
+            "kind": "string_set",
+            "description": "Accepted input format identifiers."
+          },
+          "region": {
+            "kind": "string",
+            "description": "Configured region; null means explicitly not region-bound.",
+            "nullable": true,
+            "null_meaning": "No region restriction declared by this configuration."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

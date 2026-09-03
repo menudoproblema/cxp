@@ -37,10 +37,12 @@ VIDEO_DRM_PROTECTION = "drm_protection"
 VIDEO_OP_PREPARE = "media.prepare_stream"
 VIDEO_OP_START_JOB = "media.transcode_job_start"
 
+
 class StreamingMetadata(msgspec.Struct, frozen=True):
     supported_formats: tuple[str, ...]
     max_resolution: str
     codecs: tuple[str, ...]
+
 
 _MEDIA_TELEMETRY = CapabilityTelemetry(
     metrics=(

@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cxp:schema:operations:1",
+  "$defs": {
+    "submission-request": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "document_reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "request_id",
+        "document_reference"
+      ],
+      "additionalProperties": false
+    },
+    "submission-receipt": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "rejected",
+            "unknown"
+          ]
+        },
+        "job_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "request_id",
+        "status"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "accepted"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "job_id"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "rejected",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "rejected"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "job_id"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "job-query": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "additionalProperties": false
+    },
+    "job-observation": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "outcome": {
+          "enum": [
+            "pending",
+            "succeeded",
+            "failed",
+            "cancelled",
+            "unknown"
+          ]
+        },
+        "result_scope": {
+          "enum": [
+            "submission",
+            "processing",
+            "physical_production"
+          ]
+        },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "declared",
+                "observed",
+                "tested"
+              ]
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "kind",
+            "reference"
+          ],
+          "additionalProperties": false
+        },
+        "evidence_reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "job_id",
+        "outcome",
+        "result_scope",
+        "observed_at",
+        "source"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "succeeded"
+              },
+              "result_scope": {
+                "const": "physical_production"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidence_reference"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "failed",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "document-request": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "document_reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "request_id",
+        "document_reference"
+      ],
+      "additionalProperties": false
+    },
+    "document-result": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "outcome": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "output_reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "request_id",
+        "outcome"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "output_reference"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "failed",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

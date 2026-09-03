@@ -21,63 +21,59 @@ STATUS_CANCELLED = "cancelled"
 # --- Universal Identity Fields ---
 CXP_RESOURCE_NAME = TelemetryFieldRequirement(
     name="cxp.resource.name",
-    description="The canonical name of the resource (engine, database, provider)."
+    description="The canonical name of the resource (engine, database, provider).",
 )
 CXP_RESOURCE_KIND = TelemetryFieldRequirement(
     name="cxp.resource.kind",
-    description="The category of the resource (e.g., 'mongodb', 'playwright', 'asgi')."
+    description="The category of the resource (e.g., 'mongodb', 'playwright', 'asgi').",
 )
 CACHE_HIT = TelemetryFieldRequirement(
-    name="cache.hit",
-    description="Whether the cache lookup produced a hit."
+    name="cache.hit", description="Whether the cache lookup produced a hit."
 )
 PUSH_OUTCOME = TelemetryFieldRequirement(
     name="push.outcome",
-    description="The provider-specific delivery outcome for a push notification."
+    description="The provider-specific delivery outcome for a push notification.",
 )
 STORAGE_OPERATION = TelemetryFieldRequirement(
     name="storage.operation",
-    description="The storage operation associated with the metric sample."
+    description="The storage operation associated with the metric sample.",
 )
 
 # --- Universal Operational Fields ---
 CXP_REQUEST_ID = TelemetryFieldRequirement(
     name="cxp.request.id",
-    description="A stable identifier for the request crossing domains."
+    description="A stable identifier for the request crossing domains.",
 )
 CXP_SESSION_ID = TelemetryFieldRequirement(
-    name="cxp.session.id",
-    description="A stable identifier for the end-to-end session."
+    name="cxp.session.id", description="A stable identifier for the end-to-end session."
 )
 CXP_OPERATION_ID = TelemetryFieldRequirement(
     name="cxp.operation.id",
-    description="A stable identifier for the current logical operation."
+    description="A stable identifier for the current logical operation.",
 )
 CXP_PARENT_OPERATION_ID = TelemetryFieldRequirement(
     name="cxp.parent.operation.id",
-    description="The logical parent operation identifier, if any."
+    description="The logical parent operation identifier, if any.",
 )
 CXP_OPERATION_NAME = TelemetryFieldRequirement(
     name="cxp.operation.name",
-    description="The name of the catalog operation being executed."
+    description="The name of the catalog operation being executed.",
 )
 CXP_OPERATION_STATUS = TelemetryFieldRequirement(
     name="cxp.operation.status",
-    description="The status of the operation (success, error, partial)."
+    description="The status of the operation (success, error, partial).",
 )
 CXP_ERROR_CODE = TelemetryFieldRequirement(
     name="cxp.error.code",
-    description="A standardized error code if the operation failed."
+    description="A standardized error code if the operation failed.",
 )
 
 # --- Universal Performance Fields ---
 CXP_DURATION = TelemetryFieldRequirement(
-    name="cxp.duration",
-    description="The duration of the operation in seconds."
+    name="cxp.duration", description="The duration of the operation in seconds."
 )
 CXP_PAYLOAD_SIZE = TelemetryFieldRequirement(
-    name="cxp.payload.size_bytes",
-    description="The size of the data payload in bytes."
+    name="cxp.payload.size_bytes", description="The size of the data payload in bytes."
 )
 
 # --- Shared Domain Fields ---

@@ -215,9 +215,7 @@ _DB_TOPOLOGY_SERVER_COUNT_FIELD = TelemetryFieldRequirement(
     name="db.topology.server.count"
 )
 _DB_TRANSACTION_ID_FIELD = TelemetryFieldRequirement(name="db.transaction.id")
-_DB_TRANSACTION_OUTCOME_FIELD = TelemetryFieldRequirement(
-    name="db.transaction.outcome"
-)
+_DB_TRANSACTION_OUTCOME_FIELD = TelemetryFieldRequirement(name="db.transaction.outcome")
 
 
 def _telemetry_fields(
@@ -353,8 +351,7 @@ MONGODB_CATALOG = register_catalog(
         interface=MONGODB_INTERFACE,
         satisfies_interfaces=(DATABASE_INTERFACE,),
         description=(
-            "CXP standard for providers compatible with the "
-            "database/mongodb interface."
+            "CXP standard for providers compatible with the database/mongodb interface."
         ),
         capabilities=(
             CatalogCapability(

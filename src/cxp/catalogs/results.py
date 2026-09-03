@@ -6,17 +6,22 @@ import msgspec
 
 # --- Core Error Pattern ---
 
+
 class CxpError(msgspec.Struct, frozen=True):
     """Structured error for machine-readable diagnostics."""
+
     code: str
     message: str
     retryable: bool
     details: dict[str, Any] = msgspec.field(default_factory=dict)
 
+
 # --- Common Core Result Patterns ---
+
 
 class AsyncWorkReport(msgspec.Struct, frozen=True):
     """Generic report for any asynchronous or long-running task."""
+
     work_id: str
     status: str
     created_at: str
@@ -25,12 +30,15 @@ class AsyncWorkReport(msgspec.Struct, frozen=True):
     error: CxpError | None = None
     metadata: dict[str, Any] = msgspec.field(default_factory=dict)
 
+
 class ActionResult(msgspec.Struct, frozen=True):
     """Acknowledgement envelope for side-effecting operations."""
+
     success: bool = True
     confirmed_at: str | None = None
     action_id: str | None = None
     metadata: dict[str, Any] = msgspec.field(default_factory=dict)
+
 
 # --- Aliases for Domain Specificity ---
 RunResult = AsyncWorkReport
@@ -40,17 +48,21 @@ TranscodingJob = AsyncWorkReport
 
 # --- Domain Specific Results ---
 
+
 class DbCursor(msgspec.Struct, frozen=True):
     """Database-native cursor for data retrieval."""
+
     cursor_id: str
     first_batch: tuple[dict[str, Any], ...]
     has_more: bool
+
 
 class DbWriteResult(msgspec.Struct, frozen=True):
     acknowledged: bool
     inserted_id: str | None = None
     modified_count: int = 0
     deleted_count: int = 0
+
 
 class HttpResponse(msgspec.Struct, frozen=True):
     status_code: int
@@ -77,6 +89,7 @@ class WebSocketMessage(msgspec.Struct, frozen=True):
     data: bytes | str
     is_final: bool = True
 
+
 class BlobMetadata(msgspec.Struct, frozen=True):
     key: str
     size_bytes: int
@@ -90,15 +103,18 @@ class CacheValue(msgspec.Struct, frozen=True):
     hit: bool = True
     expires_at: str | None = None
 
+
 class Message(msgspec.Struct, frozen=True):
     subject: str
     data: bytes
     headers: dict[str, str] = msgspec.field(default_factory=dict)
 
+
 class MessageAck(msgspec.Struct, frozen=True):
     stream: str | None = None
     sequence: int | None = None
     duplicate: bool = False
+
 
 class PushResult(msgspec.Struct, frozen=True):
     success: bool
@@ -120,10 +136,12 @@ class UserProfile(msgspec.Struct, frozen=True):
     email: str | None = None
     display_name: str | None = None
 
+
 class BrowserSession(msgspec.Struct, frozen=True):
     session_id: str
     browser_name: str
     browser_version: str
+
 
 class PageResponse(msgspec.Struct, frozen=True):
     url: str
@@ -161,6 +179,7 @@ class RuntimeHealthReport(msgspec.Struct, frozen=True):
     is_ready: bool
     checked_at: str
     details: dict[str, Any] = msgspec.field(default_factory=dict)
+
 
 class PrinterStatus(msgspec.Struct, frozen=True):
     is_online: bool

@@ -19,18 +19,21 @@ MOBILE_PUSH_INTERFACE = "notification/mobile-push"
 
 # Capability Names
 PUSH_FCM_SUPPORT = "fcm_protocol"  # Firebase Cloud Messaging
-PUSH_APNS_SUPPORT = "apns_protocol" # Apple Push Notification service
+PUSH_APNS_SUPPORT = "apns_protocol"  # Apple Push Notification service
 PUSH_TOPIC_MANAGEMENT = "topic_management"
+
 
 class FcmMetadata(msgspec.Struct, frozen=True):
     project_id: str
     is_v1_api: bool = True
+
 
 class ApnsMetadata(msgspec.Struct, frozen=True):
     team_id: str
     key_id: str
     bundle_id: str
     is_production: bool = False
+
 
 MOBILE_PUSH_CATALOG = register_catalog(
     CapabilityCatalog(

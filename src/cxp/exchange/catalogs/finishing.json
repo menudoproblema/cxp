@@ -1,0 +1,65 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "finishing",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "finishing.folding",
+        "description": "Folding constraints only; never implies binding or printing.",
+        "properties": {
+          "max_width": {
+            "kind": "quantity",
+            "description": "Maximum sheet width.",
+            "dimension": "length"
+          },
+          "max_height": {
+            "kind": "quantity",
+            "description": "Maximum sheet height.",
+            "dimension": "length"
+          },
+          "patterns": {
+            "kind": "string_set",
+            "description": "Supported fold pattern identifiers."
+          },
+          "max_folds": {
+            "kind": "integer",
+            "description": "Maximum folds in one configured pass."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "finishing.binding",
+        "description": "Binding constraints only; never implies folding or printing.",
+        "properties": {
+          "min_block_thickness": {
+            "kind": "quantity",
+            "description": "Minimum book-block thickness.",
+            "dimension": "length"
+          },
+          "max_block_thickness": {
+            "kind": "quantity",
+            "description": "Maximum book-block thickness.",
+            "dimension": "length"
+          },
+          "max_spine_length": {
+            "kind": "quantity",
+            "description": "Maximum spine length.",
+            "dimension": "length"
+          },
+          "methods": {
+            "kind": "string_set",
+            "description": "Binding methods, e.g. perfect, saddle-stitch."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

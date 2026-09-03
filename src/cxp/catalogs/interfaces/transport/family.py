@@ -32,7 +32,7 @@ HTTP_TRANSPORT_FAMILY_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=HTTP_OP_SEND,
-                        input_schema=HttpDispatch, # Input validation
+                        input_schema=HttpDispatch,  # Input validation
                         result_type="http.response",
                         result_schema=HttpResponse,
                         idempotent=False,

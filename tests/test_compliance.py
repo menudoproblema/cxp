@@ -42,9 +42,7 @@ def test_evaluate_capability_matrix_against_catalog_accepts_family_compatibility
 ):
     report = evaluate_capability_matrix_against_catalog(
         "browser/playwright",
-        CapabilityMatrix(
-            capabilities=(Capability(name=PLAYWRIGHT_BROWSER_LIFECYCLE),)
-        ),
+        CapabilityMatrix(capabilities=(Capability(name=PLAYWRIGHT_BROWSER_LIFECYCLE),)),
         BROWSER_AUTOMATION_CATALOG,
     )
 

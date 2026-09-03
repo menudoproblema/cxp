@@ -1,26 +1,21 @@
 import importlib
-from pathlib import Path
+import pkgutil
 
 from cxp import catalog_satisfies_interface, get_catalog
+from cxp.catalogs import interfaces
 
 
 def test_all_interface_modules_import_cleanly() -> None:
-    root = (
-        Path(__file__).resolve().parent.parent
-        / "src"
-        / "cxp"
-        / "catalogs"
-        / "interfaces"
+    modules = sorted(
+        item.name
+        for item in pkgutil.walk_packages(
+            interfaces.__path__, interfaces.__name__ + "."
+        )
     )
+    assert modules
     failures: list[tuple[str, str, str]] = []
 
-    for path in sorted(root.rglob("*.py")):
-        module_name = (
-            "cxp."
-            + str(path.relative_to(root.parent.parent))
-            .replace("/", ".")
-            .removesuffix(".py")
-        )
+    for module_name in modules:
         try:
             importlib.import_module(module_name)
         except Exception as exc:  # pragma: no cover - failure path asserted below
@@ -91,7 +86,6 @@ def test_async_domains_propagate_canonical_cancel_operations() -> None:
     from cxp.catalogs.interfaces.queue.task_engine import QUEUE_CATALOG
 
     assert (
-        VIDEO_STREAMING_CATALOG.has_operation("transcoding", PLAN_RUN_OP_CANCEL)
-        is True
+        VIDEO_STREAMING_CATALOG.has_operation("transcoding", PLAN_RUN_OP_CANCEL) is True
     )
     assert QUEUE_CATALOG.has_operation("monitoring", "queue.cancel") is True

@@ -122,8 +122,7 @@ COSECHA_REPORTER_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_REPORTER_RESULT_PROJECTION,
                 description=(
-                    "Project test starts and results into reporter-specific "
-                    "views."
+                    "Project test starts and results into reporter-specific views."
                 ),
                 metadata_schema=ResultProjectionMetadata,
                 telemetry=CapabilityTelemetry(

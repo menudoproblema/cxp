@@ -26,9 +26,11 @@ AUTH_OP_INTROSPECT = "auth.introspect_token"
 AUTH_OP_GET_USER = "auth.get_user_info"
 AUTH_OP_AUTHORIZE = "auth.authorize_action"
 
+
 class TokenMetadata(msgspec.Struct, frozen=True):
     supported_algorithms: tuple[str, ...]
     issuer: str
+
 
 AUTH_PROVIDER_CATALOG = register_catalog(
     CapabilityCatalog(

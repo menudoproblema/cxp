@@ -102,14 +102,14 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.launch",
                 start_time=1.0,
                 end_time=1.4,
-                    attributes={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.headless": True,
-                            }
-                        ),
-                    },
+                attributes={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.headless": True,
+                        }
+                    ),
+                },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -118,9 +118,9 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.context.create",
                 start_time=1.4,
                 end_time=1.6,
-                    attributes={
-                        **_browser_payload(**{"browser.engine": "playwright"}),
-                    },
+                attributes={
+                    **_browser_payload(**{"browser.engine": "playwright"}),
+                },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -129,14 +129,14 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.context.close",
                 start_time=2.0,
                 end_time=2.1,
-                    attributes={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.context.id": "ctx-1",
-                            }
-                        ),
-                    },
+                attributes={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.context.id": "ctx-1",
+                        }
+                    ),
+                },
             ),
         ),
         metrics=(
@@ -144,76 +144,76 @@ def test_playwright_catalog_validates_lifecycle_and_context_telemetry() -> None:
                 name="browser.launch.duration",
                 value=0.4,
                 unit="s",
-                    labels={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.headless": "true",
-                                "browser.outcome": "success",
-                            }
-                        ),
-                    },
+                labels={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.headless": "true",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                },
             ),
             TelemetryMetric(
                 name="browser.context.create.duration",
                 value=0.2,
                 unit="s",
-                    labels={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.outcome": "success",
-                            }
-                        ),
-                    },
+                labels={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                },
             ),
             TelemetryMetric(
                 name="browser.context.close.duration",
                 value=0.1,
                 unit="s",
-                    labels={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.outcome": "success",
-                            }
-                        ),
-                    },
+                labels={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                },
             ),
         ),
         events=(
-                TelemetryEvent(
-                    event_type="browser.session.launched",
-                    payload=_browser_payload(
-                        **{
-                            "browser.engine": "playwright",
-                            "browser.headless": True,
-                            "browser.outcome": "success",
-                        }
-                    ),
-                ),
-                TelemetryEvent(
-                    event_type="browser.context.created",
-                    payload=_browser_payload(
-                        **{
-                            "browser.engine": "playwright",
-                            "browser.context.id": "ctx-1",
-                            "browser.outcome": "success",
-                        }
-                    ),
-                ),
-                TelemetryEvent(
-                    event_type="browser.context.closed",
-                    payload=_browser_payload(
-                        **{
-                            "browser.engine": "playwright",
-                            "browser.context.id": "ctx-1",
-                            "browser.outcome": "success",
-                        }
-                    ),
+            TelemetryEvent(
+                event_type="browser.session.launched",
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.headless": True,
+                        "browser.outcome": "success",
+                    }
                 ),
             ),
-        )
+            TelemetryEvent(
+                event_type="browser.context.created",
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.context.id": "ctx-1",
+                        "browser.outcome": "success",
+                    }
+                ),
+            ),
+            TelemetryEvent(
+                event_type="browser.context.closed",
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.context.id": "ctx-1",
+                        "browser.outcome": "success",
+                    }
+                ),
+            ),
+        ),
+    )
 
     assert PLAYWRIGHT_BROWSER_CATALOG.is_telemetry_snapshot_compliant(
         snapshot,
@@ -257,16 +257,16 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.request.observe",
                 start_time=1.0,
                 end_time=1.2,
-                    attributes={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.page.id": "page-1",
-                                "browser.network.phase": "request",
-                                "browser.request.url.host": "example.com",
-                            }
-                        ),
-                    },
+                attributes={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.network.phase": "request",
+                            "browser.request.url.host": "example.com",
+                        }
+                    ),
+                },
             ),
             TelemetrySpan(
                 trace_id="trace-1",
@@ -275,16 +275,16 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.response.observe",
                 start_time=1.2,
                 end_time=1.5,
-                    attributes={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.page.id": "page-1",
-                                "browser.network.phase": "response",
-                                "browser.request.url.host": "example.com",
-                            }
-                        ),
-                    },
+                attributes={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.page.id": "page-1",
+                            "browser.network.phase": "response",
+                            "browser.request.url.host": "example.com",
+                        }
+                    ),
+                },
             ),
         ),
         metrics=(
@@ -292,58 +292,58 @@ def test_playwright_catalog_validates_network_request_and_response_telemetry() -
                 name="browser.request.duration",
                 value=0.2,
                 unit="s",
-                    labels={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.network.phase": "request",
-                                "browser.outcome": "success",
-                            }
-                        ),
-                    },
+                labels={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.network.phase": "request",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                },
             ),
             TelemetryMetric(
                 name="browser.response.duration",
                 value=0.3,
                 unit="s",
-                    labels={
-                        **_browser_payload(
-                            **{
-                                "browser.engine": "playwright",
-                                "browser.network.phase": "response",
-                                "browser.outcome": "success",
-                            }
-                        ),
-                    },
+                labels={
+                    **_browser_payload(
+                        **{
+                            "browser.engine": "playwright",
+                            "browser.network.phase": "response",
+                            "browser.outcome": "success",
+                        }
+                    ),
+                },
             ),
         ),
         events=(
             TelemetryEvent(
                 event_type="browser.request.observed",
-                    payload=_browser_payload(
-                        **{
-                            "browser.engine": "playwright",
-                            "browser.page.id": "page-1",
-                            "browser.network.phase": "request",
-                            "browser.request.url.host": "example.com",
-                            "browser.outcome": "success",
-                        }
-                    ),
-                ),
-                TelemetryEvent(
-                    event_type="browser.response.observed",
-                    payload=_browser_payload(
-                        **{
-                            "browser.engine": "playwright",
-                            "browser.page.id": "page-1",
-                            "browser.network.phase": "response",
-                            "browser.request.url.host": "example.com",
-                            "browser.outcome": "success",
-                        }
-                    ),
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.network.phase": "request",
+                        "browser.request.url.host": "example.com",
+                        "browser.outcome": "success",
+                    }
                 ),
             ),
-        )
+            TelemetryEvent(
+                event_type="browser.response.observed",
+                payload=_browser_payload(
+                    **{
+                        "browser.engine": "playwright",
+                        "browser.page.id": "page-1",
+                        "browser.network.phase": "response",
+                        "browser.request.url.host": "example.com",
+                        "browser.outcome": "success",
+                    }
+                ),
+            ),
+        ),
+    )
 
     assert PLAYWRIGHT_BROWSER_CATALOG.is_telemetry_snapshot_compliant(
         snapshot,

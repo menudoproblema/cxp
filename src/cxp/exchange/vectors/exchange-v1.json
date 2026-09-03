@@ -1,0 +1,3111 @@
+{
+  "suite_version": 1,
+  "specification": "docs/protocol/exchange-v1.md",
+  "license": "MIT",
+  "provenance": "CXP maintainers; expected semantics authored independently of evaluator output, 2026-09-03.",
+  "documents": [
+    {
+      "id": "context-valid",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "critical-root",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        },
+        "extensions": {
+          "org.example:rule": true
+        },
+        "critical_extensions": [
+          "org.example:rule"
+        ]
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "unsupported",
+        "code": "unknown_critical_extension"
+      }
+    },
+    {
+      "id": "critical-nested",
+      "document_type": "cxp.requirements",
+      "document": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "g",
+            "operator": "any",
+            "conditions": [
+              {
+                "id": "r1",
+                "operator": "support",
+                "capability": "service.compute"
+              },
+              {
+                "id": "critical",
+                "operator": "support",
+                "capability": "service.compute",
+                "extensions": {
+                  "org.example:rule": true
+                },
+                "critical_extensions": [
+                  "org.example:rule"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "unsupported",
+        "code": "unknown_critical_extension"
+      }
+    },
+    {
+      "id": "opaque-extension",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        },
+        "extensions": {
+          "org.example:rule": {
+            "critical_extensions": [
+              "unknown"
+            ],
+            "value": "1.00"
+          }
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "missing-critical-value",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        },
+        "critical_extensions": [
+          "org.example:rule"
+        ]
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "invalid",
+        "code": "missing_critical_extension"
+      }
+    },
+    {
+      "id": "unknown-field",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "subjectId": "not-an-alias"
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "schema_violation"
+      }
+    },
+    {
+      "id": "timestamp-impossible",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "as_of": "2026-02-30T00:00:00Z"
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "invalid",
+        "code": "invalid_timestamp"
+      }
+    },
+    {
+      "id": "empty-all",
+      "document_type": "cxp.requirements",
+      "document": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "g",
+            "operator": "all",
+            "conditions": []
+          }
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "schema_violation"
+      }
+    },
+    {
+      "id": "duplicate-node",
+      "document_type": "cxp.requirements",
+      "document": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "g",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "r1",
+                "operator": "support",
+                "capability": "service.compute"
+              },
+              {
+                "id": "r1",
+                "operator": "support",
+                "capability": "service.compute"
+              }
+            ]
+          }
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "invalid",
+        "code": "duplicate_requirement"
+      }
+    },
+    {
+      "id": "range-step-without-origin",
+      "document_type": "cxp.requirements",
+      "document": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 0,
+            "step": 2
+          }
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "step_requires_origin",
+        "path": "/payload/requirement/origin"
+      }
+    },
+    {
+      "id": "quantity-number-rejected",
+      "document_type": "cxp.snapshot",
+      "document": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "physical-printing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "printing.surface",
+              "support": "supported",
+              "properties": {
+                "max_width": {
+                  "value": 25.4,
+                  "unit": "mm"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "schema_violation"
+      }
+    },
+    {
+      "id": "unsafe-integer",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        },
+        "extensions": {
+          "org.example:x": 9007199254740992
+        }
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "invalid",
+        "code": "unsafe_integer"
+      }
+    },
+    {
+      "id": "future-version",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "unsupported",
+        "code": "unsupported_version"
+      }
+    },
+    {
+      "id": "duplicate-json-key",
+      "document_type": "cxp.context",
+      "raw_json": "{\"document_type\":\"cxp.context\",\"spec_version\":1,\"payload\":{\"subject_id\":\"a\",\"subject_id\":\"b\",\"configuration_revision\":\"c\"}}",
+      "schema_valid": null,
+      "expected": {
+        "status": "invalid",
+        "code": "duplicate_key"
+      }
+    },
+    {
+      "id": "duplicate-required-set",
+      "document_type": "cxp.requirements",
+      "document": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "contains_all",
+            "capability": "service.compute",
+            "path": "/properties/formats",
+            "values": [
+              "json",
+              "json"
+            ]
+          }
+        }
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "duplicate_set_value",
+        "path": "/payload/requirement/values/1"
+      }
+    },
+    {
+      "id": "unsafe-exact-token-positive",
+      "document_type": "cxp.context",
+      "raw_json": "{\"document_type\":\"cxp.context\",\"spec_version\":1,\"payload\":{\"subject_id\":\"s\",\"configuration_revision\":\"c\"},\"extensions\":{\"org.example:number\":9007199254740993}}",
+      "schema_valid": null,
+      "expected": {
+        "status": "invalid",
+        "code": "unsafe_integer",
+        "path": "/extensions/org.example:number"
+      }
+    },
+    {
+      "id": "unsafe-exact-token-negative",
+      "document_type": "cxp.context",
+      "raw_json": "{\"document_type\":\"cxp.context\",\"spec_version\":1,\"payload\":{\"subject_id\":\"s\",\"configuration_revision\":\"c\"},\"extensions\":{\"org.example:number\":-9007199254740993}}",
+      "schema_valid": null,
+      "expected": {
+        "status": "invalid",
+        "code": "unsafe_integer",
+        "path": "/extensions/org.example:number"
+      }
+    },
+    {
+      "id": "duplicate-advertised-family",
+      "document_type": "cxp.exchange_request",
+      "document": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "schema_valid": true,
+      "expected": {
+        "status": "invalid",
+        "code": "duplicate_identifier",
+        "path": "/payload/formats/1"
+      }
+    },
+    {
+      "id": "accepted-response-with-rejection-reason",
+      "document_type": "cxp.exchange_response",
+      "document": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_version": 1
+            }
+          ],
+          "reason": "Contradictory acceptance"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "schema_valid": false,
+      "expected": {
+        "status": "invalid",
+        "code": "schema_violation"
+      }
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "effective-support",
+      "rule": "effective-support",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "known-limit",
+      "rule": "known-limit",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 101
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "missing-property",
+      "rule": "missing-property",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 1
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "property_unreported"
+        ]
+      }
+    },
+    {
+      "id": "explicit-null",
+      "rule": "explicit-null",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "equals",
+            "capability": "service.compute",
+            "path": "/properties/region",
+            "value": null
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "null-not-string",
+      "rule": "null-not-string",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "equals",
+            "capability": "service.compute",
+            "path": "/properties/region",
+            "value": "eu"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "set-inclusion",
+      "rule": "set-inclusion",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "contains_all",
+            "capability": "service.compute",
+            "path": "/properties/formats",
+            "values": [
+              "csv"
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "membership",
+      "rule": "membership",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "one_of",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "values": [
+              10,
+              100
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "noop-default",
+      "rule": "noop-default",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "accepted_noop",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "effective_support_required"
+        ]
+      }
+    },
+    {
+      "id": "noop-opt-in",
+      "rule": "noop-opt-in",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "accepted_noop",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute",
+            "require_effective": false
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "unsupported",
+      "rule": "unsupported",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "unsupported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "unsupported_capability"
+        ]
+      }
+    },
+    {
+      "id": "missing-capability",
+      "rule": "missing-capability",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": []
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "capability_unreported"
+        ]
+      }
+    },
+    {
+      "id": "range-open",
+      "rule": "range-open",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "maximum": 100,
+            "maximum_inclusive": false
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "discrete-step",
+      "rule": "discrete-step",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 0,
+            "step": 3,
+            "origin": 1
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "discrete-step-mismatch",
+      "rule": "discrete-step-mismatch",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 0,
+            "step": 3,
+            "origin": 0
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "all-known-unknown",
+      "rule": "all-known-unknown",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "group",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "yes",
+                "operator": "support",
+                "capability": "service.compute"
+              },
+              {
+                "id": "unknown",
+                "operator": "equals",
+                "capability": "service.compute",
+                "path": "/properties/region",
+                "value": "eu"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "requirement_satisfied",
+          "property_unreported"
+        ]
+      }
+    },
+    {
+      "id": "any-known-unknown",
+      "rule": "any-known-unknown",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "group",
+            "operator": "any",
+            "conditions": [
+              {
+                "id": "yes",
+                "operator": "support",
+                "capability": "service.compute"
+              },
+              {
+                "id": "unknown",
+                "operator": "equals",
+                "capability": "service.compute",
+                "path": "/properties/region",
+                "value": "eu"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied",
+          "property_unreported"
+        ]
+      }
+    },
+    {
+      "id": "stale",
+      "rule": "stale",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "as_of": "2026-09-03T10:01:01Z",
+          "max_age_seconds": 60
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "stale_observation"
+        ]
+      }
+    },
+    {
+      "id": "time-boundary",
+      "rule": "time-boundary",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "as_of": "2026-09-03T10:01:00Z",
+          "max_age_seconds": 60
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "future",
+      "rule": "future",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "as_of": "2026-09-03T09:59:59Z"
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "future_observation"
+        ]
+      }
+    },
+    {
+      "id": "configuration",
+      "rule": "configuration",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "other"
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "configuration_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "availability-not-support",
+      "rule": "availability-not-support",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ],
+          "availability": "unavailable",
+          "connectivity": "offline"
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "exact-inch-point",
+      "rule": "exact-inch-point",
+      "catalog": "physical-printing",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "physical-printing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "printing.surface",
+              "support": "supported",
+              "properties": {
+                "max_width": {
+                  "value": "1",
+                  "unit": "in"
+                },
+                "ink_channels": [
+                  "cmyk",
+                  "white"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "physical-printing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+          },
+          "requirement": {
+            "id": "p1",
+            "operator": "equals",
+            "capability": "printing.surface",
+            "path": "/properties/max_width",
+            "value": {
+              "value": "72",
+              "unit": "pt"
+            }
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "physical-combined",
+      "rule": "physical-combined",
+      "catalog": "physical-printing",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "physical-printing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "printing.surface",
+              "support": "supported",
+              "properties": {
+                "max_width": {
+                  "value": "1",
+                  "unit": "in"
+                },
+                "ink_channels": [
+                  "cmyk",
+                  "white"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "physical-printing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+          },
+          "requirement": {
+            "id": "g",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "p1",
+                "operator": "range",
+                "capability": "printing.surface",
+                "path": "/properties/max_width",
+                "minimum": {
+                  "value": "25.4",
+                  "unit": "mm"
+                }
+              },
+              {
+                "id": "inks",
+                "operator": "contains_all",
+                "capability": "printing.surface",
+                "path": "/properties/ink_channels",
+                "values": [
+                  "white"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied",
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "binding-without-printing",
+      "rule": "binding-without-printing",
+      "catalog": "finishing",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "finishing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "5ef014fbeb492b463bc96ca08c0bebbf6b27574e151514c2a51cce6544f9fcc6"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "finishing.binding",
+              "support": "supported",
+              "properties": {
+                "max_block_thickness": {
+                  "value": "50",
+                  "unit": "mm"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "finishing",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "5ef014fbeb492b463bc96ca08c0bebbf6b27574e151514c2a51cce6544f9fcc6"
+          },
+          "requirement": {
+            "id": "b1",
+            "operator": "range",
+            "capability": "finishing.binding",
+            "path": "/properties/max_block_thickness",
+            "minimum": {
+              "value": "3",
+              "unit": "mm"
+            }
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "range-exclusive-minimum",
+      "rule": "range-exclusive-minimum",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 100,
+            "minimum_inclusive": false
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "negative-origin-stepped-range",
+      "rule": "negative-origin-stepped-range",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": -3,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": -7,
+            "maximum": 1,
+            "origin": -7,
+            "step": 2
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    }
+  ],
+  "rejections": [
+    {
+      "id": "null-forbidden",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": null,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "support",
+            "capability": "service.compute"
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "null_not_allowed"
+      }
+    },
+    {
+      "id": "inverted-range",
+      "rule": "known-limit",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": 100,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": 101,
+            "maximum": 50
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "invalid_range"
+      }
+    },
+    {
+      "id": "negative-step-rejected",
+      "rule": "negative-origin-stepped-range",
+      "catalog": "software-service",
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "example-provider",
+          "subject_id": "example-1",
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "configuration_revision": "config-1",
+          "observed_at": "2026-09-03T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "example-configuration"
+          },
+          "capabilities": [
+            {
+              "name": "service.compute",
+              "support": "supported",
+              "properties": {
+                "max_items": -3,
+                "formats": [
+                  "json",
+                  "csv"
+                ],
+                "region": null
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "name": "software-service",
+            "namespace": "org.cxp",
+            "version": "1.0.0",
+            "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+          },
+          "requirement": {
+            "id": "r1",
+            "operator": "range",
+            "capability": "service.compute",
+            "path": "/properties/max_items",
+            "minimum": -7,
+            "maximum": 1,
+            "origin": -7,
+            "step": -2
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "invalid_step"
+      }
+    }
+  ],
+  "canonicalization": [
+    {
+      "id": "jcs-utf16-key-order",
+      "document_type": "cxp.context",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "s",
+          "configuration_revision": "c"
+        },
+        "extensions": {
+          "org.example:data": {
+            "": 1,
+            "😀": 2
+          }
+        }
+      },
+      "expected_utf8": "{\"critical_extensions\":[],\"document_type\":\"cxp.context\",\"extensions\":{\"org.example:data\":{\"😀\":2,\"\":1}},\"payload\":{\"configuration_revision\":\"c\",\"subject_id\":\"s\"},\"spec_version\":1}"
+    }
+  ],
+  "negotiations": [
+    {
+      "id": "single-family",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "0ca0efcd0a122e807d162015a277187a392e1280203656625e4fee31a4e6654a",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "all-families-required",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "highest-implemented-common-version",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                2,
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "84c78b66a434c15c2fac7a32f226cd3ca55d46cd223e05aeef23c03da0d8503b",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "no-version-fallback",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                2
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "0e2fef67b7531d1ff1109fa0e7932a9e85bda248053c74df76f28c7795fd985a",
+          "status": "rejected",
+          "formats": [],
+          "reason": "No supported version for cxp.snapshot"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "unknown-family-rejected",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.future",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "42c1c795dd5f6aa959d7c7c7b19d763f0761088c78c0eb54bd259cce6875882b",
+          "status": "rejected",
+          "formats": [],
+          "reason": "No supported version for cxp.future"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "legacy-protocol-rejected",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 1,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2a74b1696285ea4a514a7469324702cbbcd609d70bb19484286497e077155784",
+          "status": "rejected",
+          "formats": [],
+          "reason": "Unsupported exchange protocol version"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    },
+    {
+      "id": "restricted-peer",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "supported_formats": {
+        "cxp.snapshot": [
+          1
+        ]
+      },
+      "expected_response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "rejected",
+          "formats": [],
+          "reason": "No supported version for cxp.requirements"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      }
+    }
+  ],
+  "agreements": [
+    {
+      "id": "complete-agreement",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected": {
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "response-for-another-request",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "request_mismatch"
+      }
+    },
+    {
+      "id": "partial-agreement-rejected",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "format_mismatch"
+      }
+    },
+    {
+      "id": "unoffered-version-rejected",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "accepted",
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_version": 2
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_version": 1
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected": {
+        "status": "invalid",
+        "code": "format_mismatch"
+      }
+    },
+    {
+      "id": "no-agreement-on-rejection",
+      "request": {
+        "document_type": "cxp.exchange_request",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "formats": [
+            {
+              "document_type": "cxp.snapshot",
+              "spec_versions": [
+                1
+              ]
+            },
+            {
+              "document_type": "cxp.requirements",
+              "spec_versions": [
+                1
+              ]
+            }
+          ]
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "response": {
+        "document_type": "cxp.exchange_response",
+        "spec_version": 1,
+        "payload": {
+          "protocol_version": 2,
+          "request_sha256": "2fd10547b578bc657f2870b0ddd546eb4383ad6c27ab20d0b30b27779d3e8278",
+          "status": "rejected",
+          "formats": [],
+          "reason": "Not available"
+        },
+        "extensions": {},
+        "critical_extensions": []
+      },
+      "expected": {
+        "status": "unsupported",
+        "code": "exchange_rejected"
+      }
+    }
+  ]
+}

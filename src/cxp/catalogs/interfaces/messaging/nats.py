@@ -16,10 +16,12 @@ NATS_INTERFACE = "messaging/nats"
 NATS_JETSTREAM = "jetstream"
 NATS_SUBJECT_MAPPING = "subject_mapping"
 
+
 class NatsMetadata(msgspec.Struct, frozen=True):
     server_version: str
     max_payload_bytes: int
     jetstream_enabled: bool = False
+
 
 NATS_CATALOG = register_catalog(
     CapabilityCatalog(

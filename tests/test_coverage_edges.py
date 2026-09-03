@@ -194,8 +194,7 @@ def test_catalog_helpers_cover_missing_capabilities_and_abstract_guards() -> Non
     assert catalog_capability.get_operation("missing") is None
     assert CatalogCapability(name="run").metadata_keys() == ()
     assert (
-        CatalogCapability(name="run").validate_metadata(Capability(name="run"))
-        is True
+        CatalogCapability(name="run").validate_metadata(Capability(name="run")) is True
     )
     assert catalog.capability_operation_names("missing") == ()
     assert catalog.has_operation("missing", "plan.analyze") is False
@@ -449,17 +448,23 @@ def test_registry_and_private_catalog_helpers_cover_remaining_branches() -> None
             )
         )
 
-    assert _catalog_satisfies_interface(
-        offered_interface="demo/missing",
-        required_interface="demo/interface",
-        catalogs={"demo/interface": catalog},
-    ) is False
-    assert _catalog_satisfies_interface(
-        offered_interface="demo/a",
-        required_interface="demo/other",
-        catalogs=cycle_catalogs,
-        visited={"demo/a"},
-    ) is False
+    assert (
+        _catalog_satisfies_interface(
+            offered_interface="demo/missing",
+            required_interface="demo/interface",
+            catalogs={"demo/interface": catalog},
+        )
+        is False
+    )
+    assert (
+        _catalog_satisfies_interface(
+            offered_interface="demo/a",
+            required_interface="demo/other",
+            catalogs=cycle_catalogs,
+            visited={"demo/a"},
+        )
+        is False
+    )
 
     merged = _merge_field_requirements(
         (TelemetryFieldRequirement(name="engine.name"),),

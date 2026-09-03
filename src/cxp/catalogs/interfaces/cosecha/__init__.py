@@ -151,9 +151,7 @@ from cxp.catalogs.interfaces.cosecha.runtime import (
 
 # Backward compatibility for older imports. These aliases keep import-time
 # stability while the rest of the stack migrates to the explicit catalog.
-COSECHA_ENGINE_DEFINITION_KNOWLEDGE = (
-    COSECHA_ENGINE_PROJECT_DEFINITION_KNOWLEDGE
-)
+COSECHA_ENGINE_DEFINITION_KNOWLEDGE = COSECHA_ENGINE_PROJECT_DEFINITION_KNOWLEDGE
 COSECHA_PLUGIN_COVERAGE_SUMMARY = "coverage_summary"
 
 __all__ = (

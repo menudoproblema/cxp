@@ -6,6 +6,11 @@ from threading import RLock
 import msgspec
 
 from cxp.capabilities import Capability, CapabilityMatrix
+from cxp.catalogs.validation import (
+    catalog_definition_issues,
+    catalog_relation_issues,
+    definition_is_immutable,
+)
 from cxp.descriptors import (
     CapabilityDescriptor,
     ComponentCapabilitySnapshot,
@@ -14,6 +19,13 @@ from cxp.descriptors import (
     offered_capability_names,
 )
 from cxp.telemetry import TelemetrySeverity, TelemetrySnapshot
+from cxp.validation import (
+    ContractValidationError,
+    ValidationIssue,
+    ValidationResult,
+    duplicate_issues,
+    validate_typed_metadata,
+)
 
 type CatalogTierName = str
 type CapabilityMetadataSchema = type[msgspec.Struct] | None
@@ -31,6 +43,7 @@ class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
     unknown_metadata_keys: tuple[str, ...] = ()
     interface_mismatch: str | None = None
     expected_interface: str | None = None
+    diagnostics: tuple[ValidationIssue, ...] = ()
 
     def is_valid(self) -> bool:
         return (
@@ -38,6 +51,7 @@ class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
             and not self.unknown_operations
             and not self.unknown_metadata_keys
             and self.interface_mismatch is None
+            and not self.diagnostics
         )
 
     def messages(self) -> tuple[str, ...]:
@@ -45,8 +59,7 @@ class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
 
         if self.unknown_capabilities:
             messages.append(
-                "Unknown profile capabilities: "
-                + ", ".join(self.unknown_capabilities),
+                "Unknown profile capabilities: " + ", ".join(self.unknown_capabilities),
             )
 
         if self.unknown_operations:
@@ -69,6 +82,7 @@ class CapabilityProfileDefinitionValidationResult(msgspec.Struct, frozen=True):
                 f"{self.interface_mismatch!r} != {self.expected_interface!r}",
             )
 
+        messages.extend(issue.message for issue in self.diagnostics)
         return tuple(messages)
 
 
@@ -173,8 +187,7 @@ class TelemetryValidationResult(msgspec.Struct, frozen=True):
 
         if self.invalid_event_severities:
             messages.append(
-                "Invalid event severities: "
-                + ", ".join(self.invalid_event_severities),
+                "Invalid event severities: " + ", ".join(self.invalid_event_severities),
             )
 
         return tuple(messages)
@@ -188,6 +201,7 @@ class CapabilityProfileValidationResult(msgspec.Struct, frozen=True):
     invalid_metadata: tuple[str, ...] = ()
     interface_mismatch: str | None = None
     expected_interface: str | None = None
+    diagnostics: tuple[ValidationIssue, ...] = ()
 
     def is_valid(self) -> bool:
         return (
@@ -197,6 +211,7 @@ class CapabilityProfileValidationResult(msgspec.Struct, frozen=True):
             and not self.missing_metadata_keys
             and not self.invalid_metadata
             and self.interface_mismatch is None
+            and not self.diagnostics
         )
 
     def messages(self) -> tuple[str, ...]:
@@ -238,6 +253,11 @@ class CapabilityProfileValidationResult(msgspec.Struct, frozen=True):
                 f"{self.interface_mismatch!r} != {self.expected_interface!r}",
             )
 
+        messages.extend(
+            issue.message
+            for issue in self.diagnostics
+            if issue.code != "invalid_metadata"
+        )
         return tuple(messages)
 
 
@@ -262,8 +282,7 @@ class CapabilityProfile(msgspec.Struct, frozen=True):
 
         msg = (
             f"Invalid capability profile {self.name!r} for "
-            f"interface {self.interface!r}: "
-            + "; ".join(validation.messages())
+            f"interface {self.interface!r}: " + "; ".join(validation.messages())
         )
         raise ValueError(msg)
 
@@ -274,6 +293,7 @@ class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
     required_tier: CatalogTierName | None = None
     missing_tier_capabilities: tuple[str, ...] = ()
     unknown_required_tier: CatalogTierName | None = None
+    diagnostics: tuple[ValidationIssue, ...] = ()
 
     def is_valid(self) -> bool:
         return (
@@ -281,6 +301,7 @@ class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
             and not self.invalid_metadata
             and not self.missing_tier_capabilities
             and self.unknown_required_tier is None
+            and not self.diagnostics
         )
 
     def messages(self) -> tuple[str, ...]:
@@ -307,6 +328,11 @@ class CapabilityMatrixValidationResult(msgspec.Struct, frozen=True):
                 f"{self.required_tier!r}: " + ", ".join(self.missing_tier_capabilities),
             )
 
+        messages.extend(
+            issue.message
+            for issue in self.diagnostics
+            if issue.code != "invalid_metadata"
+        )
         return tuple(messages)
 
 
@@ -314,9 +340,9 @@ class CatalogOperation(msgspec.Struct, frozen=True):
     name: str
     input_schema: CapabilityMetadataSchema = None  # Validation for request
     result_type: str | None = None
-    result_schema: CapabilityMetadataSchema = None # Validation for response
-    idempotent: bool = False                       # Safe to retry?
-    timeout_seconds: float | None = None           # Recommended timeout
+    result_schema: CapabilityMetadataSchema = None  # Validation for response
+    idempotent: bool = False  # Safe to retry?
+    timeout_seconds: float | None = None  # Recommended timeout
     description: str | None = None
 
 
@@ -346,15 +372,14 @@ class CatalogCapability(msgspec.Struct, frozen=True):
         return tuple(getattr(self.metadata_schema, "__struct_fields__", ()))
 
     def validate_metadata(self, capability: Capability) -> bool:
-        if self.metadata_schema is None:
-            return True
+        return self.validate_metadata_detailed(capability).is_valid()
 
-        try:
-            capability.get_metadata(self.metadata_schema)
-        except (TypeError, ValueError, msgspec.ValidationError):
-            return False
-
-        return True
+    def validate_metadata_detailed(
+        self, capability: Capability, *, path: str = "/metadata"
+    ) -> ValidationResult:
+        return validate_typed_metadata(
+            capability.metadata, self.metadata_schema, path=path
+        )
 
 
 class ConformanceTier(msgspec.Struct, frozen=True):
@@ -367,7 +392,7 @@ class ConformanceTier(msgspec.Struct, frozen=True):
         return all(name in offered for name in self.required_capabilities)
 
 
-class CapabilityCatalog(msgspec.Struct, frozen=True):
+class CapabilityCatalog(msgspec.Struct, frozen=True, dict=True):
     interface: str
     capabilities: tuple[CatalogCapability, ...] = ()
     tiers: tuple[ConformanceTier, ...] = ()
@@ -375,17 +400,33 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
     abstract: bool = False
     satisfies_interfaces: tuple[str, ...] = ()
 
+    def validate_definition(self) -> ValidationResult:
+        # La caché es privada de la instancia y no añade campos al contrato JSON.
+        cached = self.__dict__.get("_definition_validation")
+        if isinstance(cached, ValidationResult):
+            return cached
+        validation = ValidationResult(issues=catalog_definition_issues(self))
+        # Solo fijamos resultados de árboles congelados, no de contenedores mutables.
+        cacheable = self.__dict__.get("_definition_cacheable")
+        if cacheable is None:
+            cacheable = definition_is_immutable(self)
+            self.__dict__["_definition_cacheable"] = cacheable
+        if cacheable:
+            self.__dict__["_definition_validation"] = validation
+        return validation
+
     def _ensure_concrete(
         self,
         operation_name: str,
     ) -> None:
+        # No evaluamos contra un catálogo con identidades ambiguas.
+        validation = self.validate_definition()
+        if not validation.is_valid():
+            raise ContractValidationError(validation.issues)
         if not self.abstract:
             return
 
-        msg = (
-            f"Abstract catalog {self.interface!r} cannot perform "
-            f"{operation_name}"
-        )
+        msg = f"Abstract catalog {self.interface!r} cannot perform {operation_name}"
         raise ValueError(msg)
 
     def capability_names(self) -> tuple[str, ...]:
@@ -491,7 +532,41 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         unknown_operations: list[UnknownCapabilityOperations] = []
         invalid_metadata: list[str] = []
 
-        for descriptor in descriptors:
+        descriptors = tuple(descriptors)
+        diagnostics = list(
+            duplicate_issues(
+                (descriptor.name for descriptor in descriptors),
+                path="/capabilities",
+                code="duplicate_capability",
+            )
+        )
+
+        for index, descriptor in enumerate(descriptors):
+            path = f"/capabilities/{index}"
+            diagnostics.extend(
+                duplicate_issues(
+                    descriptor.operation_names(),
+                    path=f"{path}/operations",
+                    code="duplicate_operation",
+                )
+            )
+            diagnostics.extend(
+                duplicate_issues(
+                    descriptor.attribute_names(),
+                    path=f"{path}/attributes",
+                    code="duplicate_attribute",
+                )
+            )
+            # Las construcciones Python también respetan el enum del contrato.
+            if descriptor.level not in ("supported", "accepted_noop", "unsupported"):
+                diagnostics.append(
+                    ValidationIssue(
+                        code="invalid_support",
+                        path=f"{path}/level",
+                        message="Unknown capability support level",
+                        observed=str(descriptor.level),
+                    )
+                )
             catalog_capability = self.get_capability(descriptor.name)
             if catalog_capability is None:
                 unknown_capabilities.append(descriptor.name)
@@ -510,15 +585,39 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
                     ),
                 )
 
-            if not catalog_capability.validate_metadata(
-                descriptor.as_capability(),
-            ):
+            for offset, binding in enumerate(descriptor.operations):
+                operation = catalog_capability.get_operation(binding.operation_name)
+                # Un resultado omitido es desconocido; uno contradictorio es inválido.
+                if (
+                    operation is not None
+                    and binding.result_type is not None
+                    and operation.result_type is not None
+                    and (operation.result_type != binding.result_type)
+                ):
+                    diagnostics.append(
+                        ValidationIssue(
+                            code="conflicting_operation_result",
+                            path=f"{path}/operations/{offset}/result_type",
+                            message=(
+                                f"Operation {binding.operation_name!r} "
+                                "has a conflicting result type"
+                            ),
+                            expected=operation.result_type,
+                            observed=binding.result_type,
+                        )
+                    )
+            metadata_validation = catalog_capability.validate_metadata_detailed(
+                descriptor.as_capability(), path=f"{path}/metadata"
+            )
+            diagnostics.extend(metadata_validation.issues)
+            if not metadata_validation.is_valid():
                 invalid_metadata.append(descriptor.name)
 
         return DescriptorValidationResult(
             unknown_capabilities=tuple(unknown_capabilities),
             unknown_operations=tuple(unknown_operations),
             invalid_metadata=tuple(invalid_metadata),
+            diagnostics=tuple(diagnostics),
         )
 
     def validate_component_snapshot(
@@ -538,6 +637,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
                 invalid_metadata=validation.invalid_metadata,
                 interface_mismatch=snapshot.identity.interface,
                 expected_interface=self.interface,
+                diagnostics=validation.diagnostics,
             )
 
         return validation
@@ -575,8 +675,29 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         missing_metadata_keys: list[str] = []
         invalid_metadata: list[str] = []
 
+        # Validamos identidades y bindings antes de construir el índice por nombre.
+        descriptor_validation = self.validate_capability_descriptors(
+            snapshot.capabilities
+        )
+        profile_validation = self.validate_profile_definition(profile)
+        diagnostics = list(
+            tuple(
+                issue
+                for issue in descriptor_validation.diagnostics
+                if issue.code != "invalid_metadata"
+            )
+            + profile_validation.diagnostics
+        )
+
         descriptors_by_name = {
-            descriptor.name: descriptor for descriptor in snapshot.capabilities
+            descriptor.name: descriptor
+            for descriptor in snapshot.capabilities
+            if isinstance(descriptor.name, str)
+        }
+        descriptor_paths = {
+            descriptor.name: f"/capabilities/{index}/metadata"
+            for index, descriptor in enumerate(snapshot.capabilities)
+            if isinstance(descriptor.name, str)
         }
 
         for requirement in profile.requirements:
@@ -590,7 +711,12 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
                 missing_capabilities.append(requirement.capability_name)
                 continue
 
-            if not catalog_capability.validate_metadata(descriptor.as_capability()):
+            metadata_validation = catalog_capability.validate_metadata_detailed(
+                descriptor.as_capability(),
+                path=descriptor_paths[requirement.capability_name],
+            )
+            diagnostics.extend(metadata_validation.issues)
+            if not metadata_validation.is_valid():
                 invalid_metadata.append(requirement.capability_name)
 
             missing_requirement_operations = tuple(
@@ -619,6 +745,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             missing_operations=tuple(missing_operations),
             missing_metadata_keys=tuple(missing_metadata_keys),
             invalid_metadata=tuple(invalid_metadata),
+            diagnostics=tuple(diagnostics),
         )
 
     def validate_profile_definition(
@@ -636,7 +763,29 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
         unknown_operations: list[UnknownCapabilityOperations] = []
         unknown_metadata_keys: list[str] = []
 
-        for requirement in profile.requirements:
+        diagnostics = list(
+            duplicate_issues(
+                (requirement.capability_name for requirement in profile.requirements),
+                path="/requirements",
+                code="duplicate_requirement",
+            )
+        )
+
+        for index, requirement in enumerate(profile.requirements):
+            diagnostics.extend(
+                duplicate_issues(
+                    requirement.required_operations,
+                    path=f"/requirements/{index}/required_operations",
+                    code="duplicate_operation",
+                )
+            )
+            diagnostics.extend(
+                duplicate_issues(
+                    requirement.required_metadata_keys,
+                    path=f"/requirements/{index}/required_metadata_keys",
+                    code="duplicate_metadata_key",
+                )
+            )
             catalog_capability = self.get_capability(requirement.capability_name)
             if catalog_capability is None:
                 unknown_capabilities.append(requirement.capability_name)
@@ -666,6 +815,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             unknown_capabilities=tuple(unknown_capabilities),
             unknown_operations=tuple(unknown_operations),
             unknown_metadata_keys=tuple(unknown_metadata_keys),
+            diagnostics=tuple(diagnostics),
         )
 
     def is_component_snapshot_profile_compliant(
@@ -739,7 +889,9 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
                 continue
             for field in event_spec.required_payload_keys:
                 if field.name not in event.payload:
-                    missing_event_payload_keys.append(f"{event.event_type}.{field.name}")
+                    missing_event_payload_keys.append(
+                        f"{event.event_type}.{field.name}"
+                    )
             if (
                 event_spec.severity is not None
                 and event.severity != event_spec.severity
@@ -803,6 +955,9 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             required_tier=required_tier,
             missing_tier_capabilities=missing_tier_capabilities,
             unknown_required_tier=unknown_required_tier,
+            diagnostics=duplicate_issues(
+                offered, path="/capabilities", code="duplicate_capability"
+            ),
         )
 
     def validate_capability_matrix(
@@ -816,16 +971,28 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             tuple(capability.name for capability in matrix.capabilities),
             required_tier=required_tier,
         )
-        invalid_metadata = (
-            self.invalid_capability_metadata(matrix) if validate_metadata else ()
-        )
+        invalid_metadata: list[str] = []
+        diagnostics = list(base_validation.diagnostics)
+        # La exclusión explícita de metadata no desactiva las demás invariantes.
+        if validate_metadata:
+            for index, capability in enumerate(matrix.capabilities):
+                definition = self.get_capability(capability.name)
+                if definition is None:
+                    continue
+                result = definition.validate_metadata_detailed(
+                    capability, path=f"/capabilities/{index}/metadata"
+                )
+                diagnostics.extend(result.issues)
+                if not result.is_valid():
+                    invalid_metadata.append(capability.name)
 
         return CapabilityMatrixValidationResult(
             unknown_capabilities=base_validation.unknown_capabilities,
-            invalid_metadata=invalid_metadata,
+            invalid_metadata=tuple(invalid_metadata),
             required_tier=base_validation.required_tier,
             missing_tier_capabilities=base_validation.missing_tier_capabilities,
             unknown_required_tier=base_validation.unknown_required_tier,
+            diagnostics=tuple(diagnostics),
         )
 
     def validate_capability_names(
@@ -889,6 +1056,7 @@ class CapabilityCatalog(msgspec.Struct, frozen=True):
             validation.unknown_capabilities
             or validation.unknown_operations
             or validation.interface_mismatch is not None
+            or any(issue.code != "invalid_metadata" for issue in validation.diagnostics)
         ):
             return False
 
@@ -912,6 +1080,9 @@ class CatalogRegistry:
         replace: bool = False,
     ) -> CapabilityCatalog:
         with self._lock:
+            validation = catalog.validate_definition()
+            if not validation.is_valid():
+                raise ContractValidationError(validation.issues)
             existing = self._catalogs.get(catalog.interface)
             if existing is not None:
                 if existing == catalog:
@@ -923,6 +1094,36 @@ class CatalogRegistry:
 
             self._validate_catalog_telemetry(catalog)
             self._validate_catalog_relations(catalog)
+            candidate_catalogs = dict(self._catalogs)
+            candidate_catalogs[catalog.interface] = catalog
+            # Revisamos también los consumidores de una definición reemplazada.
+            for candidate in candidate_catalogs.values():
+                closure: dict[str, CapabilityCatalog] = {}
+                pending = [candidate.interface]
+                while pending:
+                    name = pending.pop()
+                    if name in closure:
+                        continue
+                    member = candidate_catalogs[name]
+                    closure[name] = member
+                    pending.extend(member.satisfies_interfaces)
+                members = tuple(closure.values())
+                # Incluimos conflictos transitivos y ramas de una composición.
+                for index, member in enumerate(members):
+                    for other in members[index + 1 :]:
+                        issues = catalog_relation_issues(member, other)
+                        if issues:
+                            raise ContractValidationError(issues)
+                self._validate_catalog_telemetry(
+                    CapabilityCatalog(
+                        interface=candidate.interface,
+                        capabilities=tuple(
+                            capability
+                            for member in members
+                            for capability in member.capabilities
+                        ),
+                    )
+                )
             self._catalogs[catalog.interface] = catalog
             return catalog
 
@@ -955,10 +1156,7 @@ class CatalogRegistry:
 
         for satisfied_interface in catalog.satisfies_interfaces:
             if satisfied_interface == catalog.interface:
-                msg = (
-                    "Catalog interface cannot satisfy itself: "
-                    f"{catalog.interface!r}"
-                )
+                msg = f"Catalog interface cannot satisfy itself: {catalog.interface!r}"
                 raise ValueError(msg)
 
             if satisfied_interface not in candidate_catalogs:
@@ -1010,9 +1208,7 @@ class CatalogRegistry:
                     raise ValueError(msg)
 
             for metric in capability.telemetry.metrics:
-                label_names = frozenset(
-                    field.name for field in metric.required_labels
-                )
+                label_names = frozenset(field.name for field in metric.required_labels)
                 existing_metric = metric_specs.get(metric.name)
                 if existing_metric is None:
                     metric_specs[metric.name] = (
@@ -1181,9 +1377,7 @@ def _merge_field_requirements(
     left: tuple[TelemetryFieldRequirement, ...],
     right: tuple[TelemetryFieldRequirement, ...],
 ) -> tuple[TelemetryFieldRequirement, ...]:
-    merged: dict[str, TelemetryFieldRequirement] = {
-        field.name: field for field in left
-    }
+    merged: dict[str, TelemetryFieldRequirement] = {field.name: field for field in left}
     for field in right:
         existing = merged.get(field.name)
         if existing is None:

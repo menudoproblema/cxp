@@ -7,8 +7,7 @@ HTTP_APPLICATION_CATALOG = register_catalog(
         interface=HTTP_APPLICATION_INTERFACE,
         abstract=True,
         description=(
-            "Abstract family for any HTTP application exposed to the "
-            "orchestrator."
+            "Abstract family for any HTTP application exposed to the orchestrator."
         ),
     )
 )

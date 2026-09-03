@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -34,7 +34,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "msgspec"
+  "msgspec>=0.20.0,<1",
 ]
 
 [project.urls]
@@ -43,12 +43,21 @@ Repository = "https://github.com/menudoproblema/cxp"
 Issues = "https://github.com/menudoproblema/cxp/issues"
 
 [project.optional-dependencies]
+exchange = [
+  "jsonschema>=4.23,<5",
+  "referencing>=0.35,<1",
+  "rfc8785>=0.1.4,<1",
+]
 dev = [
+  "cxp[exchange]",
   "build",
   "mypy",
   "pytest",
   "ruff",
   "twine",
+  "types-jsonschema",
+  "pre-commit",
+  "jsonschema-rs>=0.46,<1",
 ]
 
 [tool.setuptools]
@@ -59,6 +68,9 @@ version = { attr = "cxp._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+cxp = ["py.typed", "exchange/schemas/*.json", "exchange/catalogs/*.json", "exchange/vectors/*.json"]
 
 [tool.ruff]
 target-version = "py312"

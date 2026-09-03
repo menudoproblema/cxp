@@ -1,0 +1,46 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "document-processing",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "document.processing",
+        "description": "Document handling at the RIP/processor boundary, separate from physical equipment.",
+        "properties": {
+          "input_formats": {
+            "kind": "string_set",
+            "description": "Accepted format identifiers, e.g. pdf-x-4."
+          },
+          "output_formats": {
+            "kind": "string_set",
+            "description": "Produced format identifiers."
+          },
+          "live_transparency": {
+            "kind": "boolean",
+            "description": "Preserves supported transparency in this configuration."
+          },
+          "spot_colors": {
+            "kind": "boolean",
+            "description": "Understands spot-color separations."
+          }
+        },
+        "operations": [
+          {
+            "name": "analyze",
+            "input_type": "org.cxp:document-request:1",
+            "result_type": "org.cxp:document-result:1",
+            "idempotency": {
+              "state": "guaranteed"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

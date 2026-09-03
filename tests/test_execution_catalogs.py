@@ -40,8 +40,7 @@ def test_execution_family_catalog_is_abstract() -> None:
 def test_execution_catalog_hierarchy_reports_plan_run_compatibility() -> None:
     assert catalog_satisfies_interface("execution/plan-run", "execution/engine")
     assert (
-        catalog_satisfies_interface("execution/engine", "execution/plan-run")
-        is False
+        catalog_satisfies_interface("execution/engine", "execution/plan-run") is False
     )
 
 

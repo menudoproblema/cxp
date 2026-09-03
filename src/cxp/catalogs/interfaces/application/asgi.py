@@ -50,9 +50,7 @@ ASGI_APPLICATION_LIFESPAN_SHUTDOWN_FAILED = "lifespan.shutdown.failed"
 
 ASGI_APPLICATION_TLS_SCOPE_INSPECT = "tls.scope.inspect"
 
-ASGI_APPLICATION_WEBSOCKET_HTTP_RESPONSE_START = (
-    "websocket.http.response.start"
-)
+ASGI_APPLICATION_WEBSOCKET_HTTP_RESPONSE_START = "websocket.http.response.start"
 ASGI_APPLICATION_WEBSOCKET_HTTP_RESPONSE_BODY = "websocket.http.response.body"
 ASGI_APPLICATION_HTTP_PUSH = "http.response.push"
 ASGI_APPLICATION_HTTP_PATH_SEND = "http.response.pathsend"

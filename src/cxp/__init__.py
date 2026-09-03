@@ -374,8 +374,12 @@ from cxp.telemetry import (
     TelemetrySpan,
 )
 from cxp.types import ComponentIdentity, Interface, Provider, Version
+from cxp.validation import ContractValidationError, ValidationIssue, ValidationResult
 
 __all__ = (
+    "ContractValidationError",
+    "ValidationIssue",
+    "ValidationResult",
     "__version__",
     "version_info",
     "Capability",

@@ -32,8 +32,10 @@ RUNTIME_OP_RESOURCE_STATS = "runtime.resource_stats"
 RUNTIME_OP_HEALTH_CHECK = "runtime.health_check"
 RUNTIME_OP_RELOAD = "runtime.reload"
 
+
 class ConfigMetadata(msgspec.Struct, frozen=True):
     sources: tuple[str, ...]
+
 
 RUNTIME_ENVIRONMENT_CATALOG = register_catalog(
     CapabilityCatalog(

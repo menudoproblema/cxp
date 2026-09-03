@@ -170,9 +170,7 @@ def test_cosecha_engine_catalog_validates_explicit_snapshot() -> None:
             CapabilityDescriptor(
                 name=COSECHA_ENGINE_DEPENDENCY_KNOWLEDGE,
                 level="supported",
-                operations=(
-                    CapabilityOperationBinding("dependencies.describe"),
-                ),
+                operations=(CapabilityOperationBinding("dependencies.describe"),),
             ),
         ),
     )
@@ -231,9 +229,7 @@ def test_cosecha_reporter_catalog_distinguishes_human_and_structured_output() ->
                 metadata={
                     "artifact_formats": ["json"],
                 },
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
             CapabilityDescriptor(
                 name=COSECHA_REPORTER_STRUCTURED_OUTPUT,
@@ -243,9 +239,7 @@ def test_cosecha_reporter_catalog_distinguishes_human_and_structured_output() ->
                     "artifact_formats": ["json"],
                     "supports_engine_specific_projection": True,
                 },
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
         ),
     )
@@ -272,9 +266,7 @@ def test_cosecha_reporter_catalog_distinguishes_human_and_structured_output() ->
                     "output_kind": "console",
                     "supports_engine_specific_projection": True,
                 },
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
         ),
     )
@@ -316,17 +308,13 @@ def test_cosecha_reporter_catalog_allows_human_and_artifact_output_together() ->
                 name=COSECHA_REPORTER_ARTIFACT_OUTPUT,
                 level="supported",
                 metadata={"artifact_formats": ["html"]},
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
             CapabilityDescriptor(
                 name=COSECHA_REPORTER_HUMAN_OUTPUT,
                 level="supported",
                 metadata={"output_kind": "html"},
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
         ),
     )
@@ -344,11 +332,9 @@ def test_cosecha_reporter_catalog_allows_human_and_artifact_output_together() ->
         tuple(capability.name for capability in snapshot.capabilities),
         required_tier=COSECHA_REPORTER_HUMAN_TIER,
     )
-    artifact_tier_validation = (
-        COSECHA_REPORTER_CATALOG.validate_capability_set(
-            tuple(capability.name for capability in snapshot.capabilities),
-            required_tier=COSECHA_REPORTER_ARTIFACT_TIER,
-        )
+    artifact_tier_validation = COSECHA_REPORTER_CATALOG.validate_capability_set(
+        tuple(capability.name for capability in snapshot.capabilities),
+        required_tier=COSECHA_REPORTER_ARTIFACT_TIER,
     )
 
     assert human_tier_validation.is_valid()
@@ -562,17 +548,13 @@ def test_cosecha_instrumentation_catalog_validates_coverage_summary() -> None:
                     "summary_kind": "coverage.py",
                     "measurement_scope": "controller_process",
                 },
-                operations=(
-                    CapabilityOperationBinding("instrumentation.collect"),
-                ),
+                operations=(CapabilityOperationBinding("instrumentation.collect"),),
             ),
             CapabilityDescriptor(
                 name=COSECHA_INSTRUMENTATION_STRUCTURED_SUMMARY,
                 level="supported",
                 metadata={"payload_formats": ["json"], "serializable": True},
-                operations=(
-                    CapabilityOperationBinding("instrumentation.collect"),
-                ),
+                operations=(CapabilityOperationBinding("instrumentation.collect"),),
             ),
         ),
     )
@@ -590,8 +572,7 @@ def test_cosecha_instrumentation_catalog_validates_coverage_summary() -> None:
     )
 
 
-def test_cosecha_instrumentation_catalog_uses_profile_for_strict_composable_validation(
-) -> None:
+def test_instrumentation_profile_validates_strict_composition() -> None:
     snapshot = ComponentCapabilitySnapshot(
         component_name="broken-composable",
         identity=ComponentIdentity(
@@ -612,9 +593,7 @@ def test_cosecha_instrumentation_catalog_uses_profile_for_strict_composable_vali
                         {"kind": "cli_flag", "name": "--broken"},
                     ],
                 },
-                operations=(
-                    CapabilityOperationBinding("instrumentation.prepare"),
-                ),
+                operations=(CapabilityOperationBinding("instrumentation.prepare"),),
             ),
             CapabilityDescriptor(
                 name=COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
@@ -623,9 +602,7 @@ def test_cosecha_instrumentation_catalog_uses_profile_for_strict_composable_vali
                     "instrumentation_name": "broken-composable",
                     "summary_kind": "broken",
                 },
-                operations=(
-                    CapabilityOperationBinding("instrumentation.collect"),
-                ),
+                operations=(CapabilityOperationBinding("instrumentation.collect"),),
             ),
         ),
     )
@@ -637,10 +614,13 @@ def test_cosecha_instrumentation_catalog_uses_profile_for_strict_composable_vali
         snapshot,
         required_tier=COSECHA_INSTRUMENTATION_COMPOSABLE_TIER,
     )
-    assert COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_profile_compliant(
-        snapshot,
-        COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE,
-    ) is False
+    assert (
+        COSECHA_INSTRUMENTATION_CATALOG.is_component_snapshot_profile_compliant(
+            snapshot,
+            COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE,
+        )
+        is False
+    )
 
 
 def test_cosecha_engine_planning_profile_does_not_require_run_labels() -> None:
@@ -699,17 +679,13 @@ def test_cosecha_reporter_structured_profile_requires_output_kind() -> None:
                     "output_kind": "structured",
                     "artifact_formats": ["json"],
                 },
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
             CapabilityDescriptor(
                 name=COSECHA_REPORTER_ARTIFACT_OUTPUT,
                 level="supported",
                 metadata={"artifact_formats": ["json"]},
-                operations=(
-                    CapabilityOperationBinding("reporter.print_report"),
-                ),
+                operations=(CapabilityOperationBinding("reporter.print_report"),),
             ),
         ),
     )

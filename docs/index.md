@@ -12,6 +12,13 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 
 ## Mapa de Documentación
 - [Arquitectura](./architecture.md)
+- [Plan de cierre de 4.0](./architecture/next-release-plan.md)
+- [Intercambio documental v1](./protocol/exchange-v1.md)
+- [Integración del intercambio](./protocol/exchange-integration.md)
+- [Catálogos de referencia](./catalogs/exchange-reference.md)
+- [Migración a 4.0](./migration-4.0.md)
+- [Cierre de la revisión de 4.0.0](./architecture/review-4.0.0.md)
+- [Candidata y publicación](./release.md)
 - [Integración](./integration.md)
 - [Protocolo de Capacidades](./protocol/capabilities.md)
 - [Compliance Bridge](./protocol/compliance.md)

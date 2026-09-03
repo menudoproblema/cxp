@@ -40,8 +40,7 @@ from cxp import (
 def test_application_family_catalogs_are_registered() -> None:
     assert get_catalog("application/http") is HTTP_APPLICATION_CATALOG
     assert (
-        get_catalog("application/http-framework")
-        is HTTP_APPLICATION_FRAMEWORK_CATALOG
+        get_catalog("application/http-framework") is HTTP_APPLICATION_FRAMEWORK_CATALOG
     )
     assert get_catalog("application/wsgi") is WSGI_APPLICATION_CATALOG
     assert get_catalog("application/asgi") is ASGI_APPLICATION_CATALOG
@@ -194,9 +193,7 @@ def test_wsgi_profiles_validate_complete_snapshot() -> None:
             CapabilityDescriptor(
                 name="file_wrapper",
                 level="supported",
-                operations=(
-                    CapabilityOperationBinding("response.body.file_wrapper"),
-                ),
+                operations=(CapabilityOperationBinding("response.body.file_wrapper"),),
             ),
         ),
     )
@@ -253,8 +250,12 @@ def test_asgi_profiles_validate_http_lifespan_and_websocket() -> None:
                 name=ASGI_APPLICATION_WEBSOCKET,
                 level="supported",
                 operations=(
-                    CapabilityOperationBinding(ASGI_APPLICATION_WEBSOCKET_SCOPE_INSPECT),
-                    CapabilityOperationBinding(ASGI_APPLICATION_WEBSOCKET_CONNECT_RECEIVE),
+                    CapabilityOperationBinding(
+                        ASGI_APPLICATION_WEBSOCKET_SCOPE_INSPECT
+                    ),
+                    CapabilityOperationBinding(
+                        ASGI_APPLICATION_WEBSOCKET_CONNECT_RECEIVE
+                    ),
                     CapabilityOperationBinding(ASGI_APPLICATION_WEBSOCKET_ACCEPT),
                     CapabilityOperationBinding(ASGI_APPLICATION_WEBSOCKET_RECEIVE),
                     CapabilityOperationBinding(ASGI_APPLICATION_WEBSOCKET_SEND),

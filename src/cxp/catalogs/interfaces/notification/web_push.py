@@ -26,10 +26,12 @@ WEB_PUSH_INTERFACE = "notification/web-push"
 # Web-Push Specific Capabilities
 WEB_PUSH_VAPID_CONFIG = "vapid_configuration"
 
+
 class VapidMetadata(msgspec.Struct, frozen=True):
     public_key: str
     subject: str
     expiration_hours: int = 12
+
 
 _PUSH_TELEMETRY = CapabilityTelemetry(
     metrics=(
@@ -61,7 +63,7 @@ WEB_PUSH_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=NOTIFICATION_OP_SEND,
-                        result_type="push.result",
+                        result_type="notification.result",
                         result_schema=PushResult,
                         description="Send a Web Push message to a browser subscriber.",
                     ),

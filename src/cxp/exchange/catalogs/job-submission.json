@@ -1,0 +1,44 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "job-submission",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "jobs.submission",
+        "description": "Submission acknowledgement is not physical completion.",
+        "properties": {},
+        "operations": [
+          {
+            "name": "submit",
+            "input_type": "org.cxp:submission-request:1",
+            "result_type": "org.cxp:submission-receipt:1",
+            "idempotency": {
+              "state": "not_idempotent"
+            }
+          }
+        ]
+      },
+      {
+        "name": "jobs.tracking",
+        "description": "An observation reports an outcome with explicit scope; it does not execute or retry.",
+        "properties": {},
+        "operations": [
+          {
+            "name": "observe",
+            "input_type": "org.cxp:job-query:1",
+            "result_type": "org.cxp:job-observation:1",
+            "idempotency": {
+              "state": "guaranteed"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

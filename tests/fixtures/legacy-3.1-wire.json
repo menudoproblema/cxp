@@ -1,0 +1,53 @@
+{
+  "version": "3.1.0",
+  "revision": "6b5b555cbaf39c89cbe1ae0ca5955a88b049f8cf",
+  "license": "MIT",
+  "provenance": "Encoded with archived 3.1.0 source and msgspec 0.20.0",
+  "cases": [
+    {
+      "module": "cxp.capabilities",
+      "type": "CapabilityMatrix",
+      "wire": "{\"capabilities\":[{\"name\":\"read\",\"metadata\":{\"batch\":3}}]}"
+    },
+    {
+      "module": "cxp.descriptors",
+      "type": "ComponentCapabilitySnapshot",
+      "wire": "{\"component_name\":\"example\",\"capabilities\":[{\"name\":\"read\",\"level\":\"supported\",\"summary\":\"\",\"stability\":\"stable\",\"attributes\":[],\"operations\":[],\"metadata\":{},\"delivery_mode\":null,\"granularity\":null},{\"name\":\"write\",\"level\":\"accepted_noop\",\"summary\":\"\",\"stability\":\"stable\",\"attributes\":[],\"operations\":[],\"metadata\":{},\"delivery_mode\":null,\"granularity\":null}],\"component_kind\":null,\"identity\":{\"interface\":\"database/sql\",\"provider\":\"example\",\"version\":\"1.0.0\"}}"
+    },
+    {
+      "module": "cxp.handshake",
+      "type": "HandshakeRequest",
+      "wire": "{\"client_identity\":{\"interface\":\"database/sql\",\"provider\":\"example\",\"version\":\"1.0.0\"},\"required_capabilities\":[\"read\"],\"optional_capabilities\":[\"write\"],\"protocol_version\":1}"
+    },
+    {
+      "module": "cxp.handshake",
+      "type": "HandshakeResponse",
+      "wire": "{\"provider_identity\":{\"interface\":\"database/sql\",\"provider\":\"example\",\"version\":\"1.0.0\"},\"status\":\"degraded\",\"offered_capabilities\":{\"capabilities\":[{\"name\":\"read\",\"metadata\":{\"batch\":3}}]},\"reason\":\"Missing optional capabilities: write\",\"missing_required_capabilities\":[],\"missing_optional_capabilities\":[\"write\"],\"protocol_version\":1}"
+    },
+    {
+      "module": "cxp.catalogs.results",
+      "type": "CxpError",
+      "wire": "{\"code\":\"TIMEOUT\",\"message\":\"No acknowledgement\",\"retryable\":true,\"details\":{}}"
+    }
+  ],
+  "new_document": "{\"document_type\":\"cxp.context\",\"spec_version\":1,\"payload\":{\"subject_id\":\"example\",\"configuration_revision\":\"1\"}}",
+  "old_reader_results": [
+    {
+      "type": "CapabilityMatrix",
+      "status": "accepted",
+      "value": {
+        "capabilities": []
+      }
+    },
+    {
+      "type": "ComponentCapabilitySnapshot",
+      "status": "rejected",
+      "error": "Object missing required field `component_name`"
+    },
+    {
+      "type": "HandshakeRequest",
+      "status": "rejected",
+      "error": "Object missing required field `client_identity`"
+    }
+  ]
+}

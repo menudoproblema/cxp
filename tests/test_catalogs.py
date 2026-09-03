@@ -422,15 +422,11 @@ def test_public_api_reexports_complete_mongodb_contract() -> None:
     )
     assert MongoCollationMetadata().backend == {}
     assert (
-        MongoPersistenceMetadata(
-            persistent=True, storageEngine="sqlite"
-        ).storageEngine
+        MongoPersistenceMetadata(persistent=True, storageEngine="sqlite").storageEngine
         == "sqlite"
     )
     assert (
-        MongoTopologyDiscoveryMetadata(
-            topologyType="single", serverCount=1
-        ).serverCount
+        MongoTopologyDiscoveryMetadata(topologyType="single", serverCount=1).serverCount
         == 1
     )
 
@@ -562,11 +558,9 @@ def test_mongodb_text_search_profile_does_not_require_vector_search() -> None:
             MONGODB_TEXT_SEARCH_PROFILE,
         )
     )
-    search_validation = (
-        MONGODB_CATALOG.validate_component_snapshot_against_profile(
-            snapshot,
-            MONGODB_SEARCH_PROFILE,
-        )
+    search_validation = MONGODB_CATALOG.validate_component_snapshot_against_profile(
+        snapshot,
+        MONGODB_SEARCH_PROFILE,
     )
 
     assert text_search_validation.is_valid() is True
@@ -857,7 +851,10 @@ def test_catalog_can_validate_metadata_against_declared_schema() -> None:
 def test_catalog_can_return_rich_matrix_validation_result() -> None:
     catalog = CapabilityCatalog(
         interface="execution/plan-run",
-        capabilities=(CatalogCapability(name="run"),),
+        capabilities=(
+            CatalogCapability(name="run"),
+            CatalogCapability(name="planning"),
+        ),
         tiers=(
             ConformanceTier(
                 name="core",

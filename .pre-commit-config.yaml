@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: Ruff (complete standalone checkout)
+        entry: python -m ruff check .
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-format
+        name: Ruff format (complete standalone checkout)
+        entry: python -m ruff format --check .
+        language: system
+        pass_filenames: false
+        always_run: true

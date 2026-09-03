@@ -39,14 +39,13 @@ DATABASE_CATALOG = register_catalog(
             CatalogCapability(
                 name=DATABASE_CONNECTIVITY,
                 description=(
-                    "Managing connections and session state with the database "
-                    "provider."
+                    "Managing connections and session state with the database provider."
                 ),
                 operations=(
                     CatalogOperation(
                         name=DATABASE_OP_CONNECT,
                         result_type="db.connection",
-                        idempotent=True, # Safety flag
+                        idempotent=True,  # Safety flag
                         timeout_seconds=5.0,
                     ),
                     CatalogOperation(
@@ -63,7 +62,7 @@ DATABASE_CATALOG = register_catalog(
                 operations=(
                     CatalogOperation(
                         name=DATABASE_OP_QUERY,
-                        input_schema=DbQueryInput, # Bidirectional fidelity
+                        input_schema=DbQueryInput,  # Bidirectional fidelity
                         result_type="db.cursor",
                         result_schema=DbCursor,
                         idempotent=True,
@@ -79,7 +78,7 @@ DATABASE_CATALOG = register_catalog(
                         name=DATABASE_OP_EXECUTE,
                         result_type="db.write_result",
                         result_schema=DbWriteResult,
-                        idempotent=False, # Dangerous to retry blindly
+                        idempotent=False,  # Dangerous to retry blindly
                         timeout_seconds=30.0,
                     ),
                 ),

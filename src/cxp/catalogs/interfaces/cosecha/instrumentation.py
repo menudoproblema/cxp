@@ -26,9 +26,7 @@ COSECHA_INSTRUMENTATION_ACTIVATE = "instrumentation.activate"
 COSECHA_INSTRUMENTATION_COLLECT = "instrumentation.collect"
 
 COSECHA_INSTRUMENTATION_SLOT_PROCESS_ARGV = "process.argv"
-COSECHA_INSTRUMENTATION_SLOT_PROCESS_SITECUSTOMIZE = (
-    "process.sitecustomize"
-)
+COSECHA_INSTRUMENTATION_SLOT_PROCESS_SITECUSTOMIZE = "process.sitecustomize"
 COSECHA_INSTRUMENTATION_SLOT_PROCESS_ENV = "process.environment"
 COSECHA_INSTRUMENTATION_SLOT_PY_SETTRACE = "python.sys.settrace"
 COSECHA_INSTRUMENTATION_SLOT_PY_SETPROFILE = "python.sys.setprofile"
@@ -42,15 +40,9 @@ COSECHA_INSTRUMENTATION_SUMMARY_TIER = "summary"
 COSECHA_INSTRUMENTATION_STRUCTURED_TIER = "structured"
 COSECHA_INSTRUMENTATION_COMPOSABLE_TIER = "composable"
 
-COSECHA_INSTRUMENTATION_SUMMARY_PROFILE_NAME = (
-    "cosecha-instrumentation-summary"
-)
-COSECHA_INSTRUMENTATION_STRUCTURED_PROFILE_NAME = (
-    "cosecha-instrumentation-structured"
-)
-COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE_NAME = (
-    "cosecha-instrumentation-composable"
-)
+COSECHA_INSTRUMENTATION_SUMMARY_PROFILE_NAME = "cosecha-instrumentation-summary"
+COSECHA_INSTRUMENTATION_STRUCTURED_PROFILE_NAME = "cosecha-instrumentation-structured"
+COSECHA_INSTRUMENTATION_COMPOSABLE_PROFILE_NAME = "cosecha-instrumentation-composable"
 
 _INSTRUMENTATION_NAME_FIELD = TelemetryFieldRequirement(
     name="cosecha.instrumentation.name"
@@ -102,8 +94,7 @@ COSECHA_INSTRUMENTATION_CATALOG = register_catalog(
             CatalogCapability(
                 name=COSECHA_INSTRUMENTATION_BOOTSTRAP,
                 description=(
-                    "Prepare bootstrap contributions for an instrumented "
-                    "session."
+                    "Prepare bootstrap contributions for an instrumented session."
                 ),
                 metadata_schema=InstrumentationBootstrapMetadata,
                 telemetry=_instrumentation_span(
@@ -161,8 +152,7 @@ COSECHA_INSTRUMENTATION_CATALOG = register_catalog(
                     COSECHA_INSTRUMENTATION_SESSION_SUMMARY,
                 ),
                 description=(
-                    "Instrumentation that prepares and collects a session "
-                    "summary."
+                    "Instrumentation that prepares and collects a session summary."
                 ),
             ),
             ConformanceTier(

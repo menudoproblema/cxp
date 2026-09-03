@@ -7,6 +7,7 @@ import msgspec
 
 from cxp.capabilities import Capability, CapabilityMatrix, CapabilityMetadata
 from cxp.types import ComponentIdentity
+from cxp.validation import ValidationIssue
 
 type CapabilitySupportLevel = Literal[
     "supported",
@@ -133,6 +134,7 @@ class DescriptorValidationResult(msgspec.Struct, frozen=True):
     invalid_metadata: tuple[str, ...] = ()
     interface_mismatch: str | None = None
     expected_interface: str | None = None
+    diagnostics: tuple[ValidationIssue, ...] = ()
 
     def is_valid(self) -> bool:
         return (
@@ -140,6 +142,7 @@ class DescriptorValidationResult(msgspec.Struct, frozen=True):
             and not self.unknown_operations
             and not self.invalid_metadata
             and self.interface_mismatch is None
+            and not self.diagnostics
         )
 
     @property
@@ -177,6 +180,12 @@ class DescriptorValidationResult(msgspec.Struct, frozen=True):
         interface_mismatch_message = self.interface_mismatch_message
         if interface_mismatch_message is not None:
             messages.append(interface_mismatch_message)
+
+        messages.extend(
+            issue.message
+            for issue in self.diagnostics
+            if issue.code != "invalid_metadata"
+        )
 
         return tuple(messages)
 

@@ -16,14 +16,16 @@ PRODUCTION_PRINTING_INTERFACE = "printing/production"
 
 # Capability Names (Finishing/Accesorios)
 PRODUCTION_FOLDING = "folding"  # Plegador
-PRODUCTION_GLUING = "gluing"    # Encolador
+PRODUCTION_GLUING = "gluing"  # Encolador
 PRODUCTION_STAPLING = "stapling"
 PRODUCTION_COLOR_CALIBRATION = "color_calibration"
+
 
 class FinishingMetadata(msgspec.Struct, frozen=True):
     supported_folds: tuple[str, ...]  # z-fold, tri-fold, half-fold
     glue_types: tuple[str, ...]
     max_thickness_mm: float
+
 
 PRODUCTION_PRINTING_CATALOG = register_catalog(
     CapabilityCatalog(

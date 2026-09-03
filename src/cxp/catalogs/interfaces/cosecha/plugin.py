@@ -36,15 +36,9 @@ COSECHA_PLUGIN_REPORTING_SIDECAR_TIER = "reporting_sidecar"
 
 COSECHA_PLUGIN_CORE_PROFILE_NAME = "cosecha-plugin-core"
 COSECHA_PLUGIN_CONSTRAINED_PROFILE_NAME = "cosecha-plugin-constrained"
-COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE_NAME = (
-    "cosecha-plugin-timing-sidecar"
-)
-COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE_NAME = (
-    "cosecha-plugin-telemetry-sidecar"
-)
-COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE_NAME = (
-    "cosecha-plugin-reporting-sidecar"
-)
+COSECHA_PLUGIN_TIMING_SIDECAR_PROFILE_NAME = "cosecha-plugin-timing-sidecar"
+COSECHA_PLUGIN_TELEMETRY_SIDECAR_PROFILE_NAME = "cosecha-plugin-telemetry-sidecar"
+COSECHA_PLUGIN_REPORTING_SIDECAR_PROFILE_NAME = "cosecha-plugin-reporting-sidecar"
 
 _PLUGIN_NAME_FIELD = TelemetryFieldRequirement(name="cosecha.plugin.name")
 
@@ -180,8 +174,7 @@ COSECHA_PLUGIN_CATALOG = register_catalog(
                     COSECHA_PLUGIN_TELEMETRY_EXPORT,
                 ),
                 description=(
-                    "Plugin that contributes both timing and telemetry "
-                    "sidecars."
+                    "Plugin that contributes both timing and telemetry sidecars."
                 ),
             ),
             ConformanceTier(
