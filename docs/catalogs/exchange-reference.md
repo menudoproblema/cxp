@@ -1,7 +1,7 @@
 # Catálogos del intercambio v1
 
-Son recursos JSON con owner `CXP maintainers`, namespace `org.cxp` y versión
-contractual `1.0.0`. Comparten distribución con CXP, no ciclo de publicación
+Son recursos JSON con owner `CXP maintainers` y namespace `org.cxp`. Cada
+recurso tiene versión contractual propia. Comparten distribución con CXP, no ciclo de publicación
 independiente. Cambiar un catálogo no cambia automáticamente la especificación.
 Cada referencia fija además el SHA-256: una misma identidad/version no debe
 reutilizarse para publicar otro contrato.
@@ -13,6 +13,19 @@ reutilizarse para publicar otro contrato.
 | `document-processing` | Formatos, transparencia, tintas planas y contrato de análisis. | Ejecución del análisis PDF. |
 | `job-submission` | Envío y observación de trabajos como operaciones distintas. | Cola, persistencia, reintentos o producción ejecutada. |
 | `finishing` | Plegado y encuadernación con definiciones diferentes. | Una capacidad de impresión heredada. |
+
+`physical-printing` conserva 1.0.0 como versión predeterminada y añade 1.1.0
+para adopción explícita. La nueva versión mantiene sus cinco propiedades y suma:
+
+- `max_loaded_mass`: masa total cargada en la configuración;
+- `max_object_width` y `max_object_length`: límites de un objeto o montaje;
+- `print_mode_id`: identificador local estable del modo configurado;
+- `resolution_x` y `resolution_y`: el par de resolución seleccionado.
+
+`max_width` y `max_height` continúan siendo el área imprimible X/Y;
+`max_thickness` es el límite Z. Estas propiedades no describen colocación,
+colisiones, un útil, un modo certificado por el fabricante ni combinaciones
+posibles entre máximos de configuraciones diferentes.
 
 Las propiedades de `finishing.folding` son patrones, número de pliegues y tamaño
 de hoja. Las de `finishing.binding` son espesor del bloque, longitud de lomo y

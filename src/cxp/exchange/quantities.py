@@ -10,7 +10,7 @@ from types import MappingProxyType
 
 from cxp.exchange.errors import invalid
 
-__all__ = ("Quantity", "normalize_decimal")
+__all__ = ("Quantity", "normalize_decimal", "quantity_from_input")
 
 DECIMAL_PATTERN = r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?"
 UNITS = MappingProxyType(
@@ -39,6 +39,46 @@ def normalize_decimal(value: str, *, path: str = "") -> str:
     fraction = fraction.rstrip("0")
     normalized = whole + (dot + fraction if fraction else "")
     return "0" if normalized == "-0" else normalized
+
+
+def _finite_fraction_decimal(value: Fraction) -> str:
+    """Convertimos una fracción decimal exacta sin usar precisión global."""
+    numerator = value.numerator
+    denominator = value.denominator
+    powers_of_two = 0
+    powers_of_five = 0
+    while denominator % 2 == 0:
+        denominator //= 2
+        powers_of_two += 1
+    while denominator % 5 == 0:
+        denominator //= 5
+        powers_of_five += 1
+    if denominator != 1:
+        raise ValueError("Expected a finite decimal fraction")
+    scale = max(powers_of_two, powers_of_five)
+    scaled = abs(numerator)
+    scaled *= 2 ** (scale - powers_of_two)
+    scaled *= 5 ** (scale - powers_of_five)
+    digits = str(scaled).zfill(scale + 1)
+    if scale:
+        digits = f"{digits[:-scale]}.{digits[-scale:]}"
+    if numerator < 0:
+        digits = f"-{digits}"
+    return normalize_decimal(digits, path="/value")
+
+
+def quantity_from_input(value: str, unit: str) -> Quantity:
+    """Aceptamos centímetros y metros solo como comodidad de entrada.
+
+    El resultado siempre utiliza una unidad admitida por el documento CXP v1.
+    Por tanto, este helper no amplía ni modifica el contrato de intercambio.
+    """
+    normalized = normalize_decimal(value, path="/value")
+    if unit not in ("cm", "m"):
+        return Quantity(normalized, unit)
+    factor = 10 if unit == "cm" else 1000
+    exact = Fraction(Decimal(normalized)) * factor
+    return Quantity(_finite_fraction_decimal(exact), "mm")
 
 
 @dataclass(frozen=True, slots=True)

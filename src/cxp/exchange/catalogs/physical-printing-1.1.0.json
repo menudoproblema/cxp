@@ -1,0 +1,73 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "physical-printing",
+      "version": "1.1.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "printing.surface",
+        "description": "Physical printing envelope for one material/configuration; no driver or job execution.",
+        "properties": {
+          "max_width": {
+            "kind": "quantity",
+            "description": "Maximum printable width on the configured X axis.",
+            "dimension": "length"
+          },
+          "max_height": {
+            "kind": "quantity",
+            "description": "Maximum printable height on the configured Y axis.",
+            "dimension": "length"
+          },
+          "max_thickness": {
+            "kind": "quantity",
+            "description": "Maximum object thickness on the configured Z axis.",
+            "dimension": "length"
+          },
+          "max_loaded_mass": {
+            "kind": "quantity",
+            "description": "Maximum total mass loaded for this configuration.",
+            "dimension": "mass"
+          },
+          "max_object_width": {
+            "kind": "quantity",
+            "description": "Maximum width of one object in this configuration.",
+            "dimension": "length"
+          },
+          "max_object_length": {
+            "kind": "quantity",
+            "description": "Maximum length of one object in this configuration.",
+            "dimension": "length"
+          },
+          "print_mode_id": {
+            "kind": "string",
+            "description": "Stable adapter-local identifier of the active print mode."
+          },
+          "resolution_x": {
+            "kind": "quantity",
+            "description": "Configured resolution on the X axis.",
+            "dimension": "resolution"
+          },
+          "resolution_y": {
+            "kind": "quantity",
+            "description": "Configured resolution on the Y axis.",
+            "dimension": "resolution"
+          },
+          "ink_channels": {
+            "kind": "string_set",
+            "description": "Available configured ink roles, e.g. cmyk, white, varnish."
+          },
+          "material_types": {
+            "kind": "string_set",
+            "description": "Material classes validated for this configuration."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

@@ -13,6 +13,9 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 ## Mapa de Documentación
 - [Arquitectura](./architecture.md)
 - [Plan de cierre de 4.0](./architecture/next-release-plan.md)
+- [Evolución 4.1](./architecture/evolution-4.1-plan.md)
+- [CLI](./cli.md)
+- [Estabilidad y deprecación](./stability.md)
 - [Intercambio documental v1](./protocol/exchange-v1.md)
 - [Integración del intercambio](./protocol/exchange-integration.md)
 - [Catálogos de referencia](./catalogs/exchange-reference.md)
@@ -54,3 +57,4 @@ El repositorio incluye ejemplos ejecutables en:
 - `examples/async_provider.py`
 - `examples/async_telemetry_stream.py`
 - `examples/component_descriptors.py`
+- `examples/document_exchange.py`

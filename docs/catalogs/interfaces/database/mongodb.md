@@ -113,7 +113,8 @@ En la practica, esto permite responder preguntas como:
 - "¿publica `aggregate` y metadata suficiente para ese subset?"
 - "¿la telemetria emitida usa de verdad las señales `db.client.search*`?"
 
-El ejemplo [examples/mongodb_profiles.py](../../../examples/mongodb_profiles.py) muestra exactamente ese flujo:
+El ejemplo [examples/mongodb_profiles.py](../../../../examples/mongodb_profiles.py)
+muestra exactamente ese flujo:
 
 - construye un snapshot MongoDB realista;
 - lo valida contra `mongodb-search`;

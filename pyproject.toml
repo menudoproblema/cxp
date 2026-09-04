@@ -41,6 +41,11 @@ dependencies = [
 Homepage = "https://github.com/menudoproblema/cxp"
 Repository = "https://github.com/menudoproblema/cxp"
 Issues = "https://github.com/menudoproblema/cxp/issues"
+Changelog = "https://github.com/menudoproblema/cxp/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/menudoproblema/cxp/tree/main/docs"
+
+[project.scripts]
+cxp = "cxp.cli:main"
 
 [project.optional-dependencies]
 exchange = [
@@ -58,6 +63,9 @@ dev = [
   "types-jsonschema",
   "pre-commit",
   "jsonschema-rs>=0.46,<1",
+  "hypothesis>=6.100,<7",
+  "setuptools>=77",
+  "wheel",
 ]
 
 [tool.setuptools]

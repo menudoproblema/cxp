@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from importlib.resources import files
 from typing import Any
 
@@ -16,7 +17,9 @@ from cxp.validation import ValidationIssue
 
 __all__ = (
     "REFERENCE_CATALOGS",
+    "ReferenceCatalogInfo",
     "legacy_idempotency",
+    "list_reference_catalogs",
     "load_reference_catalog",
     "operation_schema",
     "validate_operation_payload",
@@ -30,14 +33,51 @@ REFERENCE_CATALOGS = (
     "finishing",
 )
 
+_REFERENCE_DEFAULTS = {name: "1.0.0" for name in REFERENCE_CATALOGS}
+_REFERENCE_RESOURCES = {
+    (name, "1.0.0"): f"{name}.json" for name in REFERENCE_CATALOGS
+} | {
+    ("physical-printing", "1.1.0"): "physical-printing-1.1.0.json",
+}
 
-def load_reference_catalog(name: str) -> Document:
+
+@dataclass(frozen=True, slots=True)
+class ReferenceCatalogInfo:
+    namespace: str
+    name: str
+    version: str
+    sha256: str
+
+
+def load_reference_catalog(name: str, *, version: str | None = None) -> Document:
     if name not in REFERENCE_CATALOGS:
         raise ValueError(f"Unknown reference catalog: {name!r}")
+    selected_version = _REFERENCE_DEFAULTS[name] if version is None else version
+    resource = _REFERENCE_RESOURCES.get((name, selected_version))
+    if resource is None:
+        raise ValueError(
+            f"Unknown reference catalog version: {name!r} {selected_version!r}"
+        )
     return load_document(
-        files("cxp.exchange").joinpath(f"catalogs/{name}.json").read_bytes(),
+        files("cxp.exchange").joinpath(f"catalogs/{resource}").read_bytes(),
         expected_type="cxp.catalog",
     )
+
+
+def list_reference_catalogs() -> tuple[ReferenceCatalogInfo, ...]:
+    catalogs = []
+    for name, version in sorted(_REFERENCE_RESOURCES):
+        document = load_reference_catalog(name, version=version)
+        identity = document.payload["identity"]
+        catalogs.append(
+            ReferenceCatalogInfo(
+                namespace=identity["namespace"],
+                name=identity["name"],
+                version=identity["version"],
+                sha256=document.sha256,
+            )
+        )
+    return tuple(catalogs)
 
 
 def legacy_idempotency(idempotent: bool) -> dict[str, str]:

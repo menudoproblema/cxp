@@ -11,6 +11,7 @@ import pytest
 from cxp.exchange import (
     CatalogStore,
     Document,
+    EvaluationResult,
     ExchangeAgreement,
     InvalidDocumentError,
     Quantity,
@@ -18,9 +19,11 @@ from cxp.exchange import (
     catalog_reference,
     document_schema,
     evaluate_requirements,
+    evaluate_requirements_detailed,
     load_document,
     negotiate_exchange,
     normalize_decimal,
+    quantity_from_input,
 )
 
 
@@ -152,6 +155,23 @@ def test_units_are_exact_and_independent_of_decimal_context():
         Quantity("1", "g").compare(Quantity("1", "mm"))
     with pytest.raises(InvalidDocumentError, match="Unknown unit"):
         Quantity("1", "meter")
+
+
+@pytest.mark.parametrize(
+    "value,unit,expected",
+    [
+        ("1", "cm", Quantity("10", "mm")),
+        ("0.001", "m", Quantity("1", "mm")),
+        ("-0.50", "cm", Quantity("-5", "mm")),
+        ("72", "pt", Quantity("72", "pt")),
+    ],
+)
+def test_input_quantity_helper_preserves_the_document_contract(value, unit, expected):
+    with localcontext() as ctx:
+        ctx.prec = 1
+        assert quantity_from_input(value, unit) == expected
+    with pytest.raises(InvalidDocumentError, match="Unknown unit"):
+        Quantity("1", "cm")
 
 
 def test_documents_own_all_data_and_roundtrip(catalog):
@@ -613,6 +633,129 @@ def test_evaluation_has_no_clock_or_network_dependency(catalog, monkeypatch):
         evaluate_requirements(snap, req, ctx, catalogs=store).payload["verdict"]
         == "compatible"
     )
+
+
+def test_detailed_evaluation_projects_the_exact_existing_document(catalog):
+    snap = snapshot(catalog)
+    req = requirements(
+        catalog,
+        leaf("range", path="/properties/count", minimum=4),
+    )
+    ctx = context()
+    store = CatalogStore([catalog])
+    previous = evaluate_requirements(snap, req, ctx, catalogs=store)
+    detailed = evaluate_requirements_detailed(snap, req, ctx, catalogs=store)
+    assert isinstance(detailed, EvaluationResult)
+    assert detailed.document.to_bytes() == previous.to_bytes()
+    assert detailed.verdict == "incompatible"
+    assert detailed.is_compatible is False
+    assert detailed.findings[0].code == "property_mismatch"
+    assert detailed.findings[0].reason == "below_minimum"
+    assert detailed.findings[0].actual_reported is True
+    assert [(item.role, item.value) for item in detailed.findings[0].operands] == [
+        ("actual", 3),
+        ("minimum", 4),
+    ]
+
+
+def test_detailed_evaluation_distinguishes_null_from_absent(catalog):
+    node = leaf("equals", path="/properties/material", value=None)
+    null_detailed = evaluate_requirements_detailed(
+        snapshot(catalog),
+        requirements(catalog, node),
+        context(),
+        catalogs=CatalogStore([catalog]),
+    )
+    assert null_detailed.findings[0].reason == "requirement_satisfied"
+    assert null_detailed.findings[0].actual_reported is True
+    assert null_detailed.findings[0].operands[0].value is None
+    absent_properties = snapshot(catalog).payload["capabilities"][0]["properties"]
+    absent_properties.pop("material")
+    detailed = evaluate_requirements_detailed(
+        snapshot(catalog, properties=absent_properties),
+        requirements(catalog, node),
+        context(),
+        catalogs=CatalogStore([catalog]),
+    )
+    assert detailed.findings[0].reason == "property_unreported"
+    assert detailed.findings[0].actual_reported is False
+    assert detailed.findings[0].operands == ()
+
+
+@pytest.mark.parametrize(
+    "node,reason",
+    [
+        (leaf("equals", path="/properties/count", value=4), "value_not_equal"),
+        (
+            leaf("one_of", path="/properties/count", values=[1, 2]),
+            "value_not_in_set",
+        ),
+        (
+            leaf("contains_all", path="/properties/colors", values=["spot"]),
+            "missing_set_elements",
+        ),
+        (
+            leaf(
+                "range",
+                path="/properties/count",
+                minimum=3,
+                minimum_inclusive=False,
+            ),
+            "minimum_excluded",
+        ),
+        (leaf("range", path="/properties/count", maximum=2), "above_maximum"),
+        (
+            leaf(
+                "range",
+                path="/properties/count",
+                maximum=3,
+                maximum_inclusive=False,
+            ),
+            "maximum_excluded",
+        ),
+        (
+            leaf(
+                "range",
+                path="/properties/count",
+                minimum=0,
+                step=2,
+                origin=0,
+            ),
+            "step_mismatch",
+        ),
+    ],
+)
+def test_detailed_evaluation_has_stable_comparison_reasons(catalog, node, reason):
+    result = evaluate_requirements_detailed(
+        snapshot(catalog),
+        requirements(catalog, node),
+        context(),
+        catalogs=CatalogStore([catalog]),
+    )
+    assert result.verdict == "incompatible"
+    assert result.findings[0].code == "property_mismatch"
+    assert result.findings[0].reason == reason
+
+
+def test_detailed_range_reports_an_explicit_nullable_value(catalog):
+    catalog_data = catalog.payload
+    quality = catalog_data["capabilities"][0]["properties"]["quality"]
+    quality.update(nullable=True, null_meaning="No quality configured")
+    nullable_catalog = doc("cxp.catalog", catalog_data)
+    properties = snapshot(nullable_catalog).payload["capabilities"][0]["properties"]
+    properties["quality"] = None
+    result = evaluate_requirements_detailed(
+        snapshot(nullable_catalog, properties=properties),
+        requirements(
+            nullable_catalog,
+            leaf("range", path="/properties/quality", minimum="0"),
+        ),
+        context(),
+        catalogs=CatalogStore([nullable_catalog]),
+    )
+    assert result.findings[0].reason == "null_not_comparable"
+    assert result.findings[0].actual_reported is True
+    assert result.findings[0].operands[0].value is None
 
 
 @pytest.mark.parametrize(

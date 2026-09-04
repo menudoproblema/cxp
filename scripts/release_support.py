@@ -2,9 +2,11 @@
 
 import gzip
 import hashlib
+import json
 import runpy
 import subprocess
 import tarfile
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -79,3 +81,48 @@ def revision() -> str:
     return subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
+
+
+def git_is_clean() -> bool:
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=ROOT
+    )
+    return status == b""
+
+
+def tag_revision(tag: str) -> str | None:
+    completed = subprocess.run(
+        ["git", "rev-parse", "--verify", f"refs/tags/{tag}^{{commit}}"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    return completed.stdout.strip() if completed.returncode == 0 else None
+
+
+def promote_candidate(
+    staged: Path, destination: Path, *, replace_unpublished: bool
+) -> Path | None:
+    """Promovemos el directorio completo y conservamos cualquier reemplazo."""
+    backup = None
+    if destination.exists():
+        publication = destination / "publication-evidence.json"
+        if publication.exists():
+            evidence = json.loads(publication.read_text(encoding="utf-8"))
+            if evidence.get("status") == "published_verified":
+                raise RuntimeError("A verified published candidate cannot be replaced")
+        if not replace_unpublished:
+            raise FileExistsError(
+                f"Candidate already exists: {destination}; "
+                "use --replace-unpublished after reviewing it"
+            )
+        backup = destination.with_name(f".{destination.name}.backup-{uuid.uuid4().hex}")
+        destination.replace(backup)
+    try:
+        staged.replace(destination)
+    except BaseException:
+        if backup is not None and not destination.exists():
+            backup.replace(destination)
+        raise
+    return backup

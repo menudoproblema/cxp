@@ -9,18 +9,23 @@ disponible; no se activa el protocolo nuevo cambiando una versión en su handsha
 
 ```python
 from cxp.exchange import (
-    CatalogStore, evaluate_requirements, load_document, load_reference_catalog,
+    CatalogStore,
+    evaluate_requirements_detailed,
+    load_document,
+    load_reference_catalog,
 )
 
-catalog = load_reference_catalog("physical-printing")
+catalog = load_reference_catalog("physical-printing", version="1.1.0")
 store = CatalogStore([catalog])
 # Los tres argumentos son bytes recibidos por nuestra aplicación.
 snapshot = load_document(snapshot_bytes, expected_type="cxp.snapshot")
 requirements = load_document(requirements_bytes, expected_type="cxp.requirements")
 context = load_document(context_bytes, expected_type="cxp.context")
-result = evaluate_requirements(snapshot, requirements, context, catalogs=store)
-print(result.payload["verdict"])
-output_bytes = result.to_bytes()
+result = evaluate_requirements_detailed(
+    snapshot, requirements, context, catalogs=store
+)
+print(result.verdict, result.findings)
+output_bytes = result.document.to_bytes()
 ```
 
 Para producir datos propios usamos `Document(contenido, expected_type=...)` y
@@ -37,6 +42,12 @@ El registro posee una tupla de documentos inmutables. Para cambiarlo construimos
 otro; no se consulta el registro global heredado ni se descargan catálogos.
 `payload` y `as_dict()` devuelven copias. `to_bytes()` devuelve bytes canónicos;
 `sha256` identifica su contenido, no su firma ni la veracidad del proveedor.
+`list_reference_catalogs()` permite descubrir todas las versiones empaquetadas.
+Omitir versión en `load_reference_catalog()` conserva el catálogo 1.0.0; nunca
+significa seleccionar automáticamente la versión más reciente.
+
+`quantity_from_input("2.5", "cm")` devuelve exactamente `25 mm`. Es una ayuda
+de entrada: `cm` y `m` siguen sin ser unidades válidas dentro del documento v1.
 
 ## Integración en vivo
 
@@ -68,5 +79,7 @@ Los findings conservan el orden de las hojas e incluyen las rutas de requisito
 y snapshot; `inputs` fija las cuatro huellas. Para reproducir una decisión hay
 que guardar esos documentos exactos y la versión semántica del evaluador.
 
-Ejemplo completo sin maquinaria: `python -m cxp.exchange.examples`. Sus entradas
-y resultados esperados están en `cxp/exchange/vectors/exchange-v1.json`.
+El ejemplo de regresión sigue disponible en `python -m cxp.exchange.examples`.
+El recorrido pedagógico, autocontenido y sin maquinaria se ejecuta con
+`python -m cxp.exchange.tutorial` o `python examples/document_exchange.py`.
+La [CLI](../cli.md) proyecta las mismas validaciones y evaluaciones para scripts.

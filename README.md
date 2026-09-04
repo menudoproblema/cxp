@@ -1,6 +1,6 @@
 # CXP: Capability Exchange Protocol
 
-![Version](https://img.shields.io/badge/version-4.0.0-blue)
+![Version](https://img.shields.io/badge/version-4.1.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12+-green)
 [![CI](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml/badge.svg)](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml)
 
@@ -31,7 +31,7 @@ The base package only requires msgspec. Document exchange is optional:
 pip install 'cxp[exchange]'
 ```
 
-To pin this release, use `pip install 'cxp[exchange]==4.0.0'`.
+To pin this release, use `pip install 'cxp[exchange]==4.1.0'`.
 
 ## Catalog Layers
 CXP includes a growing suite of first-party catalogs organized in six logical layers:
@@ -77,22 +77,27 @@ request = HandshakeRequest(
 ```
 
 ## Key Features
-### Versioned document exchange (4.0)
+### Versioned document exchange (4.1)
 
 `cxp.exchange` adds strict, portable documents and deterministic three-valued
 requirements evaluation alongside the preserved legacy API. It includes exact
 quantities, immutable snapshots, content-bound catalogs and opt-in protocol v2
 format negotiation. Document specification version 1 is independent of both.
+Version 4.1 adds explicit reference-catalog versions, typed local evaluation
+details and an automation-safe CLI without changing document specification v1.
 
 Run the packaged, hardware-free examples with:
 
 ```bash
 python -m cxp.exchange.examples
+python -m cxp.exchange.tutorial
+cxp catalog list
 ```
 
 See the [exchange specification](docs/protocol/exchange-v1.md),
 [integration guide](docs/protocol/exchange-integration.md) and
-[4.0 migration guide](docs/migration-4.0.md). Consumers should review their
+[CLI guide](docs/cli.md). Consumers upgrading from older majors should also read
+the [4.0 migration guide](docs/migration-4.0.md). Consumers should review their
 dependency constraints and integration tests before adopting this major release.
 
 ### 1. Structured Error Reporting (`CxpError`)

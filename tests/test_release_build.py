@@ -3,6 +3,7 @@
 import gzip
 import importlib.util
 import io
+import json
 import tarfile
 from pathlib import Path
 
@@ -81,3 +82,37 @@ def test_sdist_normalization_cannot_truncate_its_source(tmp_path):
     with pytest.raises(ValueError, match="different path"):
         SUPPORT.normalize_sdist(source, source, 1)
     assert source.read_bytes() == original
+
+
+def test_candidate_promotion_never_overwrites_silently(tmp_path):
+    destination = tmp_path / "4.1.0"
+    destination.mkdir()
+    (destination / "old.txt").write_text("old", encoding="utf-8")
+    staged = tmp_path / "staged"
+    staged.mkdir()
+    (staged / "new.txt").write_text("new", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        SUPPORT.promote_candidate(staged, destination, replace_unpublished=False)
+    assert (destination / "old.txt").read_text(encoding="utf-8") == "old"
+    assert (staged / "new.txt").read_text(encoding="utf-8") == "new"
+
+
+def test_candidate_replacement_is_recoverable_and_published_is_immutable(tmp_path):
+    destination = tmp_path / "4.1.0"
+    destination.mkdir()
+    (destination / "old.txt").write_text("old", encoding="utf-8")
+    staged = tmp_path / "staged"
+    staged.mkdir()
+    (staged / "new.txt").write_text("new", encoding="utf-8")
+    backup = SUPPORT.promote_candidate(staged, destination, replace_unpublished=True)
+    assert backup is not None
+    assert (backup / "old.txt").read_text(encoding="utf-8") == "old"
+    assert (destination / "new.txt").read_text(encoding="utf-8") == "new"
+
+    replacement = tmp_path / "replacement"
+    replacement.mkdir()
+    (destination / "publication-evidence.json").write_text(
+        json.dumps({"status": "published_verified"}), encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="published"):
+        SUPPORT.promote_candidate(replacement, destination, replace_unpublished=True)

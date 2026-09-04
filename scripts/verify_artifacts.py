@@ -16,6 +16,30 @@ from pathlib import Path
 
 from release_support import release_directory, source_fingerprint
 
+MINIMUM_DEPENDENCIES = (
+    "msgspec==0.20.0",
+    "jsonschema==4.23.0",
+    "referencing==0.35.0",
+    "rfc8785==0.1.4",
+)
+LATEST_DEPENDENCIES = (
+    "msgspec>=0.20.0,<1",
+    "jsonschema>=4.23,<5",
+    "referencing>=0.35,<1",
+    "rfc8785>=0.1.4,<1",
+)
+RUNTIME_DISTRIBUTIONS = (
+    "cxp",
+    "msgspec",
+    "jsonschema",
+    "jsonschema-specifications",
+    "referencing",
+    "rfc8785",
+    "rpds-py",
+    "attrs",
+    "typing-extensions",
+)
+
 
 def run(arguments: list[str], *, cwd: Path, env: dict[str, str]) -> str:
     completed = subprocess.run(
@@ -24,10 +48,112 @@ def run(arguments: list[str], *, cwd: Path, env: dict[str, str]) -> str:
     return completed.stdout.strip()
 
 
+def _python(environment: Path) -> Path:
+    return environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def _console(environment: Path) -> Path:
+    return environment / ("Scripts/cxp.exe" if os.name == "nt" else "bin/cxp")
+
+
+def _new_environment(
+    root: Path, name: str, python: str, env: dict[str, str]
+) -> tuple[Path, Path]:
+    environment = root / name
+    run([python, "-m", "venv", str(environment)], cwd=root, env=env)
+    executable = _python(environment)
+    run(
+        [str(executable), "-m", "pip", "install", "--upgrade", "pip"],
+        cwd=root,
+        env=env,
+    )
+    return environment, executable
+
+
+def _install(
+    python: Path,
+    requirement: str,
+    policy: str,
+    *,
+    cwd: Path,
+    env: dict[str, str],
+    include_exchange: bool = True,
+) -> None:
+    dependencies = MINIMUM_DEPENDENCIES if policy == "minimum" else LATEST_DEPENDENCIES
+    if not include_exchange:
+        dependencies = dependencies[:1]
+    run(
+        [
+            str(python),
+            "-m",
+            "pip",
+            "install",
+            "--upgrade",
+            requirement,
+            *dependencies,
+        ],
+        cwd=cwd,
+        env=env,
+    )
+    run([str(python), "-m", "pip", "check"], cwd=cwd, env=env)
+
+
+def _metadata(python: Path, *, cwd: Path, env: dict[str, str]) -> dict[str, object]:
+    names = json.dumps(RUNTIME_DISTRIBUTIONS)
+    probe = (
+        "import json,platform,sys; "
+        "from importlib.metadata import PackageNotFoundError,distribution; "
+        f"names={names}; items={{}}; "
+        'exec("for name in names:\\n'
+        " try:\\n"
+        "  item=distribution(name); metadata=item.metadata; "
+        "items[name]={'version':item.version,'license':"
+        "metadata.get('License-Expression') or metadata.get('License'),"
+        "'classifiers':[value for value in metadata.get_all('Classifier',[]) "
+        "if value.startswith('License ::')]}\\n"
+        " except PackageNotFoundError:\\n"
+        '  pass"); '
+        "print(json.dumps({'python':sys.version.split()[0],"
+        "'platform':platform.platform(),'distributions':items}))"
+    )
+    return json.loads(run([str(python), "-I", "-c", probe], cwd=cwd, env=env))
+
+
+def _verify_wheel_resources(wheel_path: Path) -> None:
+    required = {
+        "cxp/cli.py",
+        "cxp/py.typed",
+        "cxp/exchange/catalogs/document-processing.json",
+        "cxp/exchange/catalogs/finishing.json",
+        "cxp/exchange/catalogs/job-submission.json",
+        "cxp/exchange/catalogs/physical-printing-1.1.0.json",
+        "cxp/exchange/catalogs/physical-printing.json",
+        "cxp/exchange/catalogs/software-service.json",
+        "cxp/exchange/examples.py",
+        "cxp/exchange/schemas/exchange-v1.json",
+        "cxp/exchange/schemas/operations-v1.json",
+        "cxp/exchange/tutorial.py",
+        "cxp/exchange/vectors/exchange-v1.json",
+    }
+    with zipfile.ZipFile(wheel_path) as wheel:
+        names = set(wheel.namelist())
+        missing = sorted(required - names)
+        if missing:
+            raise ValueError(f"Missing wheel resources: {missing}")
+        if not any(name.endswith("/licenses/LICENSE") for name in names):
+            raise ValueError("Wheel license is missing")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--python", default=sys.executable)
-    parser.add_argument("--msgspec", choices=("minimum", "latest"), default="latest")
+    parser.add_argument(
+        "--dependencies",
+        "--msgspec",
+        dest="policy",
+        choices=("minimum", "latest"),
+        default="latest",
+    )
     parser.add_argument("--dist", type=Path, default=release_directory())
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
@@ -40,30 +166,11 @@ def main() -> None:
     if len(artifacts) != 2:
         raise ValueError("Use a directory containing exactly one wheel and one sdist")
     for artifact in artifacts:
-        if (
-            manifest["artifacts"].get(artifact.name)
-            != hashlib.sha256(artifact.read_bytes()).hexdigest()
-        ):
+        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        if manifest["artifacts"].get(artifact.name) != digest:
             raise ValueError("Artifact differs from the candidate manifest")
-    required = (
-        "cxp/py.typed",
-        "cxp/exchange/schemas/exchange-v1.json",
-        "cxp/exchange/schemas/operations-v1.json",
-        "cxp/exchange/vectors/exchange-v1.json",
-        "cxp/exchange/examples.py",
-    )
-    with zipfile.ZipFile(artifacts[0]) as wheel:
-        names = wheel.namelist()
-        for name in required:
-            if name not in names:
-                raise ValueError(f"Missing wheel resource: {name}")
-        if (
-            len([name for name in names if name.startswith("cxp/exchange/catalogs/")])
-            != 5
-        ):
-            raise ValueError("Wheel must include all five reference catalogs")
-        if not any(name.endswith("/licenses/LICENSE") for name in names):
-            raise ValueError("Wheel license is missing")
+    _verify_wheel_resources(artifacts[0])
+
     env = os.environ.copy()
     env.pop("PYTHONPATH", None)
     env.pop("PYTHONHOME", None)
@@ -79,34 +186,24 @@ def main() -> None:
         if len(roots) != 1:
             raise ValueError("Expected a single sdist root")
         unpacked = roots[0]
+
         for artifact in artifacts:
-            case = work / ("wheel" if artifact.suffix == ".whl" else "sdist")
+            artifact_kind = "wheel" if artifact.suffix == ".whl" else "sdist"
+            case = work / artifact_kind
             case.mkdir()
-            environment = case / "venv"
-            run([args.python, "-m", "venv", str(environment)], cwd=case, env=env)
-            python = environment / (
-                "Scripts/python.exe" if os.name == "nt" else "bin/python"
-            )
-            constraint = (
-                "msgspec==0.20.0" if args.msgspec == "minimum" else "msgspec>=0.20.0,<1"
-            )
-            run(
-                [
-                    str(python),
-                    "-m",
-                    "pip",
-                    "install",
-                    "--upgrade",
-                    str(artifact),
-                    constraint,
-                ],
+
+            base_env, base_python = _new_environment(case, "base", args.python, env)
+            _install(
+                base_python,
+                str(artifact),
+                args.policy,
                 cwd=case,
                 env=env,
+                include_exchange=False,
             )
-            # Probamos primero el paquete base sin instalar ningún extra.
             base_probe = run(
                 [
-                    str(python),
+                    str(base_python),
                     "-I",
                     "-c",
                     (
@@ -124,21 +221,57 @@ def main() -> None:
             if base_probe != manifest["version"]:
                 raise ValueError("Wrong base package version")
             missing = subprocess.run(
-                [str(python), "-I", "-c", "import cxp.exchange"],
+                [str(base_python), "-I", "-c", "import cxp.exchange"],
                 cwd=case,
                 env=env,
                 capture_output=True,
                 text=True,
             )
-            if (
-                missing.returncode == 0
-                or "pip install 'cxp[exchange]'" not in missing.stderr
+            if missing.returncode == 0 or "pip install 'cxp[exchange]'" not in (
+                missing.stderr
             ):
-                raise ValueError(
-                    "Missing exchange dependencies must have a clear error"
-                )
-            run(
-                [str(python), "-m", "pip", "install", f"{artifact}[dev]", constraint],
+                raise ValueError("Missing exchange dependencies need a clear error")
+            console_version = run(
+                [str(_console(base_env)), "--version"], cwd=case, env=env
+            )
+            run([str(_console(base_env)), "--help"], cwd=case, env=env)
+            if console_version != manifest["version"]:
+                raise ValueError("Installed CLI has the wrong version")
+
+            exchange_env, exchange_python = _new_environment(
+                case, "exchange", args.python, env
+            )
+            _install(
+                exchange_python,
+                f"{artifact}[exchange]",
+                args.policy,
+                cwd=case,
+                env=env,
+            )
+            catalog_output = run(
+                [str(_console(exchange_env)), "catalog", "list"],
+                cwd=case,
+                env=env,
+            )
+            if len(json.loads(catalog_output)) != 6:
+                raise ValueError("Installed CLI did not discover all catalogs")
+            tutorial = run(
+                [str(exchange_python), "-I", "-m", "cxp.exchange.tutorial"],
+                cwd=case,
+                env=env,
+            )
+            if {item["verdict"] for item in json.loads(tutorial).values()} != {
+                "compatible",
+                "incompatible",
+                "indeterminate",
+            }:
+                raise ValueError("Packaged tutorial does not cover all verdicts")
+
+            dev_env, dev_python = _new_environment(case, "dev", args.python, env)
+            _install(
+                dev_python,
+                f"{artifact}[dev]",
+                args.policy,
                 cwd=case,
                 env=env,
             )
@@ -147,39 +280,27 @@ def main() -> None:
             for name in ("tests", "examples", "scripts"):
                 shutil.copytree(unpacked / name, checks / name)
             shutil.copyfile(unpacked / "pyproject.toml", checks / "pyproject.toml")
-            # No copiamos src: incluso los tests recorren el paquete instalado.
-            probe = run(
+            origin = run(
                 [
-                    str(python),
+                    str(dev_python),
                     "-I",
                     "-c",
-                    (
-                        "import json,sys,cxp,msgspec; "
-                        "from importlib.metadata import version; "
-                        "from importlib.resources import files; "
-                        "assert files('cxp').joinpath('py.typed').is_file(); "
-                        "print(json.dumps({'python':sys.version.split()[0],"
-                        "'cxp':cxp.__version__,'msgspec':msgspec.__version__,"
-                        "'jsonschema':version('jsonschema'),'rfc8785':version('rfc8785'),"
-                        "'referencing':version('referencing'),"
-                        "'origin':cxp.__file__}))"
-                    ),
+                    "import cxp; print(cxp.__file__)",
                 ],
                 cwd=checks,
                 env=env,
             )
-            details = json.loads(probe)
-            if (
-                not Path(details["origin"])
-                .resolve()
-                .is_relative_to(environment.resolve())
-            ):
+            if not Path(origin).resolve().is_relative_to(dev_env.resolve()):
                 raise ValueError("CXP was imported outside the clean environment")
-            result = run(
-                [str(python), "-I", "-m", "pytest", "-q", "tests"], cwd=checks, env=env
+            tests = run(
+                [str(dev_python), "-I", "-m", "pytest", "-q", "tests"],
+                cwd=checks,
+                env=env,
             )
             examples = run(
-                [str(python), "-I", "-m", "cxp.exchange.examples"], cwd=checks, env=env
+                [str(dev_python), "-I", "-m", "cxp.exchange.examples"],
+                cwd=checks,
+                env=env,
             )
             if set(json.loads(examples).values()) != {
                 "compatible",
@@ -187,20 +308,33 @@ def main() -> None:
                 "indeterminate",
             }:
                 raise ValueError("Packaged examples do not cover all verdicts")
-            details.pop("origin")
-            reports.append(
-                {
-                    "artifact": artifact.name,
-                    "source_sha256": manifest["source_sha256"],
-                    "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
-                    "dependencies": details,
-                    "msgspec_policy": args.msgspec,
-                    "base_without_exchange": "passed",
-                    "tests": result.splitlines()[-1],
-                    "examples": "passed",
-                }
-            )
-            print(json.dumps(reports[-1]), flush=True)
+
+            installations = {
+                "base": _metadata(base_python, cwd=case, env=env),
+                "exchange": _metadata(exchange_python, cwd=case, env=env),
+                "dev": _metadata(dev_python, cwd=case, env=env),
+            }
+            exchange_distributions = installations["exchange"]["distributions"]
+            report = {
+                "artifact": artifact.name,
+                "base_without_exchange": "passed",
+                "cli": "passed",
+                "dependencies": {
+                    "python": installations["exchange"]["python"],
+                    "cxp": exchange_distributions["cxp"]["version"],
+                },
+                "dependency_policy": args.policy,
+                "examples": "passed",
+                "installations": installations,
+                "pip_check": "passed",
+                "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                "source_sha256": manifest["source_sha256"],
+                "tests": tests.splitlines()[-1],
+                "tutorial": "passed",
+            }
+            reports.append(report)
+            print(json.dumps(report), flush=True)
+
     if source_fingerprint() != manifest["source_sha256"]:
         raise ValueError("Source changed during verification; evidence is stale")
     if args.report:

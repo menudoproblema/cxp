@@ -17,6 +17,7 @@ from cxp.exchange import (
     document_schema,
     evaluate_requirements,
     legacy_idempotency,
+    list_reference_catalogs,
     load_document,
     load_reference_catalog,
     negotiate_exchange,
@@ -24,10 +25,30 @@ from cxp.exchange import (
     validate_operation_payload,
 )
 from cxp.exchange.examples import run_reference_examples
+from cxp.exchange.tutorial import run_physical_examples
 
 SUITE = json.loads(
     files("cxp.exchange").joinpath("vectors/exchange-v1.json").read_bytes()
 )
+FROZEN_EVALUATION_HASHES = {
+    "effective-support": (
+        "2a9946d5f294dbd0d5e865c77d70df0906b59002d257f2b819bba6cd44d161c2"
+    ),
+    "known-limit": "18e8065950395b615a09e4dc9d5892907b20d97ed28fcf906b2ee56a0b28afb8",
+    "missing-property": (
+        "33a2170fe998c0b1dd9a0269d288dadfc2092a120038d1ae305760c2f992aeb4"
+    ),
+    "explicit-null": "1f8e8e57ed88373f4b52d236baacc832f1a72f1c89a8d085c9dac7c4f1fcf40d",
+    "discrete-step-mismatch": (
+        "4ae2cfddfbff2fc7343ac7b8d0f96803420134e01da99b76b173ffb7e598adf9"
+    ),
+    "any-known-unknown": (
+        "0a72a49d300e6502a16a407d82d43d95757c6500a36b59c7cbb23b58fd7fc0fc"
+    ),
+    "range-exclusive-minimum": (
+        "a7e86315c4b7b8a96be04840d5dae0c1be21e9986be169d66e78b8a4ce5af84c"
+    ),
+}
 
 
 @pytest.mark.parametrize("case", SUITE["canonicalization"], ids=lambda case: case["id"])
@@ -133,6 +154,8 @@ def test_portable_evaluation_vectors(case):
         result.as_dict()
     )
     assert result.to_bytes() == evaluate_case(case).to_bytes()
+    if case["id"] in FROZEN_EVALUATION_HASHES:
+        assert result.sha256 == FROZEN_EVALUATION_HASHES[case["id"]]
 
 
 @pytest.mark.parametrize("case", SUITE["rejections"], ids=lambda case: case["id"])
@@ -159,12 +182,55 @@ def test_reference_catalog_contracts(name):
         assert "patterns" not in definitions["finishing.binding"]["properties"]
 
 
+def test_reference_catalog_versions_are_explicit_and_defaults_stay_frozen():
+    default = load_reference_catalog("physical-printing")
+    original = load_reference_catalog("physical-printing", version="1.0.0")
+    current = load_reference_catalog("physical-printing", version="1.1.0")
+    assert default.to_bytes() == original.to_bytes()
+    assert original.sha256 == (
+        "3899e78f7b757268bf27d0c6186f4caa4f963eec3ea143dcf324188c1d2d491e"
+    )
+    assert current.payload["identity"]["version"] == "1.1.0"
+    assert CatalogStore([original, current])
+    properties = current.payload["capabilities"][0]["properties"]
+    assert {
+        "max_loaded_mass",
+        "max_object_width",
+        "max_object_length",
+        "print_mode_id",
+        "resolution_x",
+        "resolution_y",
+    } <= properties.keys()
+    infos = list_reference_catalogs()
+    assert [(item.name, item.version) for item in infos].count(
+        ("physical-printing", "1.0.0")
+    ) == 1
+    assert [(item.name, item.version) for item in infos].count(
+        ("physical-printing", "1.1.0")
+    ) == 1
+    assert all(len(item.sha256) == 64 for item in infos)
+    with pytest.raises(ValueError, match="version"):
+        load_reference_catalog("physical-printing", version="9.0.0")
+
+
 def test_packaged_examples_cover_all_three_verdicts():
     assert set(run_reference_examples().values()) == {
         "compatible",
         "incompatible",
         "indeterminate",
     }
+
+
+def test_physical_tutorial_is_synthetic_deterministic_and_trivalued():
+    first = run_physical_examples()
+    assert first == run_physical_examples()
+    assert {case["verdict"] for case in first.values()} == {
+        "compatible",
+        "incompatible",
+        "indeterminate",
+    }
+    assert first["any-alternative"]["verdict"] == "compatible"
+    assert first["load-4kg"]["finding_reasons"] == ["below_minimum"]
 
 
 def test_idempotency_is_conservative_and_declarations_are_explicit():

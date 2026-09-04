@@ -1,5 +1,34 @@
 # Changelog
 
+## 4.1.0 — 2026-09-04
+
+- Added explicit reference-catalog version selection and deterministic discovery
+  metadata while preserving every unversioned loader call on catalog 1.0.0.
+- Added `physical-printing` 1.1.0 with loaded-mass, object-envelope, configured
+  print-mode and paired-resolution properties; machine geometry and control stay
+  outside CXP.
+- Added immutable typed evaluation details with precise comparison reasons and
+  operands. The existing evaluator still returns byte-identical
+  `cxp.evaluation` v1 documents from the same single engine.
+- Added exact `cm` and `m` input conversion to document-valid `mm` quantities
+  without accepting new units in document specification v1.
+- Added the dependency-light `cxp` CLI for validation, evaluation, schemas and
+  catalog inspection, including stable JSON diagnostics and distinct exit codes
+  for incompatible and indeterminate outcomes.
+- Added a synthetic physical-exchange tutorial, public stability/deprecation and
+  security policies, and property-based tests for exact quantities,
+  canonicalization and evaluator projection.
+- Hardened release handling with non-overwriting recoverable candidates,
+  isolated base/exchange/dev installations, all direct runtime dependency
+  boundaries, `pip check`, environment-local license evidence and macOS/Windows
+  wheel smoke tests.
+- Pinned GitHub Actions by immutable commit, added dependency review and update
+  automation, and prepared a manual protected Trusted Publishing flow that
+  uploads only previously accredited artifacts, produces PyPI attestations and
+  verifies the published hashes and clean installation.
+- Corrected the MongoDB profile example link found by the release documentation
+  integrity pass and made local-link validation a source gate.
+
 ## 4.0.0 — 2026-09-03
 
 - Added independent JSON Schema 2020-12 document contracts, bounded strict JSON

@@ -9,7 +9,8 @@ la librería no implica desplegar consumidores.
 
 `scripts/check.py` ejecuta los gates del checkout. `scripts/build_candidate.py`
 construye wheel y sdist, comprueba metadatos con Twine y genera
-`dist/<version>/build-manifest.json` (ahora `dist/4.0.0`). El manifiesto identifica revisión base,
+`dist/<version>/build-manifest.json` (para esta entrega, `dist/4.1.0`). El
+manifiesto identifica revisión base,
 huella del checkout (incluidos ficheros nuevos sin commit), epoch y SHA-256 de
 cada artefacto. La huella excluye archivos ignorados por Git, como entornos,
 cachés y `dist`; no se usa para afirmar que el árbol esté commiteado.
@@ -23,26 +24,29 @@ por una comparación parcial del contenido extraído. La reproducibilidad se
 comprueba con la misma cadena de herramientas; cambiar Python, herramientas o
 dependencias exige volver a construir y validar.
 
-Los artefactos y evidencias de rc1 se conservan donde estaban. No se reutilizan
-para acreditar 4.0.0 ni se sobrescriben al preparar la versión nueva.
+Una candidata existente no se sobrescribe. El reemplazo explícito de una
+candidata no publicada conserva el directorio anterior como backup recuperable;
+una candidata registrada como publicada y verificada se rechaza siempre.
 
-`scripts/verify_artifacts.py` comprueba que fuente y artefactos siguen coincidiendo,
-instala ambos en entornos nuevos, comprueba su origen y recursos, ejecuta toda la
-suite y los ejemplos empaquetados. Primero comprueba la instalación base sin
-dependencias de intercambio y el error claro al intentar usarlo; después instala
-el extra para comprobar el contrato completo. Las pruebas se copian del sdist; no se copia
-`src`. Se conserva un informe por Python 3.12/3.13/3.14 y política msgspec
-`minimum` (0.20.0) / `latest` (la resolución actual menor que 1).
+`scripts/verify_artifacts.py` comprueba que fuente y artefactos siguen
+coincidiendo e instala ambos en tres entornos distintos: base, `exchange` y
+`dev`. Ejecuta `pip check`, origen, recursos, CLI, tutorial y suite completa. Las
+pruebas se copian del sdist; no se copia `src`. Se conserva un informe por Python
+3.12/3.13/3.14 y política de dependencias `minimum` / `latest`. La primera fija
+msgspec, jsonschema, referencing y rfc8785 en sus mínimos declarados; la segunda
+resuelve la última combinación admitida.
 
 `scripts/release_evidence.py` exige los doce resultados (seis combinaciones por
 dos artefactos) y rechaza evidencia stale o incompleta. Genera
-`dist/4.0.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
+`dist/4.1.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
 candidata realmente comprobada. Los informes son locales y no se incluyen en
 el sdist para evitar ciclos de evidencia que se hashea a sí misma.
 
 Modificar cualquier fuente después de la construcción obliga a reconstruir y
-repetir los controles. La CI también prueba fuentes y artefactos en las seis
-combinaciones. Un verde local no se presenta como un run remoto de GitHub.
+repetir los controles. La CI construye una sola candidata, verifica esos mismos
+bytes en las seis combinaciones Linux y ejecuta smoke del wheel en macOS y
+Windows con rutas Unicode y espacios. Después reúne una única evidencia. Un
+verde local no se presenta como un run remoto de GitHub.
 
 ## Licencias y límites
 
@@ -51,8 +55,9 @@ no como código copiado. La base depende de msgspec (BSD-3-Clause). El extra
 `exchange` añade jsonschema (MIT), referencing (MIT) y rfc8785 (Apache-2.0).
 Los esquemas, vectores y catálogos propios se
 distribuyen bajo MIT. `py.typed` y LICENSE se comprueban en el wheel.
-La evidencia conserva los metadatos de licencia de dependencias de runtime,
-incluidas transitivas y las del extra probado; no sustituye una revisión jurídica cuando corresponda.
+La evidencia conserva desde cada entorno aislado los metadatos de licencia de
+dependencias de runtime, incluidas transitivas y las del extra probado; no
+sustituye una revisión jurídica cuando corresponda.
 Las herramientas de desarrollo no se empaquetan dentro del wheel de CXP.
 
 Los catálogos están versionados, pero aún comparten una sola distribución.
@@ -77,9 +82,18 @@ La vuelta atrás usa los artefactos previos conocidos; no sobrescribe versiones
 publicadas ni degrada documentos nuevos al formato viejo. Se conservan la
 versión anterior, sus documentos y los hashes de la candidata.
 
-Tras una futura publicación autorizada se instalará desde el destino real en un
-entorno limpio y se repetirán smoke y comprobaciones de recursos. Un upload
-exitoso por sí solo no completa ese último estado.
+La publicación se inicia manualmente indicando el run de CI y la versión. El job
+protegido `pypi` comprueba commit y etiqueta, separa únicamente wheel y sdist ya
+acreditados y usa Trusted Publishing mediante OIDC. No almacena un token largo
+ni reconstruye código con permisos de publicación. PyPI genera attestations por
+artefacto. Un job posterior contrasta hashes, descarga e instala desde PyPI y
+genera `publication-evidence.json`; un upload exitoso por sí solo no completa el
+estado publicado verificado.
+
+Antes del primer uso, el mantenedor debe configurar en PyPI el Trusted Publisher
+para el repositorio y `.github/workflows/publish.yml`, y proteger el environment
+GitHub `pypi` con revisión manual. Es configuración externa comprobable, no una
+garantía que este checkout pueda activar o afirmar por sí solo.
 
 ## Autorización de 4.0.0
 
@@ -88,11 +102,12 @@ los comandos de push y publicar en PyPI. Esto incluye el commit necesario para
 que la etiqueta señale las fuentes de la entrega. No se ejecuta el push de Git
 ni se modifican código, restricciones o locks de consumidores.
 
-La comprobación previa identifica dos políticas distintas: Cosecha mantiene
-`cxp~=3.1.0` y no adoptará esta major automáticamente; Mongoeco declara
-`cxp>=3.0.0` y sí permite resolver 4.0.0. Antes del upload se comprueban sus
-integraciones con el artefacto exacto, sin cambiar esas políticas ni presentar
-las sondas como una migración o despliegue.
+En la comprobación previa a 4.0.0, Cosecha mantenía `cxp~=3.1.0` y
+Mongoeco declaraba `cxp>=3.0.0`. Aquella evidencia conserva las políticas que
+existían entonces. Tras la publicación, ambos consumidores se adaptaron y ahora
+declaran `cxp>=4.0.0` sin límite superior. Esta situación vigente se vuelve a
+comprobar antes de publicar 4.1.0; las sondas de integración no se presentan
+como una migración ni como un despliegue.
 
 `dist/4.0.0/release-evidence.json` conserva exclusivamente la acreditación
 técnica previa. La autorización y el resultado real de publicación se registran

@@ -1,0 +1,5 @@
+# Reviewed build and upload toolchain for CXP 4.1.0 candidates.
+build==1.4.2
+setuptools==84.0.0
+twine==6.2.0
+wheel==0.48.0

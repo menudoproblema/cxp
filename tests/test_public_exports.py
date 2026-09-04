@@ -238,7 +238,7 @@ def test_package_version_matches_project_metadata() -> None:
 
     assert project["dynamic"] == ["version"]
     assert dynamic["version"]["attr"] == "cxp._version.__version__"
-    assert cxp.__version__ == "4.0.0"
+    assert cxp.__version__ == "4.1.0"
 
 
 def test_cosecha_engine_module_all_includes_lifecycle_capabilities() -> None:
