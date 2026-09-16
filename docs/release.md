@@ -9,7 +9,7 @@ la librería no implica desplegar consumidores.
 
 `scripts/check.py` ejecuta los gates del checkout. `scripts/build_candidate.py`
 construye wheel y sdist, comprueba metadatos con Twine y genera
-`dist/<version>/build-manifest.json` (para esta entrega, `dist/4.1.0`). El
+`dist/<version>/build-manifest.json` (para esta entrega, `dist/4.2.0`). El
 manifiesto identifica revisión base,
 huella del checkout (incluidos ficheros nuevos sin commit), epoch y SHA-256 de
 cada artefacto. La huella excluye archivos ignorados por Git, como entornos,
@@ -38,7 +38,7 @@ resuelve la última combinación admitida.
 
 `scripts/release_evidence.py` exige los doce resultados (seis combinaciones por
 dos artefactos) y rechaza evidencia stale o incompleta. Genera
-`dist/4.1.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
+`dist/4.2.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
 candidata realmente comprobada. Los informes son locales y no se incluyen en
 el sdist para evitar ciclos de evidencia que se hashea a sí misma.
 

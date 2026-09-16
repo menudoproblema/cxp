@@ -124,16 +124,22 @@ def _verify_wheel_resources(wheel_path: Path) -> None:
         "cxp/cli.py",
         "cxp/py.typed",
         "cxp/exchange/catalogs/document-processing.json",
+        "cxp/exchange/catalogs/document-processing-1.1.0.json",
         "cxp/exchange/catalogs/finishing.json",
+        "cxp/exchange/catalogs/finishing-1.1.0.json",
+        "cxp/exchange/catalogs/identification.json",
         "cxp/exchange/catalogs/job-submission.json",
         "cxp/exchange/catalogs/physical-printing-1.1.0.json",
         "cxp/exchange/catalogs/physical-printing.json",
+        "cxp/exchange/catalogs/positioning.json",
         "cxp/exchange/catalogs/software-service.json",
         "cxp/exchange/examples.py",
+        "cxp/exchange/industrial_examples.py",
         "cxp/exchange/schemas/exchange-v1.json",
         "cxp/exchange/schemas/operations-v1.json",
         "cxp/exchange/tutorial.py",
         "cxp/exchange/vectors/exchange-v1.json",
+        "cxp/exchange/vectors/industrial-v1.json",
     }
     with zipfile.ZipFile(wheel_path) as wheel:
         names = set(wheel.namelist())
@@ -253,7 +259,7 @@ def main() -> None:
                 cwd=case,
                 env=env,
             )
-            if len(json.loads(catalog_output)) != 6:
+            if len(json.loads(catalog_output)) != 10:
                 raise ValueError("Installed CLI did not discover all catalogs")
             tutorial = run(
                 [str(exchange_python), "-I", "-m", "cxp.exchange.tutorial"],
@@ -308,6 +314,19 @@ def main() -> None:
                 "indeterminate",
             }:
                 raise ValueError("Packaged examples do not cover all verdicts")
+            industrial_examples = run(
+                [str(dev_python), "-I", "-m", "cxp.exchange.industrial_examples"],
+                cwd=checks,
+                env=env,
+            )
+            if set(json.loads(industrial_examples).values()) != {
+                "compatible",
+                "incompatible",
+                "indeterminate",
+            }:
+                raise ValueError(
+                    "Packaged industrial examples do not cover all verdicts"
+                )
 
             installations = {
                 "base": _metadata(base_python, cwd=case, env=env),
@@ -325,6 +344,7 @@ def main() -> None:
                 },
                 "dependency_policy": args.policy,
                 "examples": "passed",
+                "industrial_examples": "passed",
                 "installations": installations,
                 "pip_check": "passed",
                 "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),

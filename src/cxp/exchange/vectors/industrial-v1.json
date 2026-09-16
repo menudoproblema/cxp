@@ -1,0 +1,537 @@
+{
+  "suite_version": 1,
+  "specification": "docs/catalogs/exchange-industrial-capabilities.md",
+  "license": "MIT",
+  "provenance": "CXP maintainers; synthetic, portable capability declarations authored independently of equipment claims, 2026-09-16.",
+  "cases": [
+    {
+      "id": "qr-reader-without-positioning",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "identification",
+        "version": "1.0.0",
+        "sha256": "80a1d6c8af0dc4063e3b1ef8a4f216ff886052e8112d1f85783d81f6645641ba"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "identification",
+            "version": "1.0.0",
+            "sha256": "80a1d6c8af0dc4063e3b1ef8a4f216ff886052e8112d1f85783d81f6645641ba"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "identification.symbol_reading",
+              "support": "supported",
+              "properties": {
+                "symbologies": [
+                  "qr_code"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "identification",
+            "version": "1.0.0",
+            "sha256": "80a1d6c8af0dc4063e3b1ef8a4f216ff886052e8112d1f85783d81f6645641ba"
+          },
+          "requirement": {
+            "id": "read",
+            "operator": "contains_all",
+            "capability": "identification.symbol_reading",
+            "path": "/properties/symbologies",
+            "values": [
+              "qr_code"
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "marks-without-compensation",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "positioning",
+        "version": "1.0.0",
+        "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "positioning.feature_detection",
+              "support": "supported",
+              "properties": {
+                "detectable_features": [
+                  "registration_mark"
+                ]
+              }
+            },
+            {
+              "name": "positioning.compensation_application",
+              "support": "unsupported",
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "requirement": {
+            "id": "both",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "detect",
+                "operator": "support",
+                "capability": "positioning.feature_detection"
+              },
+              {
+                "id": "apply",
+                "operator": "support",
+                "capability": "positioning.compensation_application"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "requirement_satisfied",
+          "unsupported_capability"
+        ]
+      }
+    },
+    {
+      "id": "fixture-global-local-no-camera",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "positioning",
+        "version": "1.0.0",
+        "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "positioning.physical_referencing",
+              "support": "supported",
+              "properties": {
+                "acquisition_methods": [
+                  "mechanical_constraint"
+                ]
+              }
+            },
+            {
+              "name": "positioning.transformation_estimation",
+              "support": "supported",
+              "properties": {
+                "registration_extents": [
+                  "global",
+                  "local"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "requirement": {
+            "id": "fixture-and-extents",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "fixture",
+                "operator": "contains_all",
+                "capability": "positioning.physical_referencing",
+                "path": "/properties/acquisition_methods",
+                "values": [
+                  "mechanical_constraint"
+                ]
+              },
+              {
+                "id": "extents",
+                "operator": "contains_all",
+                "capability": "positioning.transformation_estimation",
+                "path": "/properties/registration_extents",
+                "values": [
+                  "global",
+                  "local"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied",
+          "requirement_satisfied"
+        ]
+      }
+    },
+    {
+      "id": "through-cut-is-not-kiss-cut",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "finishing",
+        "version": "1.1.0",
+        "sha256": "e7076fe6261a26ff534227649ad3390baa25a018fc856d4c9b81d465721ccf08"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "finishing",
+            "version": "1.1.0",
+            "sha256": "e7076fe6261a26ff534227649ad3390baa25a018fc856d4c9b81d465721ccf08"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "finishing.through_cut",
+              "support": "supported",
+              "properties": {}
+            },
+            {
+              "name": "finishing.kiss_cut",
+              "support": "unsupported",
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "finishing",
+            "version": "1.1.0",
+            "sha256": "e7076fe6261a26ff534227649ad3390baa25a018fc856d4c9b81d465721ccf08"
+          },
+          "requirement": {
+            "id": "both-cuts",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "through",
+                "operator": "support",
+                "capability": "finishing.through_cut"
+              },
+              {
+                "id": "kiss",
+                "operator": "support",
+                "capability": "finishing.kiss_cut"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "requirement_satisfied",
+          "unsupported_capability"
+        ]
+      }
+    },
+    {
+      "id": "accepted-document-is-not-interpreted",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "document-processing",
+        "version": "1.1.0",
+        "sha256": "28af8977bbd39d9078b7de77598fa1f572f71b31330346574b18541dc694e3d0"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "document-processing",
+            "version": "1.1.0",
+            "sha256": "28af8977bbd39d9078b7de77598fa1f572f71b31330346574b18541dc694e3d0"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "document.acceptance",
+              "support": "supported",
+              "properties": {
+                "input_formats": [
+                  "pdf-x-4"
+                ]
+              }
+            },
+            {
+              "name": "document.production_interpretation",
+              "support": "unsupported",
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "document-processing",
+            "version": "1.1.0",
+            "sha256": "28af8977bbd39d9078b7de77598fa1f572f71b31330346574b18541dc694e3d0"
+          },
+          "requirement": {
+            "id": "accept-and-interpret",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "accept",
+                "operator": "contains_all",
+                "capability": "document.acceptance",
+                "path": "/properties/input_formats",
+                "values": [
+                  "pdf-x-4"
+                ]
+              },
+              {
+                "id": "interpret",
+                "operator": "support",
+                "capability": "document.production_interpretation"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "requirement_satisfied",
+          "unsupported_capability"
+        ]
+      }
+    },
+    {
+      "id": "effective-noop-and-absent-data",
+      "catalog": {
+        "namespace": "org.cxp",
+        "name": "positioning",
+        "version": "1.0.0",
+        "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+      },
+      "snapshot": {
+        "document_type": "cxp.snapshot",
+        "spec_version": 1,
+        "payload": {
+          "provider_id": "portable",
+          "subject_id": "subject",
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "configuration_revision": "config",
+          "observed_at": "2026-09-16T10:00:00Z",
+          "source": {
+            "kind": "declared",
+            "reference": "vector"
+          },
+          "capabilities": [
+            {
+              "name": "positioning.feature_detection",
+              "support": "supported",
+              "properties": {}
+            },
+            {
+              "name": "positioning.compensation_application",
+              "support": "accepted_noop",
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "document_type": "cxp.requirements",
+        "spec_version": 1,
+        "payload": {
+          "catalog": {
+            "namespace": "org.cxp",
+            "name": "positioning",
+            "version": "1.0.0",
+            "sha256": "7f9d8c52fe8a4f6e3704e8650e3c770bc002df62325ffee0eab9036aa26c7f37"
+          },
+          "requirement": {
+            "id": "both",
+            "operator": "all",
+            "conditions": [
+              {
+                "id": "data",
+                "operator": "contains_all",
+                "capability": "positioning.feature_detection",
+                "path": "/properties/detectable_features",
+                "values": [
+                  "registration_mark"
+                ]
+              },
+              {
+                "id": "effective",
+                "operator": "support",
+                "capability": "positioning.compensation_application"
+              }
+            ]
+          }
+        }
+      },
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "subject",
+          "configuration_revision": "config"
+        }
+      },
+      "expected": {
+        "verdict": "incompatible",
+        "codes": [
+          "property_unreported",
+          "effective_support_required"
+        ]
+      }
+    }
+  ]
+}

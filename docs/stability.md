@@ -26,6 +26,9 @@ surface after migration guidance.
 Reference catalog loaders never reinterpret an omitted version as “latest”. A
 call that selected 1.0.0 continues selecting 1.0.0; adoption of 1.1.0 is
 explicit. Documents remain bound to the catalog identity and SHA-256 they name.
+This also applies to `finishing` and `document-processing` 1.1.0. New
+`positioning` and `identification` 1.0.0 catalogs add independent names rather
+than redefining a published catalog.
 
 Deprecations are documented in the changelog and emit `DeprecationWarning` when
 that is practical. A deprecated Python or CLI surface remains available for at

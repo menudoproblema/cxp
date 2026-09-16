@@ -51,15 +51,15 @@ def main() -> None:
         run([str(python), "-m", "pip", "check"], cwd=work, env=env)
         version = run([str(console), "--version"], cwd=work, env=env)
         catalogs = json.loads(run([str(console), "catalog", "list"], cwd=work, env=env))
-        output = work / "catálogo físico 1.1.json"
+        if len(catalogs) != 10:
+            raise ValueError("Installed CLI did not discover all catalogs")
+        output = work / "catálogo positioning.json"
         shown = run(
             [
                 str(console),
                 "catalog",
                 "show",
-                "physical-printing",
-                "--version",
-                "1.1.0",
+                "positioning",
             ],
             cwd=work,
             env=env,

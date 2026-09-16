@@ -105,6 +105,14 @@ no nombres importables. Una operación se identifica dentro de su capacidad.
 La declaración de una capacidad no implica que implemente otra. Compartir
 nombre de operación entre capacidades no genera herencia.
 
+Los catálogos de posicionamiento, identificación, acabado y procesamiento
+documental siguen esta regla: una referencia física no declara detección, una
+detección no declara estimación ni compensación, y aceptar un formato no
+declara interpretar sus semánticas. La evaluación se limita a un catálogo por
+llamada; no compone resultados de catálogos distintos como garantía de proceso.
+Las versiones publicadas y sus hashes permanecen inmutables, y omitir una
+versión conserva la predeterminada documentada por el cargador de referencia.
+
 La idempotencia declara `state`: `guaranteed`, `not_idempotent` o `unknown`.
 Omitir la declaración equivale a `unknown`. Una garantía condicionada incluye
 `key`, `scope` y `window_seconds` positivos. No equivale a garantía

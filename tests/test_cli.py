@@ -50,9 +50,20 @@ def test_cli_help_version_schemas_and_catalog_discovery():
     assert ("physical-printing", "1.1.0") in {
         (item["name"], item["version"]) for item in listed
     }
+    assert {
+        ("positioning", "1.0.0"),
+        ("identification", "1.0.0"),
+        ("finishing", "1.1.0"),
+        ("document-processing", "1.1.0"),
+    } <= {(item["name"], item["version"]) for item in listed}
     shown = run_cli("catalog", "show", "physical-printing", "--version", "1.1.0")
     assert shown.returncode == 0
     assert json.loads(shown.stdout)["payload"]["identity"]["version"] == "1.1.0"
+    positioning = run_cli("catalog", "show", "positioning")
+    assert positioning.returncode == 0
+    assert (
+        json.loads(positioning.stdout)["payload"]["identity"]["name"] == "positioning"
+    )
 
 
 @pytest.mark.parametrize(

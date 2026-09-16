@@ -1,0 +1,105 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "identification",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "identification.symbol_generation",
+        "description": "Declares symbol generation only; it neither reads a symbol nor verifies printed quality.",
+        "properties": {
+          "symbologies": {
+            "kind": "string_set",
+            "description": "Supported symbol symbologies, initially qr_code and data_matrix."
+          },
+          "content_profiles": {
+            "kind": "string_set",
+            "description": "Content-profile identifiers this configuration can generate, such as opaque_payload, gs1_element_string, or gs1_digital_link_uri."
+          },
+          "min_module_width": {
+            "kind": "quantity",
+            "description": "Minimum module width this configuration can generate.",
+            "dimension": "length"
+          },
+          "max_module_width": {
+            "kind": "quantity",
+            "description": "Maximum module width this configuration can generate.",
+            "dimension": "length"
+          },
+          "minimum_quiet_zone_modules": {
+            "kind": "decimal",
+            "description": "Minimum quiet-zone width this configuration can generate, expressed in whole or fractional module widths."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "identification.symbol_reading",
+        "description": "Declares symbol reading only. A successful read is not a quality-verification or certification assertion.",
+        "properties": {
+          "symbologies": {
+            "kind": "string_set",
+            "description": "Symbol symbologies this configuration can read, initially qr_code and data_matrix."
+          },
+          "content_profiles": {
+            "kind": "string_set",
+            "description": "Content-profile identifiers this configuration can read, such as opaque_payload, gs1_element_string, or gs1_digital_link_uri."
+          },
+          "min_module_width": {
+            "kind": "quantity",
+            "description": "Minimum module width this configuration can read.",
+            "dimension": "length"
+          },
+          "max_module_width": {
+            "kind": "quantity",
+            "description": "Maximum module width this configuration can read.",
+            "dimension": "length"
+          },
+          "minimum_quiet_zone_modules": {
+            "kind": "decimal",
+            "description": "Minimum quiet-zone width this configuration can read, expressed in whole or fractional module widths."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "identification.quality_verification",
+        "description": "Declares the ability to perform a named quality-verification method. It does not issue, authenticate, or certify a quality claim.",
+        "properties": {
+          "symbologies": {
+            "kind": "string_set",
+            "description": "Symbol symbologies covered by the declared verification methods."
+          },
+          "quality_methods": {
+            "kind": "string_set",
+            "description": "Named verification methods, such as iso_iec_15415, without asserting a result or certificate."
+          },
+          "content_profiles": {
+            "kind": "string_set",
+            "description": "Content-profile identifiers covered by this verification configuration, such as opaque_payload, gs1_element_string, or gs1_digital_link_uri."
+          },
+          "min_module_width": {
+            "kind": "quantity",
+            "description": "Minimum module width covered by this verification configuration.",
+            "dimension": "length"
+          },
+          "max_module_width": {
+            "kind": "quantity",
+            "description": "Maximum module width covered by this verification configuration.",
+            "dimension": "length"
+          },
+          "minimum_quiet_zone_modules": {
+            "kind": "decimal",
+            "description": "Minimum quiet-zone width covered by this verification configuration, expressed in whole or fractional module widths."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "document-processing",
+      "version": "1.1.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "document.processing",
+        "description": "Document handling at the RIP/processor boundary, separate from physical equipment.",
+        "properties": {
+          "input_formats": {
+            "kind": "string_set",
+            "description": "Accepted format identifiers, e.g. pdf-x-4."
+          },
+          "output_formats": {
+            "kind": "string_set",
+            "description": "Produced format identifiers."
+          },
+          "live_transparency": {
+            "kind": "boolean",
+            "description": "Preserves supported transparency in this configuration."
+          },
+          "spot_colors": {
+            "kind": "boolean",
+            "description": "Understands spot-color separations."
+          }
+        },
+        "operations": [
+          {
+            "name": "analyze",
+            "input_type": "org.cxp:document-request:1",
+            "result_type": "org.cxp:document-result:1",
+            "idempotency": {
+              "state": "guaranteed"
+            }
+          }
+        ]
+      },
+      {
+        "name": "document.acceptance",
+        "description": "Accepts declared document-format identifiers. Acceptance does not recognize, preserve, or interpret document semantics.",
+        "properties": {
+          "input_formats": {
+            "kind": "string_set",
+            "description": "Accepted format identifiers, such as pdf-x-4."
+          },
+          "document_profiles": {
+            "kind": "string_set",
+            "description": "Accepted profile identifiers within the declared formats."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "document.feature_recognition",
+        "description": "Recognizes declared document features without claiming that they are retained or interpreted for production.",
+        "properties": {
+          "recognized_features": {
+            "kind": "string_set",
+            "description": "Recognizable features, such as processing_steps, technical_separations, live_transparency, or spot_colors."
+          },
+          "processing_step_profiles": {
+            "kind": "string_set",
+            "description": "Recognizable named Processing Steps profiles."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "document.feature_preservation",
+        "description": "Preserves declared features through a document-processing boundary without claiming their production interpretation.",
+        "properties": {
+          "preserved_features": {
+            "kind": "string_set",
+            "description": "Features preserved by this configuration, such as processing_steps, technical_separations, live_transparency, or spot_colors."
+          },
+          "processing_step_profiles": {
+            "kind": "string_set",
+            "description": "Named Processing Steps profiles preserved by this configuration."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "document.production_interpretation",
+        "description": "Interprets declared document semantics for an external production process. It neither provides a physical capability nor executes that process.",
+        "properties": {
+          "interpreted_features": {
+            "kind": "string_set",
+            "description": "Features interpreted for an external process, such as processing_steps or technical_separations."
+          },
+          "processing_step_profiles": {
+            "kind": "string_set",
+            "description": "Named Processing Steps profiles that can be interpreted."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

@@ -82,4 +82,8 @@ que guardar esos documentos exactos y la versión semántica del evaluador.
 El ejemplo de regresión sigue disponible en `python -m cxp.exchange.examples`.
 El recorrido pedagógico, autocontenido y sin maquinaria se ejecuta con
 `python -m cxp.exchange.tutorial` o `python examples/document_exchange.py`.
+Los ejemplos industriales sintéticos se ejecutan con
+`python -m cxp.exchange.industrial_examples` o
+`python examples/industrial_catalogs.py`. Cada resultado corresponde a un
+catálogo y una configuración; no se unen para acreditar un proceso completo.
 La [CLI](../cli.md) proyecta las mismas validaciones y evaluaciones para scripts.

@@ -43,6 +43,7 @@ def main() -> None:
             or report["dependencies"]["cxp"] != manifest["version"]
             or report["base_without_exchange"] != "passed"
             or report["cli"] != "passed"
+            or report["industrial_examples"] != "passed"
             or report["pip_check"] != "passed"
             or report["tutorial"] != "passed"
         ):

@@ -13,6 +13,8 @@ reutilizarse para publicar otro contrato.
 | `document-processing` | Formatos, transparencia, tintas planas y contrato de análisis. | Ejecución del análisis PDF. |
 | `job-submission` | Envío y observación de trabajos como operaciones distintas. | Cola, persistencia, reintentos o producción ejecutada. |
 | `finishing` | Plegado y encuadernación con definiciones diferentes. | Una capacidad de impresión heredada. |
+| `positioning` | Referencias físicas, detección, estimación y compensación declaradas por separado. | Geometría, visión, calibración, movimiento o éxito de registro. |
+| `identification` | Generación, lectura, calidad, perfil de contenido y límites físicos separados. | Generar/leer imágenes, buscar archivos o certificar calidad. |
 
 `physical-printing` conserva 1.0.0 como versión predeterminada y añade 1.1.0
 para adopción explícita. La nueva versión mantiene sus cinco propiedades y suma:
@@ -26,6 +28,14 @@ para adopción explícita. La nueva versión mantiene sus cinco propiedades y su
 `max_thickness` es el límite Z. Estas propiedades no describen colocación,
 colisiones, un útil, un modo certificado por el fabricante ni combinaciones
 posibles entre máximos de configuraciones diferentes.
+
+`finishing` y `document-processing` conservan 1.0.0 como versión
+predeterminada y añaden 1.1.0 solo por selección explícita. La primera suma
+corte pasante, medio corte, hendido y perforación; la segunda separa aceptar,
+reconocer, preservar e interpretar características documentales. Los catálogos
+`positioning` e `identification` se publican en 1.0.0. La semántica detallada,
+las fuentes, la matriz de correspondencias y los ejemplos de adopción viven en
+[capacidades industriales declarativas](exchange-industrial-capabilities.md).
 
 Las propiedades de `finishing.folding` son patrones, número de pliegues y tamaño
 de hoja. Las de `finishing.binding` son espesor del bloque, longitud de lomo y

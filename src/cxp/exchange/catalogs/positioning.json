@@ -1,0 +1,120 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.cxp",
+      "name": "positioning",
+      "version": "1.0.0"
+    },
+    "owner": "CXP maintainers",
+    "capabilities": [
+      {
+        "name": "positioning.physical_referencing",
+        "description": "Locates work by declared physical references. It does not acquire an image, measure a feature, estimate a transform, or apply compensation.",
+        "properties": {
+          "reference_types": {
+            "kind": "string_set",
+            "description": "Physical reference types accepted by this configuration, such as registration_pin, edge_stop, or fixture."
+          },
+          "acquisition_methods": {
+            "kind": "string_set",
+            "description": "Methods that establish the physical reference, such as contact or mechanical_constraint."
+          },
+          "target_scopes": {
+            "kind": "string_set",
+            "description": "Work-object scopes to which a reference can apply: piece, sheet, panel, or segment."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "positioning.feature_detection",
+        "description": "Detects declared visual or sensed features. Detection alone neither estimates a registration transform nor applies a compensation.",
+        "properties": {
+          "detectable_features": {
+            "kind": "string_set",
+            "description": "Feature classes detectable in this configuration, such as registration_mark, edge, corner, or fiducial."
+          },
+          "acquisition_methods": {
+            "kind": "string_set",
+            "description": "Feature-acquisition methods, such as optical_sensor, camera_image, or manual_input."
+          },
+          "identifiable_mark_profiles": {
+            "kind": "string_set",
+            "description": "Stable producer-defined profiles of marks that this configuration can identify."
+          },
+          "minimum_feature_size": {
+            "kind": "quantity",
+            "description": "Smallest declared feature size detectable under the configuration conditions.",
+            "dimension": "length"
+          },
+          "reference_requirements": {
+            "kind": "string_set",
+            "description": "Named reference conditions needed by detection, such as two_registration_marks or physical_edge."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "positioning.transformation_estimation",
+        "description": "Estimates a declared coordinate transformation from supplied references. It does not move equipment or apply that estimate.",
+        "properties": {
+          "transform_models": {
+            "kind": "string_set",
+            "description": "Supported model identifiers, such as translation_2d, rigid_2d, similarity_2d, affine_2d, or projective_2d."
+          },
+          "target_scopes": {
+            "kind": "string_set",
+            "description": "Work-object scopes for an estimate: piece, sheet, panel, or segment."
+          },
+          "registration_extents": {
+            "kind": "string_set",
+            "description": "Whether an estimate is declared global, local, or both within one configuration."
+          },
+          "minimum_reference_count": {
+            "kind": "integer",
+            "description": "Minimum number of references required by the declared model in this configuration."
+          },
+          "error_metric": {
+            "kind": "string",
+            "description": "Named positional-error metric, for example maximum_absolute_position_error."
+          },
+          "max_position_error": {
+            "kind": "quantity",
+            "description": "Declared bound for error_metric when its stated configuration conditions apply.",
+            "dimension": "length"
+          },
+          "error_conditions_id": {
+            "kind": "string",
+            "description": "Stable identifier for the declared conditions of the error assertion; it is not a calibration or uncertainty claim."
+          }
+        },
+        "operations": []
+      },
+      {
+        "name": "positioning.compensation_application",
+        "description": "Applies a declared compensation to coordinates in the selected configuration. It does not imply feature detection, transform estimation, motion, or physical success.",
+        "properties": {
+          "accepted_transform_sources": {
+            "kind": "string_set",
+            "description": "Sources accepted for compensation, such as external_estimate, local_estimate, or manual_input."
+          },
+          "transform_models": {
+            "kind": "string_set",
+            "description": "Transformation models that this configuration can apply."
+          },
+          "target_scopes": {
+            "kind": "string_set",
+            "description": "Work-object scopes for compensation: piece, sheet, panel, or segment."
+          },
+          "registration_extents": {
+            "kind": "string_set",
+            "description": "Whether the configuration can apply global, local, or both declared compensations."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

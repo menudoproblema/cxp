@@ -31,6 +31,8 @@ REFERENCE_CATALOGS = (
     "document-processing",
     "job-submission",
     "finishing",
+    "positioning",
+    "identification",
 )
 
 _REFERENCE_DEFAULTS = {name: "1.0.0" for name in REFERENCE_CATALOGS}
@@ -38,6 +40,8 @@ _REFERENCE_RESOURCES = {
     (name, "1.0.0"): f"{name}.json" for name in REFERENCE_CATALOGS
 } | {
     ("physical-printing", "1.1.0"): "physical-printing-1.1.0.json",
+    ("document-processing", "1.1.0"): "document-processing-1.1.0.json",
+    ("finishing", "1.1.0"): "finishing-1.1.0.json",
 }
 
 

@@ -98,7 +98,14 @@ def main() -> None:
                 env=env,
             )
         )
-    if installed != version or len(catalogs) != 6:
+        industrial_examples = json.loads(
+            _run(
+                [str(python), "-I", "-m", "cxp.exchange.industrial_examples"],
+                cwd=work,
+                env=env,
+            )
+        )
+    if installed != version or len(catalogs) != 10:
         raise ValueError("Clean PyPI installation did not expose this release")
     if {item["verdict"] for item in tutorial.values()} != {
         "compatible",
@@ -106,6 +113,12 @@ def main() -> None:
         "indeterminate",
     }:
         raise ValueError("Published tutorial did not preserve all verdicts")
+    if set(industrial_examples.values()) != {
+        "compatible",
+        "incompatible",
+        "indeterminate",
+    }:
+        raise ValueError("Published industrial examples did not cover all verdicts")
     publication = {
         "artifacts": evidence["artifacts"],
         "base_revision": revision(),

@@ -19,6 +19,7 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 - [Intercambio documental v1](./protocol/exchange-v1.md)
 - [Integración del intercambio](./protocol/exchange-integration.md)
 - [Catálogos de referencia](./catalogs/exchange-reference.md)
+- [Capacidades industriales declarativas](./catalogs/exchange-industrial-capabilities.md)
 - [Migración a 4.0](./migration-4.0.md)
 - [Cierre de la revisión de 4.0.0](./architecture/review-4.0.0.md)
 - [Candidata y publicación](./release.md)

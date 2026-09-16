@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.2.0 — 2026-09-16
+
+- Added independent declarative `positioning` and `identification` reference
+  catalogs, preserving the existing evaluator and document schema. Identification
+  profiles and physical limits are scoped to generation, reading or verification.
+- Added explicitly selected `finishing` 1.1.0 and `document-processing` 1.1.0
+  resources; their 1.0.0 defaults and content hashes remain unchanged. The latter
+  retains the full `document.processing` definition, including `analyze`.
+- Added portable acceptance coverage and executable synthetic industrial
+  examples, including asymmetric identification configurations. Removed the
+  undefined `minimum_contrast_ratio` positioning property. CXP still does not
+  execute physical operations, process documents, calculate geometry, certify
+  claims, or reserve resources.
+
 ## 4.1.0 — 2026-09-04
 
 - Added explicit reference-catalog version selection and deterministic discovery
