@@ -7,10 +7,10 @@ Cuando una interfaz o un resultado enriquecido necesita publicar un error estruc
 
 ```python
 class CxpError(msgspec.Struct, frozen=True):
-    code: str           # Código máquina (ej. "AUTH_EXPIRED")
-    message: str        # Descripción humana
-    retryable: bool     # Indicación de si un reintento es útil
-    details: dict       # Datos extra (ej. stack trace, códigos de hardware)
+    code: str  # Código máquina (ej. "AUTH_EXPIRED")
+    message: str  # Descripción humana
+    retryable: bool  # Indicación de si un reintento es útil
+    details: dict  # Datos extra (ej. stack trace, códigos de hardware)
 ```
 
 ## Ventajas de la Fidelidad de Error

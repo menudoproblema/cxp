@@ -13,6 +13,8 @@
   undefined `minimum_contrast_ratio` positioning property. CXP still does not
   execute physical operations, process documents, calculate geometry, certify
   claims, or reserve resources.
+- Normalized four documentation examples for the standalone source formatter;
+  this changes neither the published API nor any catalog contract or hash.
 
 ## 4.1.0 — 2026-09-04
 

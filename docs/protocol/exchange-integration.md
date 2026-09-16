@@ -21,9 +21,7 @@ store = CatalogStore([catalog])
 snapshot = load_document(snapshot_bytes, expected_type="cxp.snapshot")
 requirements = load_document(requirements_bytes, expected_type="cxp.requirements")
 context = load_document(context_bytes, expected_type="cxp.context")
-result = evaluate_requirements_detailed(
-    snapshot, requirements, context, catalogs=store
-)
+result = evaluate_requirements_detailed(snapshot, requirements, context, catalogs=store)
 print(result.verdict, result.findings)
 output_bytes = result.document.to_bytes()
 ```

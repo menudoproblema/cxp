@@ -28,6 +28,7 @@ from cxp import (
     TelemetrySnapshot,
 )
 
+
 # Síncrono
 class MyProvider:
     def cxp_identity(self) -> ComponentIdentity: ...
@@ -36,6 +37,7 @@ class MyProvider:
     def cxp_telemetry_provider_id(self) -> str: ...
     def cxp_telemetry_snapshot(self) -> TelemetrySnapshot | None: ...
     def cxp_telemetry_stream(self) -> Iterator[TelemetrySnapshot]: ...
+
 
 # Asíncrono
 class MyAsyncProvider:
@@ -208,6 +210,7 @@ from cxp import (
     negotiate_with_async_provider,
 )
 
+
 class MongoProvider:
     async def cxp_identity(self) -> ComponentIdentity:
         return ComponentIdentity(
@@ -223,6 +226,7 @@ class MongoProvider:
                 Capability(name="write"),
             )
         )
+
 
 request = HandshakeRequest(
     client_identity=ComponentIdentity(

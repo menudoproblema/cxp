@@ -87,6 +87,7 @@ La capa rica no forma parte del handshake, pero sí tiene una superficie first-p
 ```python
 from cxp import ComponentCapabilitySnapshot, ComponentIdentity
 
+
 class MyProvider:
     def cxp_identity(self) -> ComponentIdentity: ...
     def cxp_capability_snapshot(self) -> ComponentCapabilitySnapshot: ...
@@ -96,6 +97,7 @@ Y su variante asíncrona:
 
 ```python
 from cxp import ComponentCapabilitySnapshot, ComponentIdentity
+
 
 class MyAsyncProvider:
     async def cxp_identity(self) -> ComponentIdentity: ...
