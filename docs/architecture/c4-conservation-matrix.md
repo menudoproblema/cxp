@@ -42,10 +42,14 @@ cannot establish that no published external consumer exists.
   The old Mongoeco facade and telemetry imports are still active.
 - Cosecha branch `ai/cosecha-c4` bounds its legacy dependency below 5 and
   packages five owner catalogs, nineteen tiers and nineteen profiles. Source
-  tests and an installed-wheel read validate the exact references. Its runner,
-  planner, runtime interop and adapter still use legacy APIs; those must migrate
+  tests and an installed-wheel read validate the exact references. The
+  instrumentation planner now uses exchange for tier/profile evaluation and
+  validates correlated trigger pairs in Cosecha before projection. Its runner,
+  runtime interop and other adapters still use legacy APIs; those must migrate
   before any removal major. The staged Cosecha worktree cannot commit while
-  its unrelated RFC corpus hook rejects the available workset.
+  its unrelated RFC corpus hook rejects the available workset: historical
+  `RFC-GDT-0003` content at the recorded revision has a different SHA-256 from
+  the roadmap's candidate pin.
 - CXP 4.3.0 now resolves package exports lazily: importing
   `cxp.exchange.core` does not load validator or legacy catalog modules. The
   final wheel/sdist candidate at `cd87211` passed the full twelve-cell release
