@@ -137,10 +137,12 @@ def _verify_wheel_resources(wheel_path: Path) -> None:
         "cxp/exchange/industrial_examples.py",
         "cxp/exchange/schemas/exchange-v1.json",
         "cxp/exchange/schemas/context-v2.json",
+        "cxp/exchange/schemas/catalog-v2.json",
         "cxp/exchange/schemas/operations-v1.json",
         "cxp/exchange/tutorial.py",
         "cxp/exchange/vectors/exchange-v1.json",
         "cxp/exchange/vectors/context-v2.json",
+        "cxp/exchange/vectors/catalog-v2.json",
         "cxp/exchange/vectors/industrial-v1.json",
     }
     with zipfile.ZipFile(wheel_path) as wheel:
