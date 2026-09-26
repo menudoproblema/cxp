@@ -27,7 +27,7 @@
       "path": "/tmp/cosecha-c4-major-dist/cosecha_core-0.0.3.tar.gz",
       "sha256": "2bd823568b2425165761a2237e500ca29f2d6c07e017d09f4b0a009ac6b48383"
     },
-    "source_gate": "core and testkit: 1091 passed, 3 skipped; new exchange files pass Ruff",
+    "source_gate": "core and testkit against the CXP removal-prototype wheel: 1091 passed, 3 skipped; new exchange files pass Ruff",
     "installed_gate": "wheel and sdist load five owner catalogs with no legacy adapter or CXP component modules",
     "commit_gate": "blocked by unrelated RFC corpus checkout errors and unpublished CXP 4.3.0 resolver constraint"
   },
@@ -41,7 +41,7 @@
       "path": "/tmp/mongoeco-c4-major-dist/mongoeco-4.7.0.tar.gz",
       "sha256": "b16a2e95ee2f6a8b39863a973fbacc6393bf8803fad2d9b438afbe2e6df4133d"
     },
-    "source_gate": "3092 unit tests passed, 26 skipped, 1336 subtests; lint ratchet and public typing passed",
+    "source_gate": "unit suite against the CXP removal-prototype wheel: 3092 passed, 26 skipped, 1336 subtests; lint ratchet and public typing passed",
     "installed_gate": "wheel and sdist load pinned exchange documents and Mongoeco operational data with no legacy CXP modules"
   },
   "torculo": {
