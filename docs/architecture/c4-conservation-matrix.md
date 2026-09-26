@@ -95,6 +95,13 @@ cannot establish that no published external consumer exists.
   unknown top-level keys and wrong top-level types across all ten capability
   metadata shapes. The latter does not turn nested operational metadata into
   portable exchange semantics.
+- The rebuilt Mongoeco wheel and exact local CXP 4.3.0 wheel installed into a
+  fresh Python 3.13 environment with resolved dependencies. Its declared
+  `mongodb-core` evaluation was compatible at catalog SHA
+  `2426ee7a7d9b4c06ab6d22b3eb9de2dcc16f2cd7b385efb618c7eb373c84dc5a`
+  without loading `cxp.catalogs`. The rebuilt Cosecha core wheel installed
+  with CXP 4.3.0 and evaluated the real coverage instrumenter as `composable`.
+  These are installed exchange paths, not full consumer release gates.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
