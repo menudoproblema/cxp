@@ -17,6 +17,7 @@ El protocolo se mantiene orientado a datos y agnóstico respecto a la implementa
 - [CLI](./cli.md)
 - [Estabilidad y deprecación](./stability.md)
 - [Intercambio documental v1](./protocol/exchange-v1.md)
+- [Catálogo documental v2](./protocol/catalog-v2.md)
 - [Integración del intercambio](./protocol/exchange-integration.md)
 - [Catálogos de referencia](./catalogs/exchange-reference.md)
 - [Capacidades industriales declarativas](./catalogs/exchange-industrial-capabilities.md)

@@ -1,0 +1,478 @@
+{
+  "contract": "cxp.catalog@2",
+  "catalog": {
+    "critical_extensions": [],
+    "document_type": "cxp.catalog",
+    "extensions": {},
+    "payload": {
+      "capabilities": [
+        {
+          "name": "device.print",
+          "operations": [
+            {
+              "idempotency": {
+                "state": "unknown"
+              },
+              "name": "print",
+              "result_type": "org.example:print-result",
+              "source": {
+                "locator": "device.print/print",
+                "reference": "org.example:equipment-contract",
+                "revision": "2026-09-26"
+              }
+            }
+          ],
+          "properties": {
+            "copies": {
+              "bounds": {
+                "maximum": 100,
+                "maximum_inclusive": true,
+                "minimum": 1,
+                "minimum_inclusive": true
+              },
+              "kind": "integer",
+              "nullable": false,
+              "source": {
+                "locator": "device.print/copies",
+                "reference": "org.example:equipment-contract",
+                "revision": "2026-09-26"
+              }
+            },
+            "label": {
+              "domain": {
+                "mode": "open"
+              },
+              "kind": "string",
+              "nullable": false,
+              "source": {
+                "locator": "device.print/label",
+                "reference": "org.example:equipment-contract",
+                "revision": "2026-09-26"
+              }
+            },
+            "modes": {
+              "domain": {
+                "mode": "closed",
+                "values": [
+                  "duplex",
+                  "simplex"
+                ]
+              },
+              "kind": "string_set",
+              "nullable": false,
+              "source": {
+                "locator": "device.print/modes",
+                "reference": "org.example:equipment-contract",
+                "revision": "2026-09-26"
+              }
+            },
+            "width": {
+              "bounds": {
+                "maximum": {
+                  "unit": "mm",
+                  "value": "400"
+                },
+                "maximum_inclusive": false,
+                "minimum": {
+                  "unit": "mm",
+                  "value": "100"
+                },
+                "minimum_inclusive": true
+              },
+              "dimension": "length",
+              "kind": "quantity",
+              "nullable": false,
+              "source": {
+                "locator": "device.print/width",
+                "reference": "org.example:equipment-contract",
+                "revision": "2026-09-26"
+              }
+            }
+          },
+          "source": {
+            "locator": "device.print",
+            "reference": "org.example:equipment-contract",
+            "revision": "2026-09-26"
+          }
+        }
+      ],
+      "identity": {
+        "name": "device",
+        "namespace": "org.example",
+        "version": "2.0.0"
+      },
+      "owner": "Example",
+      "source": {
+        "locator": "catalog",
+        "reference": "org.example:equipment-contract",
+        "revision": "2026-09-26"
+      }
+    },
+    "spec_version": 2
+  },
+  "snapshots": {
+    "compatible": {
+      "critical_extensions": [],
+      "document_type": "cxp.snapshot",
+      "extensions": {},
+      "payload": {
+        "capabilities": [
+          {
+            "name": "device.print",
+            "operations": [],
+            "properties": {
+              "copies": 2,
+              "modes": [
+                "duplex"
+              ],
+              "width": {
+                "unit": "mm",
+                "value": "200"
+              }
+            },
+            "support": "supported"
+          }
+        ],
+        "catalog": {
+          "name": "device",
+          "namespace": "org.example",
+          "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+          "version": "2.0.0"
+        },
+        "configuration_revision": "rev-1",
+        "observed_at": "2026-09-26T10:00:00.000000Z",
+        "provider_id": "example",
+        "source": {
+          "kind": "observed",
+          "reference": "report-sha256"
+        },
+        "subject_id": "printer"
+      },
+      "spec_version": 1
+    },
+    "incompatible": {
+      "critical_extensions": [],
+      "document_type": "cxp.snapshot",
+      "extensions": {},
+      "payload": {
+        "capabilities": [
+          {
+            "name": "device.print",
+            "operations": [],
+            "properties": {
+              "copies": 2,
+              "modes": [
+                "simplex"
+              ],
+              "width": {
+                "unit": "mm",
+                "value": "200"
+              }
+            },
+            "support": "supported"
+          }
+        ],
+        "catalog": {
+          "name": "device",
+          "namespace": "org.example",
+          "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+          "version": "2.0.0"
+        },
+        "configuration_revision": "rev-1",
+        "observed_at": "2026-09-26T10:00:00.000000Z",
+        "provider_id": "example",
+        "source": {
+          "kind": "observed",
+          "reference": "report-sha256"
+        },
+        "subject_id": "printer"
+      },
+      "spec_version": 1
+    },
+    "missing": {
+      "critical_extensions": [],
+      "document_type": "cxp.snapshot",
+      "extensions": {},
+      "payload": {
+        "capabilities": [
+          {
+            "name": "device.print",
+            "operations": [],
+            "properties": {
+              "copies": 2,
+              "width": {
+                "unit": "mm",
+                "value": "200"
+              }
+            },
+            "support": "supported"
+          }
+        ],
+        "catalog": {
+          "name": "device",
+          "namespace": "org.example",
+          "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+          "version": "2.0.0"
+        },
+        "configuration_revision": "rev-1",
+        "observed_at": "2026-09-26T10:00:00.000000Z",
+        "provider_id": "example",
+        "source": {
+          "kind": "observed",
+          "reference": "report-sha256"
+        },
+        "subject_id": "printer"
+      },
+      "spec_version": 1
+    },
+    "invalid_domain": {
+      "critical_extensions": [],
+      "document_type": "cxp.snapshot",
+      "extensions": {},
+      "payload": {
+        "capabilities": [
+          {
+            "name": "device.print",
+            "operations": [],
+            "properties": {
+              "copies": 2,
+              "modes": [
+                "duplex",
+                "unknown"
+              ],
+              "width": {
+                "unit": "mm",
+                "value": "200"
+              }
+            },
+            "support": "supported"
+          }
+        ],
+        "catalog": {
+          "name": "device",
+          "namespace": "org.example",
+          "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+          "version": "2.0.0"
+        },
+        "configuration_revision": "rev-1",
+        "observed_at": "2026-09-26T10:00:00.000000Z",
+        "provider_id": "example",
+        "source": {
+          "kind": "observed",
+          "reference": "report-sha256"
+        },
+        "subject_id": "printer"
+      },
+      "spec_version": 1
+    }
+  },
+  "requirements": {
+    "critical_extensions": [],
+    "document_type": "cxp.requirements",
+    "extensions": {},
+    "payload": {
+      "catalog": {
+        "name": "device",
+        "namespace": "org.example",
+        "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+        "version": "2.0.0"
+      },
+      "requirement": {
+        "capability": "device.print",
+        "critical_extensions": [],
+        "extensions": {},
+        "id": "duplex",
+        "operations": [],
+        "operator": "contains_all",
+        "path": "/properties/modes",
+        "require_effective": true,
+        "values": [
+          "duplex"
+        ]
+      }
+    },
+    "spec_version": 1
+  },
+  "invalid_requirements": {
+    "outside_domain": {
+      "critical_extensions": [],
+      "document_type": "cxp.requirements",
+      "extensions": {},
+      "payload": {
+        "catalog": {
+          "name": "device",
+          "namespace": "org.example",
+          "sha256": "42e47298a700ca14b52cb0a73069db14e809625ecfada0c7a5fcdcfdd91700db",
+          "version": "2.0.0"
+        },
+        "requirement": {
+          "capability": "device.print",
+          "critical_extensions": [],
+          "extensions": {},
+          "id": "duplex",
+          "operations": [],
+          "operator": "contains_all",
+          "path": "/properties/modes",
+          "require_effective": true,
+          "values": [
+            "unknown"
+          ]
+        }
+      },
+      "spec_version": 1
+    }
+  },
+  "context": {
+    "critical_extensions": [],
+    "document_type": "cxp.context",
+    "extensions": {},
+    "payload": {
+      "accepted_sources": [
+        "observed"
+      ],
+      "configuration_revision": "rev-1",
+      "subject_id": "printer"
+    },
+    "spec_version": 2
+  },
+  "invalid_catalogs": {
+    "inverted_bounds": {
+      "critical_extensions": [],
+      "document_type": "cxp.catalog",
+      "extensions": {},
+      "payload": {
+        "capabilities": [
+          {
+            "name": "device.print",
+            "operations": [
+              {
+                "idempotency": {
+                  "state": "unknown"
+                },
+                "name": "print",
+                "result_type": "org.example:print-result",
+                "source": {
+                  "locator": "device.print/print",
+                  "reference": "org.example:equipment-contract",
+                  "revision": "2026-09-26"
+                }
+              }
+            ],
+            "properties": {
+              "copies": {
+                "bounds": {
+                  "maximum": 100,
+                  "maximum_inclusive": true,
+                  "minimum": 101,
+                  "minimum_inclusive": true
+                },
+                "kind": "integer",
+                "nullable": false,
+                "source": {
+                  "locator": "device.print/copies",
+                  "reference": "org.example:equipment-contract",
+                  "revision": "2026-09-26"
+                }
+              },
+              "label": {
+                "domain": {
+                  "mode": "open"
+                },
+                "kind": "string",
+                "nullable": false,
+                "source": {
+                  "locator": "device.print/label",
+                  "reference": "org.example:equipment-contract",
+                  "revision": "2026-09-26"
+                }
+              },
+              "modes": {
+                "domain": {
+                  "mode": "closed",
+                  "values": [
+                    "duplex",
+                    "simplex"
+                  ]
+                },
+                "kind": "string_set",
+                "nullable": false,
+                "source": {
+                  "locator": "device.print/modes",
+                  "reference": "org.example:equipment-contract",
+                  "revision": "2026-09-26"
+                }
+              },
+              "width": {
+                "bounds": {
+                  "maximum": {
+                    "unit": "mm",
+                    "value": "400"
+                  },
+                  "maximum_inclusive": false,
+                  "minimum": {
+                    "unit": "mm",
+                    "value": "100"
+                  },
+                  "minimum_inclusive": true
+                },
+                "dimension": "length",
+                "kind": "quantity",
+                "nullable": false,
+                "source": {
+                  "locator": "device.print/width",
+                  "reference": "org.example:equipment-contract",
+                  "revision": "2026-09-26"
+                }
+              }
+            },
+            "source": {
+              "locator": "device.print",
+              "reference": "org.example:equipment-contract",
+              "revision": "2026-09-26"
+            }
+          }
+        ],
+        "identity": {
+          "name": "device",
+          "namespace": "org.example",
+          "version": "2.0.0"
+        },
+        "owner": "Example",
+        "source": {
+          "locator": "catalog",
+          "reference": "org.example:equipment-contract",
+          "revision": "2026-09-26"
+        }
+      },
+      "spec_version": 2
+    }
+  },
+  "evaluations": [
+    {
+      "id": "closed-domain-compatible",
+      "snapshot": "compatible",
+      "verdict": "compatible"
+    },
+    {
+      "id": "closed-domain-incompatible",
+      "snapshot": "incompatible",
+      "verdict": "incompatible"
+    },
+    {
+      "id": "closed-domain-missing",
+      "snapshot": "missing",
+      "verdict": "indeterminate"
+    },
+    {
+      "id": "closed-domain-invalid-observation",
+      "snapshot": "invalid_domain",
+      "error": "value_outside_domain"
+    },
+    {
+      "id": "closed-domain-invalid-requirement",
+      "snapshot": "compatible",
+      "requirements": "outside_domain",
+      "error": "value_outside_domain"
+    }
+  ]
+}

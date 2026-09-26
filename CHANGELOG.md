@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
+  bounds, element-level documentary sources, independent schema and negotiation.
+  Catalog v1 and the already verified 4.3.0 candidate remain unchanged.
+
 ## 4.3.0 — 2026-09-26
 
 - Add opt-in `cxp.context` v2 with mandatory `accepted_sources`, independent
