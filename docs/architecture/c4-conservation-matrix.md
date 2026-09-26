@@ -166,6 +166,11 @@ external published consumers.
   `cxp.catalogs`, `cxp.descriptors`, `cxp.handshake` or `cxp.capabilities`.
   The expanded source focal set passes 197 tests. The old adapter module is
   still packaged, so full artifact absence remains open.
+- The Cosecha `cxp_adapters` module and Mongoeco legacy root reexports now emit
+  `DeprecationWarning` while their migration branches retain those APIs.
+  Mongoeco's direct `cxp.capabilities` facade also warns. These are source
+  preparations for consumer migration releases; the old files are not yet
+  removed and no deprecation release has been published.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
