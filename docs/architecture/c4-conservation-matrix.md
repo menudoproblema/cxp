@@ -105,8 +105,17 @@ cannot establish that no published external consumer exists.
 - Cosecha runner instrumentation admission now builds the owner-validated
   declared snapshot and evaluates the summary tier with exchange/context v2.
   Its strict mode rejects an indeterminate requirement, and a focused runner,
-  planner and catalog set passed 123 tests. Engine, reporter, plugin and
-  runtime runner admission still call the legacy adapter.
+  planner and catalog set passed 123 tests.
+- Cosecha plugin runner admission now evaluates its declared owner snapshot
+  against the core tier through the same exchange evaluator. A real telemetry
+  plugin satisfies the telemetry sidecar tier; unknown sidecar capabilities
+  reject. The runner, plugin and catalog focal set passed 82 tests. Reporter,
+  runtime and engine runner admission now also use their owner validated
+  declared snapshots and exchange context v2. Real Gherkin satisfies the
+  integrated engine tier, while Pytest is indeterminate for that tier and
+  compatible for core, knowledge and planning. Engine runner focal tests pass.
+  The Cosecha runtime interface validator and standalone `cxp_adapters.py`
+  remain legacy and require migration or removal before the major.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
