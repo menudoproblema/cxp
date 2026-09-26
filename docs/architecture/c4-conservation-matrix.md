@@ -1,0 +1,31 @@
+# C4 conservation matrix (implementation ledger)
+
+This ledger records the decision for each legacy guarantee before deleting code.
+It does not certify migration. The CXP 4.3.0 candidate at `9480e45` remains the
+C1–C3 input; C4 develops separately and has no published target version yet.
+
+| Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
+| --- | --- | --- | --- |
+| Capability identity, declared support, operations | Cosecha runner/planner; Mongoeco catalog exports | Owner catalog and snapshot v1, pinned by identity/version/SHA; `support` and operation requirements | Same positive/negative decisions for every consumed tier/profile |
+| Profile `required_metadata_keys` | Mongoeco `compat/_catalog_export.py`; Cosecha profile validation | Per-capability `string_set` property of keys actually present, `contains_all` requirement; local owner validates value shape before snapshot | Missing key remains insufficient or negative according to the authored requirement, never filled by a default; catalog rejects unknown keys |
+| Tiers and families | Cosecha component admission; Mongoeco profiles and `database/mongodb` interface family | Owner-authored named requirement documents with `all` of capability/operation/property leaves, each pinned to one catalog; a family relation is an explicit owner declaration, not a global registry lookup | Every old tier/profile requirement has an equivalent authored tree and independent oracle; no implicit ordering |
+| `ActivationTrigger(kind, name)` | Cosecha `capabilities.py`, `flag_namespaces.py`, `instrumentation_planner.py` | Keep correlated pairs in Cosecha operational bootstrap metadata and its local validation. Remove the redundant legacy CXP metadata projection. If a real compatibility consumer emerges, add a typed portable pair-set to exchange first | Planner accepts/rejects each pair and preserves kind/name association; no flattening |
+| Operation input/result schemas | Published generic legacy catalogs; no active Cosecha or Mongoeco runtime use found | Runtime payload validation belongs to the producer's operational contract. `result_type` remains the portable exchange operation identity. A consumer that compares schema compatibility needs a versioned portable contract before deletion | Inspect external consumers and retain equivalent operational validators wherever used |
+| Metadata schemas for offered descriptors | Cosecha and Mongoeco legacy catalog validation | Owner validates data shape before emitting exchange snapshots; exchange evaluates only normalized reported properties | Invalid metadata cannot become a compatible snapshot |
+| Handshake, descriptors, matrices, compliance evaluation | Cosecha runtime and Mongoeco public facade | One exchange `CatalogStore` + `evaluate_requirements` path; owner construction and lifecycle remain local | No runtime import or public fallback to old modules; negative/unknown cases preserved |
+| Global catalog registry | Cosecha `runtime_interop.py`; CXP legacy imports | Exact explicit `CatalogStore` passed by the consumer | No environmental registration, import-by-ID or network resolution |
+| Cosecha engine/runtime/instrumentation/reporter/plugin catalogs | CXP `catalogs/interfaces/cosecha`; Cosecha adapters and runner | Catalog JSON and requirement documents owned and versioned by Cosecha | Installed Cosecha artifact exports exact hashes and evaluates without Cosecha imports in evaluator process |
+| MongoDB generic interface catalog | CXP `catalogs/interfaces/database/mongodb`; Mongoeco facade, compat and telemetry | Owner-authored Mongoeco exchange catalog and requirements. Mochuelo deployment catalog is separate | Installed Mongoeco artifact, compat outputs and explain/telemetry tests pass without legacy CXP modules |
+| CXP telemetry classes | Mongoeco driver telemetry, Cosecha operational telemetry | Producer-owned telemetry contract; exchange is only compatibility | Existing telemetry outputs preserved and no CXP legacy runtime import |
+| Exchange v1/v2 documents, canonical JSON, hashes, limits, catalog store and evaluator | Tórculo and future Mochuelo | Retain in CXP major; no second evaluator | Historical vectors and Tórculo functional tests remain green |
+
+## Release and consumer order
+
+1. CXP 4.3.0 is a verified local candidate only. Keep it available as an exact artifact for migration development.
+2. Migration releases of Cosecha and Mongoeco must replace runtime uses of legacy CXP. Before those releases, their current manifests and locks have `<5`; Tórculo already has `<5`.
+3. A CXP minor must document deprecation and retain public legacy APIs for at least one subsequent minor release, per `docs/stability.md`.
+4. After consumer artifacts pass installed tests, the removal major can delete legacy entrypoints and catalogs. Retain neutral validation code actually imported by exchange. Confirm absence in the wheel/sdist and recheck external consumers immediately before removal.
+
+The repository census found Cosecha, Mongoeco and Tórculo in current accessible
+checkouts. A public web code search returned no indexed matches; that result
+cannot establish that no published external consumer exists.
