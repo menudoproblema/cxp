@@ -30,6 +30,11 @@ C1–C3 input; C4 develops separately and has no published target version yet.
 The repository census found Cosecha, Mongoeco and Tórculo in current accessible
 checkouts. A public web code search returned no indexed matches; that result
 cannot establish that no published external consumer exists.
+The repeated local search also found historical `cosecha-framework.old` and
+several worktrees of the same gdynamics/Cosecha repository. The old checkout
+has extensive unrelated WIP and `cxp>=1.0.0`; it is preserved as evidence,
+not treated as the current Cosecha migration target. This does not settle
+external published consumers.
 
 ## Progress against this ledger
 
@@ -150,8 +155,9 @@ cannot establish that no published external consumer exists.
   still reject. The focused runtime-profile, manifest and discovery set passes
   51 tests, and importing `cosecha.core.runtime` no longer loads any CXP
   legacy component module in the source environment. This operational
-  vocabulary does not decide provider compatibility; owner exchange catalogs
-  do that separately.
+  vocabulary does not decide provider compatibility. Any such decision needs
+  the exact catalog and requirements of the provider's owner; Cosecha's
+  runtime service graph and readiness checks remain operational.
 - A rebuilt Cosecha core wheel
   (`1f9e881d2eb27c1abbc1945458158149b8dc77210568a96ba2153425df274197`)
   installed with exact CXP 4.3.0 evaluates the real local runtime as
