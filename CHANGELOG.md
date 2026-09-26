@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — legacy migration window
+
+- Deprecate root exports of the legacy component protocol with a Python
+  `DeprecationWarning`. Exchange and shared validation exports remain current.
+  Legacy APIs are still present; their removal requires a later major release
+  after a subsequent minor release and consumer migration.
+
 ## 4.3.0 — 2026-09-26 (local candidate)
 
 - Add opt-in `cxp.context` v2 with mandatory `accepted_sources`, independent

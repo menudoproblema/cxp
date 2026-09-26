@@ -87,3 +87,9 @@ cannot establish that no published external consumer exists.
   A profile must carry or resolve an exact owner-authored exchange catalog;
   the abstract execution interface's present implicit concrete lookup cannot
   remain as a fallback.
+- The CXP C4 branch now emits a `DeprecationWarning` when a root export of the
+  legacy component protocol is first resolved. Shared validation exports do
+  not warn. The behavior is documented in the unreleased changelog and
+  stability policy; all legacy APIs remain available. The branch's local
+  `scripts/check.py` gate passed (506 tests). This is preparatory source code,
+  not a published deprecation release or the required subsequent minor.
