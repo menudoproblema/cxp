@@ -1,0 +1,57 @@
+{
+  "kind": "source-prototype-evidence",
+  "published": false,
+  "release_candidate": false,
+  "note": "Version strings in these artifacts are inherited from their pre-major source branches. They do not assign or reserve public removal-major versions.",
+  "cxp": {
+    "source_revision": "fe443a9",
+    "wheel": {
+      "path": "/tmp/cxp-c4-major-dryrun/cxp-4.3.0-py3-none-any.whl",
+      "sha256": "17b361d6cbcacf0a93c8f69e2fdb172f44496dee960fc0e4fc2ac61c7108e967"
+    },
+    "sdist": {
+      "path": "/tmp/cxp-c4-major-dryrun/cxp-4.3.0.tar.gz",
+      "sha256": "14171e99137fa06c91db817ee52c3473737f48e9236aff061d05a4d74363b71a"
+    },
+    "source_gate": "scripts/check.py: documentation, Ruff, mypy, 277 tests passed",
+    "installed_gate": "wheel and sdist install with exchange context v2 and no legacy modules"
+  },
+  "cosecha_core": {
+    "source_revision": "093f5e61fe2391caef1eb782a72ca676842ee2b8",
+    "staged_diff_sha256": "3e82d45697531363508014f75deff348da14a83bcbff517b9df1bdf4dd65ac85",
+    "wheel": {
+      "path": "/tmp/cosecha-c4-major-dist/cosecha_core-0.0.3-py3-none-any.whl",
+      "sha256": "a6899b6e0cb35164fc490d992b1796eb5a457417a25966a19d0b0ed44894c336"
+    },
+    "sdist": {
+      "path": "/tmp/cosecha-c4-major-dist/cosecha_core-0.0.3.tar.gz",
+      "sha256": "2bd823568b2425165761a2237e500ca29f2d6c07e017d09f4b0a009ac6b48383"
+    },
+    "source_gate": "core and testkit: 1091 passed, 3 skipped; new exchange files pass Ruff",
+    "installed_gate": "wheel and sdist load five owner catalogs with no legacy adapter or CXP component modules",
+    "commit_gate": "blocked by unrelated RFC corpus checkout errors and unpublished CXP 4.3.0 resolver constraint"
+  },
+  "mongoeco": {
+    "source_revision": "f11bca7fa6ed9f3329754e59c4fd0396387e90ea",
+    "wheel": {
+      "path": "/tmp/mongoeco-c4-major-dist/mongoeco-4.7.0-py3-none-any.whl",
+      "sha256": "f38f014e936a5bdcc4bc313be42b255709676e86269cdfa645791bc007db485b"
+    },
+    "sdist": {
+      "path": "/tmp/mongoeco-c4-major-dist/mongoeco-4.7.0.tar.gz",
+      "sha256": "b16a2e95ee2f6a8b39863a973fbacc6393bf8803fad2d9b438afbe2e6df4133d"
+    },
+    "source_gate": "3092 unit tests passed, 26 skipped, 1336 subtests; lint ratchet and public typing passed",
+    "installed_gate": "wheel and sdist load pinned exchange documents and Mongoeco operational data with no legacy CXP modules"
+  },
+  "torculo": {
+    "source_revision": "d4a0795150e5eba56e7f962595c308df57dc5f8a",
+    "installed_gate": "four clean main wheels plus CXP prototype: 15 exchange tests passed, 1 current-version pin deselected, pip check passed",
+    "wheels": {
+      "torculo_core": "845827f8c4c344f8328ec34bc88d283dbb0406c7a54cfb0a0c00a9c7b833c940",
+      "torculo_specifications": "5e18354931405f9a3ba97f5fc9760adab66202c7f5278bdf2b02ffd61c42d4dc",
+      "torculo_planning": "c55ef6d9de89c5b48b4a81864d9303841c93f51ce2e95293fd0a1b830cbdba91",
+      "torculo_pdf": "07fcbd6ad6c558c68a778acace2ca5c515004e2c97dbaafb65b570289f1454cd"
+    }
+  }
+}
