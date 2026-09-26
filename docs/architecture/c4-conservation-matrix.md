@@ -56,3 +56,18 @@ cannot establish that no published external consumer exists.
   `cxp.exchange.core` does not load validator or legacy catalog modules. The
   final wheel/sdist candidate at `cd87211` passed the full twelve-cell release
   matrix. This is local evidence, not publication or a migration release.
+- The final CXP wheel (`6b81ee9d31111ce2d74f9d1aca90cc12510d96c08b024fcab9f37120d33f0794`)
+  passed 15 Tórculo PDF/planning exchange tests on its existing checkout. The
+  one deselected test asserts the intentionally unchanged 4.2.0 lock; it is a
+  release coordination check, not an exchange behavior failure. The Tórculo
+  source worktree and lock were not edited.
+- A Cosecha core wheel rebuilt after the instrumentation planner migration
+  installed with the exact CXP 4.3.0 wheel into a fresh Python 3.13
+  environment. Its five owner catalogs and the instrumentation summary tier
+  load with the pinned content hashes, and that exchange-only import path does
+  not load `cxp.catalogs`, `cxp.descriptors` or `cxp.handshake`. This smoke does
+  not certify runner admission: that path still uses legacy adapters.
+- The Cosecha lock still resolves CXP 4.1.0, because 4.3.0 is only a local
+  candidate. Its source tests use the installed exact 4.3.0 wheel. The
+  migration release must raise the dependency floor to the published exchange
+  version and regenerate the portable lock before its full gate.
