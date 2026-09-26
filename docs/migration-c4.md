@@ -1,9 +1,9 @@
 # Migration from the retired component protocol
 
-This guide applies to the future CXP removal major. It does not assign or
-announce a published version. CXP 4.3.0 is the published deprecation release.
-The verified 4.4.0 candidate must be published as the subsequent minor before
-this public removal under [stability policy](stability.md).
+This guide applies to the CXP 5.0.0 release candidate; it does not announce
+publication. CXP 4.3.0 is the published deprecation release. The owner chose
+direct 5.0.0 retirement as the documented exception in
+[stability policy](stability.md).
 
 ## Replace the compatibility path
 
@@ -39,7 +39,8 @@ ignored extension. Runtime payload schemas, readiness, lifecycle and
 telemetry stay with their operational owners. A real cross-component schema
 compatibility need would require a separate versioned portable contract.
 
-Cosecha owns its engine, runtime, instrumentation, reporter and plugin exchange
+Cosecha owns its engine, runtime, instrumentation, reporter, plugin and
+plugin-host exchange
 catalogs and requirements. Mongoeco owns its generic MongoDB catalog and
 requirements. Mochuelo's deployment guarantee catalog is separate and owned
 by Mochuelo. Tórculo remains an exchange consumer and needs only artifact
@@ -55,6 +56,6 @@ to prove that exchange does not route old payloads to a permissive reader.
 
 Before publication, verify both wheel and sdist, all supported Python and
 dependency combinations, installed consumer artifacts, exact catalog hashes,
-the absence of legacy modules, and the release sequence recorded in the
+the absence of legacy modules, and the direct-major decision recorded in the
 [conservation matrix](architecture/c4-conservation-matrix.md). Do not widen
 consumer dependency bounds to this major until their migration artifacts pass.

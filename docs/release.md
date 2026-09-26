@@ -72,7 +72,7 @@ conformidad universal, soporte de maquinaria ni seguridad física.
 Antes de publicar, el mantenedor debe identificar destino y autorizar los hashes
 exactos. Además, cada owner de consumidores conocidos debe revisar:
 
-- restricciones que excluyen 4.x o permiten majors sin límite;
+- restricciones que excluyen 5.x o permiten majors sin límite;
 - catálogos privados, overrides, decoders cerrados y bindings de Web Push;
 - resolución de dependencias y pruebas de integración con la candidata;
 - conservación de cada garantía al migrar a exchange o a su propietario operativo.
@@ -80,9 +80,9 @@ exactos. Además, cada owner de consumidores conocidos debe revisar:
 La [matriz de conservación](architecture/c4-conservation-matrix.md) registra
 la evidencia de integración y las migraciones que siguen abiertas. La major
 de retirada exige artefactos instalados de cada consumidor admitido, sus
-límites de dependencias coordinados y la secuencia de deprecación de
-[estabilidad](stability.md). La falta de cualquiera de esos gates impide
-publicar; actualizar dependencias automáticamente no los satisface.
+límites de dependencias coordinados y la excepción de retirada directa
+documentada en [estabilidad](stability.md). La falta de cualquiera de esos
+gates impide publicar; actualizar dependencias automáticamente no los satisface.
 
 La revisión de consumidores se acredita para cada candidata exacta. Los gates
 de CXP y una prueba sintética con catálogos externos no sustituyen la revisión

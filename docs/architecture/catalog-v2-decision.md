@@ -63,7 +63,7 @@ indeterminate. No se consulta una fuente documental para decidir conformidad.
   versión y el núcleo puro no carga validadores.
 - API y CLI coinciden; ambos validadores JSON Schema comprueban estructura;
   los oráculos semánticos portables siguen independientes.
-- Wheel/sdist y consumidores se verifican para la minor que adopte v2; ninguna
+- Wheel/sdist y consumidores se verifican para la 5.0.0 que adopta v2; ninguna
   versión de catálogo propietario cambia sin identidad, versión y SHA nuevos.
 
 La decisión de qué propiedades concretas migran a v2 pertenece a la matriz

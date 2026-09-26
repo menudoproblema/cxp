@@ -1,24 +1,20 @@
 # Changelog
 
-## Unreleased — removal-major source (not published)
+## 5.0.0 — release candidate, not published
 
+- Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
+  bounds, element-level documentary sources, independent schema and negotiation.
+  Catalog v1 and the published 4.3.0 contracts remain readable.
 - Remove the old component handshake, descriptors, global registry, compliance
   evaluator, producer catalogs, adapters and telemetry API from the installed
   package. Preserve their source, tests and examples under `evidence/`.
 - Retain `cxp.exchange`, explicit catalog resolution and neutral validation
   diagnostics. Document guarantee ownership and consumer migration in
   [the C4 guide](docs/migration-c4.md).
-- Publication remains contingent on the published 4.4.0 minor, installed
-  consumer checks and the release gates. No final major version is assigned
-  by this source prototype.
-
-## 4.4.0 candidate — 2026-09-26
-
-- Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
-  bounds, element-level documentary sources, independent schema and negotiation.
-  Catalog v1 and the published 4.3.0 contracts remain unchanged.
-- Retain the deprecated component protocol through this subsequent minor
-  release while known consumers adopt owner-authored exchange catalogs.
+- The owner selected a direct 4.3.0 to 5.0.0 release. This is the documented
+  exception to the subsequent-minor deprecation window in
+  [stability policy](docs/stability.md). Publication still requires exact
+  artifact checks, consumer migration evidence and approval.
 
 ## 4.3.0 — 2026-09-26
 

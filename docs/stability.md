@@ -31,8 +31,8 @@ This also applies to `finishing` and `document-processing` 1.1.0. New
 than redefining a published catalog.
 
 Deprecations are documented in the changelog and emit `DeprecationWarning` when
-that is practical. A deprecated Python or CLI surface remains available for at
-least one subsequent minor release. Wire contracts and published catalog
+that is practical. The normal policy retains a deprecated Python or CLI surface
+for at least one subsequent minor release. Wire contracts and published catalog
 versions are not silently rewritten; retirement requires a documented successor
 and migration path.
 
@@ -41,17 +41,24 @@ bytes remain stable; only a consumer explicitly offering v2 can negotiate it.
 The semantic evaluator revision is recorded independently of package and
 document versions. See [context v2](protocol/context-v2.md).
 
+## Direct 5.0.0 retirement decision
+
 In 4.3.0, root exports and direct imports of the legacy component protocol
-began issuing `DeprecationWarning`. The 4.4.0 candidate retains those public
-APIs while consumers migrate to owner-authored exchange catalogs; the minor
-must be published before this removal major.
+began issuing `DeprecationWarning`. On 2026-09-26 the owner directed a direct
+5.0.0 release instead of publishing the prepared 4.4.0 minor. This is a
+specific exception to the normal subsequent-minor window above; it does not
+rewrite what 4.3.0 provided or create an implied fallback in 5.0.0.
+
+Before 5.0.0 publication, known consumers must pass installed-artifact tests
+against the exact candidate, and dependency bounds or constraints must prevent
+older consumer releases from resolving an incompatible major automatically.
+The migration guide identifies the successor for each retained guarantee.
 
 The retired component protocol is absent from this removal-major source tree.
 `cxp.exchange` and the shared `cxp.validation` diagnostics remain supported.
 See the [migration guide](migration-c4.md) and historical source under
-`evidence/`. Publishing this source requires the preceding deprecation and
-subsequent minor releases and installed consumer evidence; this checkout does
-not itself establish that release sequence.
+`evidence/`. A clean source tree alone does not establish the consumer and
+artifact evidence required for publication.
 
 ## Evaluation details
 

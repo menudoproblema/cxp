@@ -2,9 +2,9 @@
 
 This ledger records the decision for each legacy guarantee before deleting code.
 It does not certify migration. CXP 4.3.0 is published and verified from PyPI.
-The 4.4.0 candidate combines catalog v2 with the deprecation window; its
-PR #9 CI passed but it is not yet published. This branch is an exchange-only
-removal prototype with a provisional development version, not a public major.
+The owner directed one 5.0.0 release containing catalog v2 and complete legacy
+retirement. The prepared 4.4.0 candidate was not published. This checkout is
+the 5.0.0 source candidate on `main`; publication needs the gates below.
 
 | Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
 | --- | --- | --- | --- |
@@ -25,9 +25,9 @@ removal prototype with a provisional development version, not a public major.
 ## Release and consumer order
 
 1. CXP 4.3.0 is published with deprecation warnings. Keep its exact PyPI artifacts as the baseline for migration and historical conformance.
-2. Migration releases of Cosecha and Mongoeco replace runtime uses of legacy CXP. Their current manifests keep `<5`; Tórculo already has `<5`.
-3. Publish at least one subsequent minor retaining the deprecated public APIs, per `docs/stability.md`. The opt-in catalog v2 candidate is being prepared for this window.
-4. After consumer artifacts pass installed tests and dependencies are coordinated, the removal major can delete legacy entrypoints and catalogs. Retain neutral validation code actually imported by exchange. Confirm absence in the wheel/sdist and recheck external consumers immediately before removal.
+2. Preserve the 4.4.0 branch and its artifacts as unpublished preparation. The owner has approved a direct 5.0.0 exception to the normal subsequent-minor window in `docs/stability.md`.
+3. Coordinate Cosecha, Mongoeco, Tórculo and historical unbounded consumers so automatic resolution cannot install an incompatible major. Their owner catalogs and operational guarantees remain available without a CXP legacy fallback.
+4. Publish 5.0.0 only after exact installed consumer artifacts pass, the wheel/sdist exclude legacy entrypoints and catalogs, the full release matrix passes and external consumers are checked again. Retain neutral validation code actually imported by exchange.
 
 The repository census found Cosecha, Mongoeco and Tórculo in current accessible
 checkouts. A public web code search returned no indexed matches; that result
@@ -40,23 +40,26 @@ external published consumers.
 
 ## Current preparation status (2026-09-26)
 
-- CXP `ai/cxp-4.4-release@0e3af61` has a stable 4.4.0 candidate with a
-  12-cell local artifact matrix and a successful PR #9 CI run. The dependency
-  review check awaits repository Dependency graph configuration. The minor
-  retains deprecated public APIs; no tag or publication has occurred.
+- CXP `main` contains catalog v2 and the exchange-only removal code. The
+  prepared 4.4.0 branch passed its local matrix and PR #9 CI but will not be
+  published. The 5.0.0 exact candidate must be rebuilt and verified from
+  this `main` revision; the earlier 4.4.0 and 5.0.0.dev0 artifact hashes do
+  not certify it.
 - Cosecha `ai/cosecha-catalog-v2@a6cb1b9` has six catalog v2 declarations,
   19 tiers and 19 profiles. Its source suite passed 2639 tests with five
-  skips; wheel and sdist installed with exact CXP 4.4.0 evaluate all 38
-  requirements. `cxp_adapters.py` remains packaged for the compatibility
-  window. Its development lock awaits 4.4.0 publication.
+  skips; wheel and sdist installed with the discarded 4.4.0 candidate evaluate
+  all 38 requirements. The separate `ai/cosecha-c4-major-v2` prototype removes
+  `cxp_adapters.py`, retains six catalog v2 declarations and passed 2623
+  source tests with five skips. It still needs installed checks against the
+  exact 5.0.0 release candidate and a portable lock.
 - Mongoeco `ai/mongoeco-catalog-v2@59ed7e9` has an owner catalog v2 candidate
   with source references and domains, requiring `cxp>=4.4.0.dev0,<5`; its wheel
-  and sdist pass isolated installation checks. It has not been published.
-- CXP `ai/cxp-c4-major-v2@e5d114a` combines the exchange-only removal
-  prototype with catalog v2. Documentation, Ruff, mypy and 319 source tests
-  pass. Reproducible wheel/sdist for provisional `5.0.0.dev0` passed an
-  installed Python 3.13/latest verification with retired modules absent.
-  This does not satisfy the public major release gate.
+  and sdist pass isolated installation checks. The separate Mongoeco major
+  prototype removes legacy reexports; final installed conformance against the
+  exact 5.0.0 candidate remains open.
+- The earlier CXP `5.0.0.dev0` prototype passed documentation, Ruff, mypy,
+  319 source tests and installed Python 3.13/latest verification with legacy
+  modules absent. Those provisional bytes are not 5.0.0 release evidence.
 - Before public removal, repeat the external consumer census, validate the
   installed absence of handshake/descriptors/registry/adapters and preserve
   the v1 historical artifacts outside the new package.
