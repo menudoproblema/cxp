@@ -12,7 +12,7 @@
   consumer checks and the release gates. No final major version is assigned
   by this source prototype.
 
-## 4.4.0 — 2026-09-26
+## 4.4.0 candidate — 2026-09-26
 
 - Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
   bounds, element-level documentary sources, independent schema and negotiation.

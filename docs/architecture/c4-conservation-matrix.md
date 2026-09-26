@@ -2,9 +2,9 @@
 
 This ledger records the decision for each legacy guarantee before deleting code.
 It does not certify migration. CXP 4.3.0 is published and verified from PyPI.
-The current C4 branch combines the opt-in catalog v2 contract with the
-deprecation window in a 4.4.0 release candidate. It is not a removal release;
-the public retirement requires a later major.
+The 4.4.0 candidate combines catalog v2 with the deprecation window; its
+PR #9 CI passed but it is not yet published. This branch is an exchange-only
+removal prototype with a provisional development version, not a public major.
 
 | Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
 | --- | --- | --- | --- |
@@ -40,18 +40,23 @@ external published consumers.
 
 ## Current preparation status (2026-09-26)
 
-- CXP `ai/cxp-c4@481c757` merged catalog v2 and C4 deprecation preparation as
-  `4.4.0.dev0`; its 12-cell artifact matrix passed. The subsequent stable
-  4.4.0 candidate requires its own exact artifact evidence. This version keeps
-  the legacy code and is not the removal major.
-- Cosecha `ai/cosecha-c4@54d8aaf` has a clean merged source and Python 3.13
-  wheel/sdist installations with CXP 4.3.0 from PyPI. All 38 pinned
-  requirements and the local runtime verdicts pass in both installations.
-  `cxp_adapters.py` remains packaged for the current public compatibility
-  window; no C4 absence claim is made.
+- CXP `ai/cxp-4.4-release@0e3af61` has a stable 4.4.0 candidate with a
+  12-cell local artifact matrix and a successful PR #9 CI run. The dependency
+  review check awaits repository Dependency graph configuration. The minor
+  retains deprecated public APIs; no tag or publication has occurred.
+- Cosecha `ai/cosecha-catalog-v2@a6cb1b9` has six catalog v2 declarations,
+  19 tiers and 19 profiles. Its source suite passed 2639 tests with five
+  skips; wheel and sdist installed with exact CXP 4.4.0 evaluate all 38
+  requirements. `cxp_adapters.py` remains packaged for the compatibility
+  window. Its development lock awaits 4.4.0 publication.
 - Mongoeco `ai/mongoeco-catalog-v2@59ed7e9` has an owner catalog v2 candidate
-  with source references and domains, pinned to CXP `4.4.0.dev0`; its wheel
+  with source references and domains, requiring `cxp>=4.4.0.dev0,<5`; its wheel
   and sdist pass isolated installation checks. It has not been published.
+- CXP `ai/cxp-c4-major-v2@e5d114a` combines the exchange-only removal
+  prototype with catalog v2. Documentation, Ruff, mypy and 319 source tests
+  pass. Reproducible wheel/sdist for provisional `5.0.0.dev0` passed an
+  installed Python 3.13/latest verification with retired modules absent.
+  This does not satisfy the public major release gate.
 - Before public removal, repeat the external consumer census, validate the
   installed absence of handshake/descriptors/registry/adapters and preserve
   the v1 historical artifacts outside the new package.

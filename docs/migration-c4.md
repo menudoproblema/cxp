@@ -1,9 +1,9 @@
 # Migration from the retired component protocol
 
 This guide applies to the future CXP removal major. It does not assign or
-announce a published version. The verified 4.3.0 exchange candidate, a
-deprecation release and its required subsequent minor must precede this
-public removal under [stability policy](stability.md).
+announce a published version. CXP 4.3.0 is the published deprecation release.
+The verified 4.4.0 candidate must be published as the subsequent minor before
+this public removal under [stability policy](stability.md).
 
 ## Replace the compatibility path
 
