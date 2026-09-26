@@ -6,6 +6,8 @@
   JSON Schema, explicit negotiation, and indeterminate source exclusion.
 - Separate the validated exchange evaluator from schema loading; preserve v1
   evaluator version and frozen report hashes.
+- Resolve package exports on demand so importing the pure evaluator does not
+  load JSON Schema validators or legacy catalog modules transitively.
 - Allow family/version selection in the schema API and CLI. The frozen v1
   `future-version` vector used context version 2 as an unknown example; its
   exact payload is now invalid because `accepted_sources` is absent.
