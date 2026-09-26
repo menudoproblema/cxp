@@ -42,7 +42,7 @@ cannot establish that no published external consumer exists.
   CXP 4.3.0 can evaluate these documents without importing CXP legacy modules.
   Driver telemetry now uses Mongoeco-owned primitives and works from an
   installed wheel without `cxp.telemetry`. The old Mongoeco catalog facade,
-  public reexports and `explain()` projections still use legacy CXP objects.
+  public reexports and compat exports still use legacy CXP objects.
 - Cosecha branch `ai/cosecha-c4` bounds its legacy dependency below 5 and
   packages five owner catalogs, nineteen tiers and nineteen profiles. Source
   tests and an installed-wheel read validate the exact references. The
@@ -124,6 +124,14 @@ cannot establish that no published external consumer exists.
   tier and loads all five catalog hashes. Importing the operational runtime
   still loads `cxp.catalogs` and `cxp.descriptors` through legacy runtime
   interop, so the absence gate remains open.
+- Mongoeco cursor `explain()` now reports the exact exchange catalog reference
+  and profile verdicts from the single exchange evaluator using context v2.
+  It no longer infers a minimal profile from a query path. Operation metadata
+  stays in owner-authored data. The new Mongoeco wheel installed with the
+  final CXP 4.3.0 wheel evaluates a vector-search explanation as compatible
+  without loading `cxp.catalogs`, `cxp.descriptors`, `cxp.handshake` or
+  `cxp.capabilities`. Its 207 focal cursor/exchange tests pass. The old public
+  facade and `compat` exports remain active separately.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
