@@ -114,8 +114,8 @@ cannot establish that no published external consumer exists.
   declared snapshots and exchange context v2. Real Gherkin satisfies the
   integrated engine tier, while Pytest is indeterminate for that tier and
   compatible for core, knowledge and planning. Engine runner focal tests pass.
-  The Cosecha runtime interface validator and standalone `cxp_adapters.py`
-  remain legacy and require migration or removal before the major.
+  The standalone `cxp_adapters.py` remains legacy and requires removal before
+  the major.
 - The Cosecha engine projection now rejects missing declared knowledge scopes
   instead of supplying a favorable default. Gherkin and Pytest declare their
   scopes explicitly; a negative omission test and their owner contract tests
@@ -123,7 +123,8 @@ cannot establish that no published external consumer exists.
   evaluates the real local runtime as compatible against the pinned runtime
   tier and loads all five catalog hashes. Importing the operational runtime
   still loads `cxp.catalogs` and `cxp.descriptors` through legacy runtime
-  interop, so the absence gate remains open.
+  interop at the time of this wheel build; a later source change removes that
+  import and still needs a rebuilt installed-wheel gate.
 - Mongoeco cursor `explain()` now reports the exact exchange catalog reference
   and profile verdicts from the single exchange evaluator using context v2.
   It no longer infers a minimal profile from a query path. Operation metadata
@@ -141,6 +142,24 @@ cannot establish that no published external consumer exists.
   remain unchanged as evidence; tests compare their unaffected sections and
   assert the deliberate mock-safe projection delta. Its 259 focused compat,
   cursor and exchange tests pass.
+- Cosecha now owns its manifest/runtime-profile interface-name vocabulary as
+  an operational contract. The previous global CXP registry and its implicit
+  abstract-to-concrete catalog lookup are gone from active runtime interop.
+  Abstract `execution/engine` with capability claims rejects; concrete
+  `execution/plan-run` validates. Reserved unknown names and capability names
+  still reject. The focused runtime-profile, manifest and discovery set passes
+  51 tests, and importing `cosecha.core.runtime` no longer loads any CXP
+  legacy component module in the source environment. This operational
+  vocabulary does not decide provider compatibility; owner exchange catalogs
+  do that separately.
+- A rebuilt Cosecha core wheel
+  (`1f9e881d2eb27c1abbc1945458158149b8dc77210568a96ba2153425df274197`)
+  installed with exact CXP 4.3.0 evaluates the real local runtime as
+  compatible. Its manifest vocabulary rejects unknown
+  `execution/plan-run` capability names, and that installed path loads none of
+  `cxp.catalogs`, `cxp.descriptors`, `cxp.handshake` or `cxp.capabilities`.
+  The expanded source focal set passes 197 tests. The old adapter module is
+  still packaged, so full artifact absence remains open.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
