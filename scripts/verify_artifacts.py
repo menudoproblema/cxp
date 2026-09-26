@@ -229,7 +229,12 @@ def main() -> None:
             if base_probe != manifest["version"]:
                 raise ValueError("Wrong base package version")
             missing = subprocess.run(
-                [str(base_python), "-I", "-c", "import cxp.exchange"],
+                [
+                    str(base_python),
+                    "-I",
+                    "-c",
+                    "from cxp.exchange import Document",
+                ],
                 cwd=case,
                 env=env,
                 capture_output=True,
