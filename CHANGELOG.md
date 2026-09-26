@@ -18,6 +18,8 @@
 - Deprecate root exports and direct imports of the legacy component protocol
   with `DeprecationWarning`. Legacy behavior and public APIs remain available;
   `cxp.exchange` and shared validation diagnostics remain current.
+- Preserve deprecation warning counts in release test reports while accepting
+  all-passed artifact suites; failed or skipped cases still block release evidence.
 
 
 ## 4.2.0 — 2026-09-16

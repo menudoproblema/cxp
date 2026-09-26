@@ -39,8 +39,11 @@ resuelve la última combinación admitida.
 `scripts/release_evidence.py` exige los doce resultados (seis combinaciones por
 dos artefactos) y rechaza evidencia stale o incompleta. Genera
 `dist/4.3.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
-candidata realmente comprobada. Los informes son locales y no se incluyen en
-el sdist para evitar ciclos de evidencia que se hashea a sí misma.
+candidata realmente comprobada. Un resumen de Pytest con todos los casos en
+verde y un recuento de `DeprecationWarning` sigue conservando los avisos en el
+informe; un fallo o caso saltado impide el cierre. Los informes son locales y
+no se incluyen en el sdist para evitar ciclos de evidencia que se hashea a sí
+misma.
 
 Modificar cualquier fuente después de la construcción obliga a reconstruir y
 repetir los controles. La CI construye una sola candidata, verifica esos mismos
