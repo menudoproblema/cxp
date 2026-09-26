@@ -188,3 +188,22 @@ external published consumers.
   modules absent. The dry-run files still carry 4.3.0 from the base checkout
   and are not release candidates or an assigned major version. Public removal
   waits for the release sequence and complete installed consumer migration.
+- The isolated Cosecha removal-major source deletes `cxp_adapters.py` and
+  obsolete registry-fallback tests, preserving their original bytes in
+  `evidence/cosecha-legacy-cxp-adapters.zip`. Its core and testkit suite passes
+  (1091 tests, 3 skipped). The core wheel contains all five owner catalogs and
+  no adapter; an installed smoke with the CXP removal prototype loads no CXP
+  legacy modules. The source is staged because the repository's pre-commit
+  governance hook rejects unrelated historical RFC checkout references and
+  its `uv` hooks cannot resolve unpublished CXP 4.3.0. No hook was bypassed.
+- The isolated Mongoeco removal-major source replaces public legacy reexports
+  with exact exchange documents. `compat.export_full_compat_catalog()` embeds
+  the same documents; operational telemetry validation and runtime-subset
+  data are owned by Mongoeco. The previous public API fixture remains untouched,
+  while a source candidate manifest records five removals and two additions.
+  Its unit suite passes (3092 tests, 26 skipped, 1336 subtests), lint ratchet
+  and public typing checks pass, and installed wheel/sdist inspection confirms
+  absent legacy modules. A fresh installed-wheel smoke evaluates
+  `mongodb-mock-safe` as compatible with the same exchange evaluator. Its
+  source commit is `f11bca7` on `ai/mongoeco-c4-major`; the prototype still
+  carries the pre-major package version and an upper bound below CXP 5.
