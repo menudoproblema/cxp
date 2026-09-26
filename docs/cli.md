@@ -20,10 +20,14 @@ cxp evaluate --catalog catalog.json --snapshot snapshot.json \
 cxp evaluate --catalog catalog.json --snapshot snapshot.json \
   --requirements requirements.json --context context.json --explain
 cxp schema document
+cxp schema document --type cxp.context --spec-version 2
 cxp schema operation org.cxp:document-result:1
 cxp catalog list
 cxp catalog show physical-printing --version 1.1.0
 ```
+
+`schema document` without options returns the published v1 family schema;
+`--type` selects one family and `--spec-version 2` selects the context v2 schema.
 
 `--catalog` may be repeated. `validate` reports scope `document` when it checks
 only intrinsic document rules and `catalog` when it also resolves and validates

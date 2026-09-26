@@ -12,7 +12,7 @@ from cxp.exchange.errors import invalid, unsupported
 __all__ = ("ExchangeAgreement", "SUPPORTED_FORMATS", "negotiate_exchange")
 
 SUPPORTED_FORMATS: Mapping[str, tuple[int, ...]] = MappingProxyType(
-    dict.fromkeys(DOCUMENT_TYPES, (1,))
+    {name: (1, 2) if name == "cxp.context" else (1,) for name in DOCUMENT_TYPES}
 )
 
 

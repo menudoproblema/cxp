@@ -70,6 +70,11 @@ def test_portable_document_vectors(case):
         )
     data = case.get("raw_json") or json.dumps(case["document"])
     status = case["expected"]["status"]
+    # This frozen v1 vector used version 2 as its unknown-version example.
+    # Context v2 is now known, but this exact payload lacks accepted_sources.
+    historical_v2_delta = case["id"] == "future-version"
+    if historical_v2_delta:
+        status = "invalid"
     if status == "accepted":
         document = load_document(data, expected_type=case["document_type"])
         assert (
@@ -82,7 +87,9 @@ def test_portable_document_vectors(case):
         )
         with pytest.raises(error_type) as error:
             load_document(data, expected_type=case["document_type"])
-        assert error.value.issues[0].code == case["expected"]["code"]
+        assert error.value.issues[0].code == (
+            "schema_violation" if historical_v2_delta else case["expected"]["code"]
+        )
         if "path" in case["expected"]:
             assert error.value.issues[0].path == case["expected"]["path"]
         if "document" in case:

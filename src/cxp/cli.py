@@ -122,7 +122,13 @@ def _evaluate(args: argparse.Namespace) -> int:
 def _schema_document(args: argparse.Namespace) -> int:
     from cxp.exchange import document_schema
 
-    _write_stdout(_json_bytes(document_schema()))
+    _write_stdout(
+        _json_bytes(
+            document_schema(
+                document_type=args.document_type, spec_version=args.spec_version
+            )
+        )
+    )
     return 0
 
 
@@ -189,6 +195,8 @@ def _parser() -> argparse.ArgumentParser:
     schema = commands.add_parser("schema", help="print a packaged schema")
     schema_commands = schema.add_subparsers(dest="schema_command", required=True)
     schema_document = schema_commands.add_parser("document")
+    schema_document.add_argument("--type", dest="document_type", choices=DOCUMENT_TYPES)
+    schema_document.add_argument("--spec-version", type=int, default=1)
     _add_diagnostics(schema_document)
     schema_document.set_defaults(handler=_schema_document)
     schema_operation = schema_commands.add_parser("operation")

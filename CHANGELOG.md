@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.3.0 — 2026-09-26 (local candidate)
+
+- Add opt-in `cxp.context` v2 with mandatory `accepted_sources`, independent
+  JSON Schema, explicit negotiation, and indeterminate source exclusion.
+- Separate the validated exchange evaluator from schema loading; preserve v1
+  evaluator version and frozen report hashes.
+- Allow family/version selection in the schema API and CLI. The frozen v1
+  `future-version` vector used context version 2 as an unknown example; its
+  exact payload is now invalid because `accepted_sources` is absent.
+
+
 ## 4.2.0 — 2026-09-16
 
 - Added independent declarative `positioning` and `identification` reference

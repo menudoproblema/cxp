@@ -49,12 +49,12 @@ not from the maintainer's active virtual environment.
 
 ```bash
 python scripts/build_candidate.py
-python scripts/verify_artifacts.py --dependencies minimum --dist dist/4.1.0
-python scripts/verify_artifacts.py --dependencies latest --dist dist/4.1.0
+python scripts/verify_artifacts.py --dependencies minimum --dist dist/4.3.0
+python scripts/verify_artifacts.py --dependencies latest --dist dist/4.3.0
 ```
 
 Repeat artifact checks with `--python` for 3.12, 3.13 and 3.14, saving each report
-with `--report dist/4.1.0/reports/<python>-<policy>.json`. These install both
+with `--report dist/4.3.0/reports/<python>-<policy>.json`. These install both
 wheel and sdist in separate base, exchange and development environments, copy
 tests/examples/scripts from the sdist, and run without editable installs, source
 injection or a sibling checkout. The minimum policy fixes every direct runtime

@@ -158,6 +158,8 @@ def normalize_payload(content: dict[str, Any]) -> None:
                 key: _value(value) for key, value in capability["properties"].items()
             }
     elif kind == "cxp.context":
+        if content["spec_version"] == 2:
+            payload["accepted_sources"].sort()
         if "as_of" in payload:
             payload["as_of"] = timestamp(payload["as_of"], "/payload/as_of")
     elif kind == "cxp.requirements":

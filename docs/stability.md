@@ -36,6 +36,11 @@ least one subsequent minor release. Wire contracts and published catalog
 versions are not silently rewritten; retirement requires a documented successor
 and migration path.
 
+The `cxp.context` v2 addition is opt-in. Existing context v1 calls and document
+bytes remain stable; only a consumer explicitly offering v2 can negotiate it.
+The semantic evaluator revision is recorded independently of package and
+document versions. See [context v2](protocol/context-v2.md).
+
 ## Evaluation details
 
 `cxp.evaluation` remains the portable result. `EvaluationResult` and its typed

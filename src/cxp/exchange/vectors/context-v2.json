@@ -1,0 +1,134 @@
+{
+  "suite": "cxp.context.v2",
+  "documents": [
+    {
+      "id": "declared",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            "declared"
+          ]
+        }
+      },
+      "schema_valid": true
+    },
+    {
+      "id": "observed",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            "observed"
+          ]
+        }
+      },
+      "schema_valid": true
+    },
+    {
+      "id": "tested",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            "tested"
+          ]
+        }
+      },
+      "schema_valid": true
+    },
+    {
+      "id": "empty",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": []
+        }
+      },
+      "schema_valid": false
+    },
+    {
+      "id": "duplicate",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            "tested",
+            "tested"
+          ]
+        }
+      },
+      "schema_valid": false
+    },
+    {
+      "id": "unknown",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            "estimated"
+          ]
+        }
+      },
+      "schema_valid": false
+    },
+    {
+      "id": "boolean",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": [
+            true
+          ]
+        }
+      },
+      "schema_valid": false
+    },
+    {
+      "id": "string",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev",
+          "accepted_sources": "tested"
+        }
+      },
+      "schema_valid": false
+    },
+    {
+      "id": "missing",
+      "document": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "server",
+          "configuration_revision": "rev"
+        }
+      },
+      "schema_valid": false
+    }
+  ]
+}

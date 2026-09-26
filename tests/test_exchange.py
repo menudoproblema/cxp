@@ -279,7 +279,7 @@ def test_resource_limits_and_cycles():
 @pytest.mark.parametrize(
     "field,value,error_type",
     [
-        ("spec_version", 2, UnsupportedContractError),
+        ("spec_version", 3, UnsupportedContractError),
         ("spec_version", True, InvalidDocumentError),
         ("document_type", "cxp.future", UnsupportedContractError),
         (

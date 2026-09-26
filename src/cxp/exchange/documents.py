@@ -140,20 +140,37 @@ def _copy_json(value: object) -> Any:
     return visit(value, "", 0)
 
 
-@lru_cache(maxsize=1)
-def _schema() -> JsonObject:
-    resource = files("cxp.exchange").joinpath("schemas/exchange-v1.json")
+@lru_cache(maxsize=2)
+def _schema(spec_version: int = 1) -> JsonObject:
+    name = "exchange-v1.json" if spec_version == 1 else "context-v2.json"
+    resource = files("cxp.exchange").joinpath(f"schemas/{name}")
     return json.loads(resource.read_text(encoding="utf-8"))
 
 
-def document_schema() -> JsonObject:
+def document_schema(
+    *, document_type: str | None = None, spec_version: int = 1
+) -> JsonObject:
     """Devolvemos una copia del contrato estructural distribuido con CXP."""
-    return json.loads(json.dumps(_schema()))
-
-
-@lru_cache(maxsize=7)
-def _validator(document_type: str) -> Draft202012Validator:
+    if (document_type, spec_version) != ("cxp.context", 2) and spec_version != 1:
+        raise ValueError("Unsupported document family/version")
+    if document_type is not None and document_type not in DOCUMENT_TYPES:
+        raise ValueError("Unknown document family")
+    if spec_version == 2:
+        return json.loads(json.dumps(_schema(2)))
     schema = _schema()
+    if document_type is None:
+        return json.loads(json.dumps(schema))
+    definition = next(
+        item
+        for item in schema["oneOf"]
+        if item["properties"]["document_type"]["const"] == document_type
+    )
+    return json.loads(json.dumps({**definition, "$defs": schema["$defs"]}))
+
+
+@lru_cache(maxsize=8)
+def _validator(document_type: str, spec_version: int) -> Draft202012Validator:
+    schema = _schema(spec_version)
     definition = next(
         item
         for item in schema["oneOf"]
@@ -182,15 +199,34 @@ def _validate(value: object, expected_type: str) -> bytes:
         raise invalid(
             "invalid_version", "/spec_version", "Document version must be an integer"
         )
-    if version != 1:
+    if version != 1 and (document_type, version) != ("cxp.context", 2):
         raise unsupported(
             "unsupported_version", "/spec_version", "Unsupported document version"
         )
     # Damos diagnósticos precisos sin retirar las restricciones del JSON Schema.
     issues = requirement_shape_issues(content)
+    if (document_type, version) == ("cxp.context", 2):
+        sources = (
+            content.get("payload", {}).get("accepted_sources")
+            if isinstance(content.get("payload"), dict)
+            else None
+        )
+        if isinstance(sources, list):
+            seen: set[str] = set()
+            for index, source in enumerate(sources):
+                if isinstance(source, str) and source in seen:
+                    issues.append(
+                        ValidationIssue(
+                            "duplicate_source",
+                            f"/payload/accepted_sources/{index}",
+                            "Source values must be unique",
+                        )
+                    )
+                if isinstance(source, str):
+                    seen.add(source)
     if issues:
         raise InvalidDocumentError(issues)
-    for error in _validator(document_type).iter_errors(content):
+    for error in _validator(document_type, version).iter_errors(content):
         path = "/" + "/".join(pointer_token(token) for token in error.absolute_path)
         issues.append(
             ValidationIssue("schema_violation", path.rstrip("/"), error.message[:512])
@@ -205,7 +241,7 @@ def _validate(value: object, expected_type: str) -> bytes:
     # Los valores por defecto también cuentan en el documento que exportamos.
     content = _copy_json(content)
     # La normalización no puede introducir duplicados ni romper el esquema.
-    for error in _validator(document_type).iter_errors(content):
+    for error in _validator(document_type, version).iter_errors(content):
         path = "/" + "/".join(pointer_token(token) for token in error.absolute_path)
         raise invalid("schema_violation", path.rstrip("/"), error.message[:512])
     encoded = rfc8785.dumps(content)

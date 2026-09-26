@@ -3,6 +3,7 @@
 from cxp.exchange.documents import Document, document_schema, load_document
 from cxp.exchange.errors import InvalidDocumentError, UnsupportedContractError
 from cxp.exchange.evaluation import (
+    CONTEXT_V2_EVALUATOR_VERSION,
     EVALUATOR_VERSION,
     EvaluationFinding,
     EvaluationOperand,
@@ -37,6 +38,7 @@ __all__ = (
     "CatalogStore",
     "Document",
     "EVALUATOR_VERSION",
+    "CONTEXT_V2_EVALUATOR_VERSION",
     "EvaluationFinding",
     "EvaluationOperand",
     "EvaluationResult",
