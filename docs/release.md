@@ -74,9 +74,11 @@ exactos. Además, cada owner de consumidores conocidos debe revisar:
 - resolución de dependencias y pruebas de integración con la candidata;
 - aislamiento de los canales legacy/nuevo y conservación de requisitos.
 
-No se han cambiado ni acreditado esos consumidores desde esta tarea. La falta
-de evidencia de integración es una condición explícita que impide publicar,
-no una invitación a actualizar dependencias automáticamente.
+La revisión de consumidores se acredita para cada candidata exacta. Los gates
+de CXP y una prueba sintética con catálogos externos no sustituyen la revisión
+del owner ni las pruebas de integración de los consumidores alcanzados. Si
+falta esa evidencia, la publicación queda pendiente; no se actualizan
+dependencias automáticamente.
 
 La vuelta atrás usa los artefactos previos conocidos; no sobrescribe versiones
 publicadas ni degrada documentos nuevos al formato viejo. Se conservan la

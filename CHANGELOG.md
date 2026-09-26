@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.3.0 — 2026-09-26 (local candidate)
+## 4.3.0 — 2026-09-26
 
 - Add opt-in `cxp.context` v2 with mandatory `accepted_sources`, independent
   JSON Schema, explicit negotiation, and indeterminate source exclusion.
