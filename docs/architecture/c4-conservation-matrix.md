@@ -130,8 +130,14 @@ cannot establish that no published external consumer exists.
   stays in owner-authored data. The new Mongoeco wheel installed with the
   final CXP 4.3.0 wheel evaluates a vector-search explanation as compatible
   without loading `cxp.catalogs`, `cxp.descriptors`, `cxp.handshake` or
-  `cxp.capabilities`. Its 207 focal cursor/exchange tests pass. The old public
+  `cxp.capabilities`. Its 209 focal cursor/exchange tests pass. The old public
   facade and `compat` exports remain active separately.
+- Mongoeco's real mock/tooling gate now has a sixth pinned exchange profile,
+  `mongodb-mock-safe`. It requires operation bindings and owner-validated
+  metadata keys without flattening structured values. An omitted required key
+  is incompatible in an independent negative test. The legacy
+  `compat.export_mock_safe_profile_catalog()` path still has its own evaluator
+  and must switch to this document before the major.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
