@@ -167,6 +167,32 @@ def test_source_set_has_canonical_bytes_and_v1_is_unchanged(inputs):
         make("cxp.context", context(None, version=1)["payload"], version=2)
 
 
+@pytest.mark.parametrize(
+    "update,expected",
+    [
+        ({"subject_id": "other"}, "subject_mismatch"),
+        ({"configuration_revision": "other"}, "configuration_mismatch"),
+        (
+            {"as_of": "2026-09-26T00:02:00Z", "max_age_seconds": 60},
+            "source_not_accepted",
+        ),
+    ],
+)
+def test_source_exclusion_combined_with_other_context_failures(
+    inputs, update, expected
+):
+    catalog, requirement, snapshot = inputs
+    payload = context(["observed"])["payload"] | update
+    result = evaluate_requirements(
+        snapshot("tested"),
+        requirement,
+        make("cxp.context", payload, version=2),
+        catalogs=CatalogStore([catalog]),
+    )
+    assert result.payload["verdict"] == "indeterminate"
+    assert result.payload["findings"][0]["code"] == expected
+
+
 def test_v2_schema_and_negotiation_do_not_fallback():
     schema = document_schema(document_type="cxp.context", spec_version=2)
     valid = context(["tested"])
