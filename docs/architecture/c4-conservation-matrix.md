@@ -39,7 +39,9 @@ cannot establish that no published external consumer exists.
   `CatalogStore`. Tests cover missing values, incompatible explicit values,
   wrong operation types, source policy and exact hash. A wheel installed with
   CXP 4.3.0 can evaluate these documents without importing CXP legacy modules.
-  The old Mongoeco facade and telemetry imports are still active.
+  Driver telemetry now uses Mongoeco-owned primitives and works from an
+  installed wheel without `cxp.telemetry`. The old Mongoeco catalog facade,
+  public reexports and `explain()` projections still use legacy CXP objects.
 - Cosecha branch `ai/cosecha-c4` bounds its legacy dependency below 5 and
   packages five owner catalogs, nineteen tiers and nineteen profiles. Source
   tests and an installed-wheel read validate the exact references. The
