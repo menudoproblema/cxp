@@ -116,3 +116,20 @@ def test_candidate_replacement_is_recoverable_and_published_is_immutable(tmp_pat
     )
     with pytest.raises(RuntimeError, match="published"):
         SUPPORT.promote_candidate(replacement, destination, replace_unpublished=True)
+
+
+@pytest.mark.parametrize(
+    ("summary", "accepted"),
+    [
+        ("521 passed in 4.50s", True),
+        ("521 passed, 374 warnings in 4.50s", True),
+        ("1 passed, 1 warning in 0.02s", True),
+        ("521 passed, 1 failed in 4.50s", False),
+        ("520 passed, 1 skipped in 4.50s", False),
+        ("0 passed in 0.02s", False),
+    ],
+)
+def test_release_summary_keeps_warnings_without_accepting_incomplete_suite(
+    summary: str, accepted: bool
+) -> None:
+    assert SUPPORT.successful_pytest_summary(summary) is accepted

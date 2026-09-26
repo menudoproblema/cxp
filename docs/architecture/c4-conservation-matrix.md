@@ -1,8 +1,10 @@
 # C4 conservation matrix (implementation ledger)
 
 This ledger records the decision for each legacy guarantee before deleting code.
-It does not certify migration. The CXP 4.3.0 candidate at `cd87211` remains the
-C1–C3 input; C4 develops separately and has no published target version yet.
+It does not certify migration. CXP 4.3.0 is published and verified from PyPI.
+The current C4 branch combines the opt-in catalog v2 contract with the
+deprecation window in a 4.4.0 release candidate. It is not a removal release;
+the public retirement requires a later major.
 
 | Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
 | --- | --- | --- | --- |
@@ -22,10 +24,10 @@ C1–C3 input; C4 develops separately and has no published target version yet.
 
 ## Release and consumer order
 
-1. CXP 4.3.0 is a verified local candidate only. Keep it available as an exact artifact for migration development.
-2. Migration releases of Cosecha and Mongoeco must replace runtime uses of legacy CXP. Before those releases, their current manifests and locks have `<5`; Tórculo already has `<5`.
-3. A CXP minor must document deprecation and retain public legacy APIs for at least one subsequent minor release, per `docs/stability.md`.
-4. After consumer artifacts pass installed tests, the removal major can delete legacy entrypoints and catalogs. Retain neutral validation code actually imported by exchange. Confirm absence in the wheel/sdist and recheck external consumers immediately before removal.
+1. CXP 4.3.0 is published with deprecation warnings. Keep its exact PyPI artifacts as the baseline for migration and historical conformance.
+2. Migration releases of Cosecha and Mongoeco replace runtime uses of legacy CXP. Their current manifests keep `<5`; Tórculo already has `<5`.
+3. Publish at least one subsequent minor retaining the deprecated public APIs, per `docs/stability.md`. The opt-in catalog v2 candidate is being prepared for this window.
+4. After consumer artifacts pass installed tests and dependencies are coordinated, the removal major can delete legacy entrypoints and catalogs. Retain neutral validation code actually imported by exchange. Confirm absence in the wheel/sdist and recheck external consumers immediately before removal.
 
 The repository census found Cosecha, Mongoeco and Tórculo in current accessible
 checkouts. A public web code search returned no indexed matches; that result
@@ -36,7 +38,29 @@ has extensive unrelated WIP and `cxp>=1.0.0`; it is preserved as evidence,
 not treated as the current Cosecha migration target. This does not settle
 external published consumers.
 
+## Current preparation status (2026-09-26)
+
+- CXP `ai/cxp-c4@481c757` merged catalog v2 and C4 deprecation preparation as
+  `4.4.0.dev0`; its 12-cell artifact matrix passed. The subsequent stable
+  4.4.0 candidate requires its own exact artifact evidence. This version keeps
+  the legacy code and is not the removal major.
+- Cosecha `ai/cosecha-c4@54d8aaf` has a clean merged source and Python 3.13
+  wheel/sdist installations with CXP 4.3.0 from PyPI. All 38 pinned
+  requirements and the local runtime verdicts pass in both installations.
+  `cxp_adapters.py` remains packaged for the current public compatibility
+  window; no C4 absence claim is made.
+- Mongoeco `ai/mongoeco-catalog-v2@59ed7e9` has an owner catalog v2 candidate
+  with source references and domains, pinned to CXP `4.4.0.dev0`; its wheel
+  and sdist pass isolated installation checks. It has not been published.
+- Before public removal, repeat the external consumer census, validate the
+  installed absence of handshake/descriptors/registry/adapters and preserve
+  the v1 historical artifacts outside the new package.
+
 ## Progress against this ledger
+
+The entries below preserve earlier migration observations in chronological
+order. Their candidate and lock statements describe those earlier revisions;
+the current state is recorded above.
 
 - Mongoeco branch `ai/mongoeco-c4` bounds its legacy dependency below 5 and
   packages an owner-authored MongoDB exchange catalog, three tier documents,

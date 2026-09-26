@@ -8,19 +8,19 @@
 - Retain `cxp.exchange`, explicit catalog resolution and neutral validation
   diagnostics. Document guarantee ownership and consumer migration in
   [the C4 guide](docs/migration-c4.md).
-- Publication remains contingent on the deprecation release, a subsequent
-  minor, installed consumer checks and the release gates. No major version is
-  assigned by this source prototype.
+- Publication remains contingent on the published 4.4.0 minor, installed
+  consumer checks and the release gates. No final major version is assigned
+  by this source prototype.
 
-## Deprecation-minor source (not published)
+## 4.4.0 — 2026-09-26
 
-- Deprecate root exports and direct module imports of the legacy component
-  protocol with a Python `DeprecationWarning`. Exchange and shared validation
-  exports remain current.
-  Legacy APIs are still present; their removal requires a later major release
-  after a subsequent minor release and consumer migration.
+- Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
+  bounds, element-level documentary sources, independent schema and negotiation.
+  Catalog v1 and the published 4.3.0 contracts remain unchanged.
+- Retain the deprecated component protocol through this subsequent minor
+  release while known consumers adopt owner-authored exchange catalogs.
 
-## 4.3.0 — 2026-09-26 (local candidate)
+## 4.3.0 — 2026-09-26
 
 - Add opt-in `cxp.context` v2 with mandatory `accepted_sources`, independent
   JSON Schema, explicit negotiation, and indeterminate source exclusion.
@@ -31,6 +31,15 @@
 - Allow family/version selection in the schema API and CLI. The frozen v1
   `future-version` vector used context version 2 as an unknown example; its
   exact payload is now invalid because `accepted_sources` is absent.
+- Add portable context v2 evaluation vectors with independently authored source
+  policy and precedence outcomes; the historical v1 vectors remain unchanged.
+- Document context v2 resource admission with an executable external-data example
+  and separate compatible, incompatible, indeterminate and invalid outcomes.
+- Deprecate root exports and direct imports of the legacy component protocol
+  with `DeprecationWarning`. Legacy behavior and public APIs remain available;
+  `cxp.exchange` and shared validation diagnostics remain current.
+- Preserve deprecation warning counts in release test reports while accepting
+  all-passed artifact suites; failed or skipped cases still block release evidence.
 
 
 ## 4.2.0 — 2026-09-16

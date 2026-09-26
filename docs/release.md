@@ -9,7 +9,7 @@ la librería no implica desplegar consumidores.
 
 `scripts/check.py` ejecuta los gates del checkout. `scripts/build_candidate.py`
 construye wheel y sdist, comprueba metadatos con Twine y genera
-`dist/<version>/build-manifest.json` (para esta candidata, `dist/4.3.0`). El
+`dist/<version>/build-manifest.json`. El
 manifiesto identifica revisión base,
 huella del checkout (incluidos ficheros nuevos sin commit), epoch y SHA-256 de
 cada artefacto. La huella excluye archivos ignorados por Git, como entornos,
@@ -38,9 +38,12 @@ resuelve la última combinación admitida.
 
 `scripts/release_evidence.py` exige los doce resultados (seis combinaciones por
 dos artefactos) y rechaza evidencia stale o incompleta. Genera
-`dist/4.3.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
-candidata realmente comprobada. Los informes son locales y no se incluyen en
-el sdist para evitar ciclos de evidencia que se hashea a sí misma.
+`dist/<version>/release-evidence.json`; ese fichero contiene los hashes exactos de la
+candidata realmente comprobada. Un resumen de Pytest con todos los casos en
+verde y un recuento de `DeprecationWarning` sigue conservando los avisos en el
+informe; un fallo o caso saltado impide el cierre. Los informes son locales y
+no se incluyen en el sdist para evitar ciclos de evidencia que se hashea a sí
+misma.
 
 Modificar cualquier fuente después de la construcción obliga a reconstruir y
 repetir los controles. La CI construye una sola candidata, verifica esos mismos
@@ -80,6 +83,12 @@ de retirada exige artefactos instalados de cada consumidor admitido, sus
 límites de dependencias coordinados y la secuencia de deprecación de
 [estabilidad](stability.md). La falta de cualquiera de esos gates impide
 publicar; actualizar dependencias automáticamente no los satisface.
+
+La revisión de consumidores se acredita para cada candidata exacta. Los gates
+de CXP y una prueba sintética con catálogos externos no sustituyen la revisión
+del owner ni las pruebas de integración de los consumidores alcanzados. Si
+falta esa evidencia, la publicación queda pendiente; no se actualizan
+dependencias automáticamente.
 
 La vuelta atrás usa los artefactos previos conocidos; no sobrescribe versiones
 publicadas ni degrada documentos nuevos al formato viejo. Se conservan la

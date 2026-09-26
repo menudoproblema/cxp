@@ -41,6 +41,11 @@ bytes remain stable; only a consumer explicitly offering v2 can negotiate it.
 The semantic evaluator revision is recorded independently of package and
 document versions. See [context v2](protocol/context-v2.md).
 
+In 4.3.0, root exports and direct imports of the legacy component protocol
+began issuing `DeprecationWarning`. The deprecated public APIs remained
+available through the subsequent 4.4.0 minor while consumers migrated to
+owner-authored exchange catalogs.
+
 The retired component protocol is absent from this removal-major source tree.
 `cxp.exchange` and the shared `cxp.validation` diagnostics remain supported.
 See the [migration guide](migration-c4.md) and historical source under

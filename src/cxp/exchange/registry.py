@@ -21,7 +21,9 @@ def catalog_reference(catalog: Document) -> dict[str, str]:
 
 
 def _numeric(value: Any, definition: JsonObject, path: str) -> int | Fraction:
-    result = property_value(value, definition, path, allow_null=False)
+    result = property_value(
+        value, definition, path, allow_null=False, check_constraints=False
+    )
     if isinstance(result, bool) or not isinstance(result, (int, Fraction)):
         raise invalid("invalid_range", path, "Range values must be numeric")
     return result
@@ -50,6 +52,7 @@ def validate_leaf(node: JsonObject, capability: JsonObject, path: str) -> None:
             raise invalid(
                 "invalid_operator", path, "contains_all requires a string set"
             )
+        property_value(node["values"], definition, f"{path}/values", allow_null=False)
     elif operator == "equals":
         property_value(node["value"], definition, f"{path}/value")
     elif operator == "one_of":

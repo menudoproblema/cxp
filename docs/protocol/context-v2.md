@@ -47,6 +47,14 @@ sigue devolviendo el esquema v1 publicado. Para la nueva familia/versión se
 consulta `document_schema(document_type="cxp.context", spec_version=2)` o
 `cxp schema document --type cxp.context --spec-version 2`.
 
+Los vectores portables de `src/cxp/exchange/vectors/context-v2.json` incluyen
+documentos estructurales válidos e inválidos, un catálogo y snapshots como
+datos, y evaluaciones con veredictos, códigos y versión semántica esperados.
+Cubren las tres fuentes admitidas y excluidas, la precedencia de sujeto,
+revisión, procedencia y vigencia, la semántica conservada de v1 y la igualdad
+canónica del conjunto `accepted_sources`. Los oráculos están escritos desde
+esta especificación; un consumidor puede ejecutarlos sin importar CXP.
+
 Versión del paquete, `spec_version`, identidad/versión/huella de catálogo y
 `evaluator_version` son identidades separadas. Un catálogo nuevo se fija por
 namespace, nombre, versión SemVer y SHA-256 exactos; no se selecciona latest,

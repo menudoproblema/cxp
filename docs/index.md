@@ -6,6 +6,8 @@ contexto y procedencia admitida. El evaluador no importa a ninguno de ellos.
 
 - [Especificación documental v1](protocol/exchange-v1.md)
 - [Contexto v2 y procedencia](protocol/context-v2.md)
+- [Catálogo v2 y dominios explícitos](protocol/catalog-v2.md)
+- [Decisión de catálogo v2](architecture/catalog-v2-decision.md)
 - [Integración](protocol/exchange-integration.md)
 - [CLI](cli.md)
 - [Catálogos de referencia](catalogs/exchange-reference.md)

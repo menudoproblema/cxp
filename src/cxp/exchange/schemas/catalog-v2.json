@@ -1,0 +1,642 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cxp:schema:catalog:2",
+  "title": "CXP catalog document v2",
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*[:.][\\x21-\\x7E]+$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "version": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        }
+      },
+      "required": [
+        "namespace",
+        "name",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "quantity": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "unit": {
+          "enum": [
+            "um",
+            "mm",
+            "in",
+            "pt",
+            "g",
+            "kg",
+            "dpi",
+            "deg"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "property": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "string",
+            "boolean",
+            "integer",
+            "decimal",
+            "quantity",
+            "string_set"
+          ]
+        },
+        "dimension": {
+          "enum": [
+            "length",
+            "mass",
+            "resolution",
+            "angle"
+          ]
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "null_meaning": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "source": {
+          "$ref": "#/$defs/source_reference"
+        },
+        "domain": {
+          "$ref": "#/$defs/domain"
+        },
+        "bounds": {
+          "$ref": "#/$defs/bounds"
+        }
+      },
+      "required": [
+        "kind",
+        "source"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "quantity"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "dimension"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "dimension"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "nullable": {
+                "const": true
+              }
+            },
+            "required": [
+              "nullable"
+            ]
+          },
+          "then": {
+            "required": [
+              "null_meaning"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "null_meaning"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "string",
+                  "string_set"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "domain"
+            ],
+            "not": {
+              "required": [
+                "bounds"
+              ]
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "domain"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "integer",
+                  "decimal",
+                  "quantity"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "bounds"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "idempotency": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "guaranteed",
+            "not_idempotent",
+            "unknown"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "window_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "key": [
+          "scope",
+          "window_seconds"
+        ],
+        "scope": [
+          "key",
+          "window_seconds"
+        ],
+        "window_seconds": [
+          "key",
+          "scope"
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "unknown",
+                  "not_idempotent"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "key"
+                  ]
+                },
+                {
+                  "required": [
+                    "scope"
+                  ]
+                },
+                {
+                  "required": [
+                    "window_seconds"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "result_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*[:.][\\x21-\\x7E]+$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "input_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*[:.][\\x21-\\x7E]+$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "idempotency": {
+          "$ref": "#/$defs/idempotency"
+        },
+        "source": {
+          "$ref": "#/$defs/source_reference"
+        }
+      },
+      "required": [
+        "name",
+        "result_type",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "capability_definition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+            "not": {
+              "pattern": "[\\r\\n]"
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/property"
+          },
+          "maxProperties": 1000
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operation"
+          },
+          "maxItems": 1000
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "source": {
+          "$ref": "#/$defs/source_reference"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "operations",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "catalog": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability_definition"
+          },
+          "maxItems": 1000
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "source": {
+          "$ref": "#/$defs/source_reference"
+        }
+      },
+      "required": [
+        "identity",
+        "owner",
+        "capabilities",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "source_reference": {
+      "type": "object",
+      "properties": {
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "reference",
+        "revision",
+        "locator"
+      ],
+      "additionalProperties": false
+    },
+    "domain": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "open"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "closed"
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16384
+              },
+              "minItems": 1,
+              "maxItems": 1000,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "mode",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "minimum": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+              "maxLength": 128
+            },
+            {
+              "$ref": "#/$defs/quantity"
+            }
+          ]
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+              "maxLength": 128
+            },
+            {
+              "$ref": "#/$defs/quantity"
+            }
+          ]
+        },
+        "minimum_inclusive": {
+          "type": "boolean"
+        },
+        "maximum_inclusive": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "minimum"
+          ]
+        },
+        {
+          "required": [
+            "maximum"
+          ]
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "minimum_inclusive"
+            ]
+          },
+          "then": {
+            "required": [
+              "minimum"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "maximum_inclusive"
+            ]
+          },
+          "then": {
+            "required": [
+              "maximum"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "document_type": {
+          "const": "cxp.catalog"
+        },
+        "spec_version": {
+          "const": 2
+        },
+        "payload": {
+          "$ref": "#/$defs/catalog"
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*[:.][\\x21-\\x7E]+$",
+            "not": {
+              "pattern": "[\\r\\n]"
+            }
+          }
+        },
+        "critical_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 1000,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "document_type",
+        "spec_version",
+        "payload"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}
