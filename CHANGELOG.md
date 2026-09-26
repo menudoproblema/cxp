@@ -11,6 +11,8 @@
 - Allow family/version selection in the schema API and CLI. The frozen v1
   `future-version` vector used context version 2 as an unknown example; its
   exact payload is now invalid because `accepted_sources` is absent.
+- Add portable context v2 evaluation vectors with independently authored source
+  policy and precedence outcomes; the historical v1 vectors remain unchanged.
 
 
 ## 4.2.0 — 2026-09-16

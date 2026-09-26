@@ -38,9 +38,10 @@ def context(sources: object, version: int = 2) -> dict:
     return {"document_type": "cxp.context", "spec_version": version, "payload": payload}
 
 
-VECTORS = json.loads(
+SUITE = json.loads(
     files("cxp.exchange").joinpath("vectors/context-v2.json").read_text()
-)["documents"]
+)
+VECTORS = SUITE["documents"]
 
 
 @pytest.mark.parametrize("case", VECTORS, ids=lambda case: case["id"])
@@ -56,6 +57,87 @@ def test_portable_context_vectors(case):
     else:
         with pytest.raises(InvalidDocumentError):
             Document(value, expected_type="cxp.context")
+
+
+@pytest.mark.parametrize("case", SUITE["evaluations"], ids=lambda case: case["id"])
+def test_portable_context_evaluation_vectors(case):
+    catalog = Document(SUITE["catalog"], expected_type="cxp.catalog")
+    requirements = Document(SUITE["requirements"], expected_type="cxp.requirements")
+    snapshot = Document(
+        SUITE["snapshots"][case["snapshot"]], expected_type="cxp.snapshot"
+    )
+    context_document = Document(case["context"], expected_type="cxp.context")
+    v1_validator = jsonschema_rs.Draft202012Validator(document_schema())
+    for document in (catalog, requirements, snapshot):
+        assert v1_validator.is_valid(document.as_dict())
+    context_schema = document_schema(
+        document_type="cxp.context", spec_version=context_document.spec_version
+    )
+    assert jsonschema_rs.Draft202012Validator(context_schema).is_valid(
+        context_document.as_dict()
+    )
+    result = evaluate_requirements(
+        snapshot, requirements, context_document, catalogs=CatalogStore([catalog])
+    )
+    assert result.payload["verdict"] == case["expected"]["verdict"]
+    assert [finding["code"] for finding in result.payload["findings"]] == case[
+        "expected"
+    ]["codes"]
+    assert result.payload["evaluator_version"] == case["expected"]["evaluator_version"]
+    assert v1_validator.is_valid(result.as_dict())
+
+
+def test_portable_context_source_order_has_identical_bytes():
+    left, right = (
+        Document(value, expected_type="cxp.context")
+        for value in SUITE["canonical_equivalence"]
+    )
+    assert left.to_bytes() == right.to_bytes()
+    assert left.sha256 == right.sha256
+
+
+@pytest.mark.parametrize(
+    "case_id,exit_code",
+    [("observed-admitted", 0), ("observed-excluded", 3)],
+)
+def test_portable_context_evaluation_matches_cli(tmp_path, case_id, exit_code):
+    case = next(case for case in SUITE["evaluations"] if case["id"] == case_id)
+    inputs = {
+        "catalog": SUITE["catalog"],
+        "snapshot": SUITE["snapshots"][case["snapshot"]],
+        "requirements": SUITE["requirements"],
+        "context": case["context"],
+    }
+    for name, value in inputs.items():
+        (tmp_path / f"{name}.json").write_text(json.dumps(value))
+    command = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "cxp.cli",
+            "evaluate",
+            "--catalog",
+            str(tmp_path / "catalog.json"),
+            "--snapshot",
+            str(tmp_path / "snapshot.json"),
+            "--requirements",
+            str(tmp_path / "requirements.json"),
+            "--context",
+            str(tmp_path / "context.json"),
+        ],
+        capture_output=True,
+        check=False,
+    )
+    assert command.returncode == exit_code, command.stderr.decode()
+    expected = evaluate_requirements(
+        Document(inputs["snapshot"], expected_type="cxp.snapshot"),
+        Document(inputs["requirements"], expected_type="cxp.requirements"),
+        Document(inputs["context"], expected_type="cxp.context"),
+        catalogs=CatalogStore(
+            [Document(inputs["catalog"], expected_type="cxp.catalog")]
+        ),
+    )
+    assert json.loads(command.stdout) == expected.as_dict()
 
 
 @pytest.fixture
