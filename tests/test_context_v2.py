@@ -243,6 +243,23 @@ def test_pure_core_has_no_validator_imports():
     assert "referencing" not in imports
 
 
+def test_pure_core_import_does_not_load_document_validators_or_legacy_catalogs():
+    command = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys; import cxp.exchange.core; "
+            "assert 'jsonschema' not in sys.modules; "
+            "assert 'referencing' not in sys.modules; "
+            "assert not any(n.startswith('cxp.catalogs') for n in sys.modules)",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert command.returncode == 0, command.stderr
+
+
 def test_cli_and_python_use_same_v2_contract(tmp_path):
     path = tmp_path / "context.json"
     path.write_text(json.dumps(context(["tested", "observed"])))
