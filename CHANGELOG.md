@@ -13,6 +13,11 @@
   exact payload is now invalid because `accepted_sources` is absent.
 - Add portable context v2 evaluation vectors with independently authored source
   policy and precedence outcomes; the historical v1 vectors remain unchanged.
+- Document context v2 resource admission with an executable external-data example
+  and separate compatible, incompatible, indeterminate and invalid outcomes.
+- Deprecate root exports and direct imports of the legacy component protocol
+  with `DeprecationWarning`. Legacy behavior and public APIs remain available;
+  `cxp.exchange` and shared validation diagnostics remain current.
 
 
 ## 4.2.0 — 2026-09-16

@@ -5,9 +5,12 @@ from typing import Literal
 
 import msgspec
 
+from cxp._legacy import warn_legacy_import
 from cxp.capabilities import Capability, CapabilityMatrix, CapabilityMetadata
 from cxp.types import ComponentIdentity
 from cxp.validation import ValidationIssue
+
+warn_legacy_import(__name__)
 
 type CapabilitySupportLevel = Literal[
     "supported",

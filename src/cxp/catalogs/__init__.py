@@ -1,3 +1,4 @@
+from cxp._legacy import warn_legacy_import
 from cxp.catalogs.base import (
     DEFAULT_CATALOG_REGISTRY,
     CapabilityCatalog,
@@ -311,6 +312,8 @@ from cxp.catalogs.interfaces import (
     MongoVectorSearchMetadata,
 )
 from cxp.descriptors import DescriptorValidationResult, UnknownCapabilityOperations
+
+warn_legacy_import(__name__)
 
 __all__ = (
     "DEFAULT_CATALOG_REGISTRY",

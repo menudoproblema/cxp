@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from importlib import import_module
 from typing import TYPE_CHECKING
+from warnings import warn
 
 from cxp._version import __version__, version_info
 
@@ -1138,6 +1139,13 @@ def __getattr__(name: str):
     module_name = _EXPORT_MODULES.get(name)
     if module_name is None:
         raise AttributeError(name)
+    if module_name != "cxp.validation":
+        warn(
+            f"cxp.{name} belongs to the legacy component protocol; "
+            "use cxp.exchange and owner-authored catalogs instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     value = getattr(import_module(module_name), name)
     globals()[name] = value
     return value

@@ -4,6 +4,7 @@ from collections.abc import AsyncIterator, Iterator
 from inspect import isawaitable
 from typing import cast
 
+from cxp._legacy import warn_legacy_import
 from cxp.capabilities import CapabilityMatrix
 from cxp.catalogs.base import (
     CapabilityCatalog,
@@ -31,6 +32,8 @@ from cxp.handshake import (
 )
 from cxp.telemetry import TelemetrySnapshot
 from cxp.types import ComponentIdentity
+
+warn_legacy_import(__name__)
 
 __all__ = (
     "collect_provider_capability_snapshot",

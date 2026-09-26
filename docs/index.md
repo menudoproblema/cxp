@@ -59,3 +59,4 @@ El repositorio incluye ejemplos ejecutables en:
 - `examples/async_telemetry_stream.py`
 - `examples/component_descriptors.py`
 - `examples/document_exchange.py`
+- `examples/resource_guarantees.py`

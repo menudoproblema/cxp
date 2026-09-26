@@ -3,11 +3,14 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Iterator
 from typing import Protocol, runtime_checkable
 
+from cxp._legacy import warn_legacy_import
 from cxp.capabilities import CapabilityMatrix
 from cxp.descriptors import ComponentCapabilitySnapshot
 from cxp.handshake import ProtocolVersion
 from cxp.telemetry import TelemetrySnapshot
 from cxp.types import ComponentIdentity
+
+warn_legacy_import(__name__)
 
 __all__ = (
     "AsyncCapabilityProvider",

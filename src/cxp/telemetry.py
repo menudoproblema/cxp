@@ -9,6 +9,11 @@ from uuid import uuid4
 
 import msgspec
 
+from cxp._legacy import warn_legacy_import
+
+warn_legacy_import(__name__)
+
+
 type TelemetrySeverity = Literal["debug", "info", "warning", "error", "critical"]
 type TelemetryItemKind = Literal["event", "metric", "span"]
 type TelemetryOverflowPolicy = Literal["raise", "drop_newest", "drop_oldest"]
