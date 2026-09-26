@@ -2,8 +2,9 @@
 
 ## Unreleased — legacy migration window
 
-- Deprecate root exports of the legacy component protocol with a Python
-  `DeprecationWarning`. Exchange and shared validation exports remain current.
+- Deprecate root exports and direct module imports of the legacy component
+  protocol with a Python `DeprecationWarning`. Exchange and shared validation
+  exports remain current.
   Legacy APIs are still present; their removal requires a later major release
   after a subsequent minor release and consumer migration.
 

@@ -21,9 +21,11 @@ with warnings.catch_warnings(record=True) as observed:
     from cxp import CapabilityDescriptor, ValidationIssue
 assert CapabilityDescriptor.__name__ == 'CapabilityDescriptor'
 assert ValidationIssue.__name__ == 'ValidationIssue'
-assert len(observed) == 1
-assert observed[0].category is DeprecationWarning
-assert 'legacy component protocol' in str(observed[0].message)
+messages = [str(item.message) for item in observed]
+assert any(item.startswith('cxp.CapabilityDescriptor ') for item in messages)
+assert any(item.startswith('cxp.descriptors ') for item in messages)
+assert not any(item.startswith('cxp.ValidationIssue ') for item in messages)
+assert all(item.category is DeprecationWarning for item in observed)
 """
     result = subprocess.run(
         (sys.executable, "-c", script),

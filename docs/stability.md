@@ -41,9 +41,10 @@ bytes remain stable; only a consumer explicitly offering v2 can negotiate it.
 The semantic evaluator revision is recorded independently of package and
 document versions. See [context v2](protocol/context-v2.md).
 
-Root exports of the legacy component protocol issue `DeprecationWarning` in
-the next migration minor. `cxp.exchange` and the shared `cxp.validation`
-diagnostics remain supported. Deprecation does not change legacy behavior,
+Root exports and direct module imports of the legacy component protocol issue
+`DeprecationWarning` in the next migration minor. `cxp.exchange` and the shared
+`cxp.validation` diagnostics remain supported. Deprecation does not change
+legacy behavior,
 catalog identities or their bytes. Removal waits for a subsequent minor
 release and the migration of known consumers; the removal major will contain
 the separate migration guide and artifact evidence.

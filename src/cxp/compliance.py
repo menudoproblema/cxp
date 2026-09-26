@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import msgspec
 
+from cxp._legacy import warn_legacy_import
 from cxp.catalogs.base import CapabilityMatrixValidationResult
 from cxp.handshake import HandshakeResponse
+
+warn_legacy_import(__name__)
 
 
 class CatalogComplianceReport(msgspec.Struct, frozen=True):

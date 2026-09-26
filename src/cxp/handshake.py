@@ -4,9 +4,12 @@ from typing import Literal
 
 import msgspec
 
+from cxp._legacy import warn_legacy_import
 from cxp.capabilities import CapabilityMatrix
 from cxp.catalogs.base import catalog_satisfies_interface, get_catalog
 from cxp.types import ComponentIdentity
+
+warn_legacy_import(__name__)
 
 type HandshakeStatus = Literal["accepted", "degraded", "rejected"]
 type ProtocolVersion = int

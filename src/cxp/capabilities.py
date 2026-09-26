@@ -5,6 +5,11 @@ from typing import TypeVar
 
 import msgspec
 
+from cxp._legacy import warn_legacy_import
+
+warn_legacy_import(__name__)
+
+
 T = TypeVar("T")
 # El valor real esperado aquí es un mapping simple o un msgspec.Struct,
 # pero msgspec no permite unions con varios tipos "dict-like" al decodificar.
