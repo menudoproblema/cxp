@@ -207,3 +207,11 @@ external published consumers.
   `mongodb-mock-safe` as compatible with the same exchange evaluator. Its
   source commit is `f11bca7` on `ai/mongoeco-c4-major`; the prototype still
   carries the pre-major package version and an upper bound below CXP 5.
+- A clean Tórculo `main` checkout at `d4a0795` built `torculo-core`,
+  `torculo-specifications`, `torculo-planning` and `torculo-pdf` wheels. These
+  four wheels and the CXP removal-prototype wheel installed together in a
+  fresh Python 3.13 environment. The 15 PDF/planning exchange tests passed
+  from the installed packages; one test that pins the current 4.2.0 release
+  was deliberately deselected and must be updated with the real major
+  adoption. Its existing `<5` dependency bound still protects normal
+  resolution. The dirty original Tórculo checkout was untouched.
