@@ -67,6 +67,13 @@ cannot establish that no published external consumer exists.
   load with the pinned content hashes, and that exchange-only import path does
   not load `cxp.catalogs`, `cxp.descriptors` or `cxp.handshake`. This smoke does
   not certify runner admission: that path still uses legacy adapters.
+- With that core wheel reinstalled after dependency resolution, the real
+  Cosecha coverage instrumenter produced a declared exchange snapshot and
+  satisfied the `composable` tier (`a9dec37922d04815c313761e1874899436fb9227aa63f0d94e4c2d631436e65d`).
+  Importing the instrumenter already loads CXP legacy catalogs through other
+  Cosecha entrypoints; the exchange evaluation itself introduced no additional
+  legacy imports. This is an integration pass for the planner's data path, not
+  an absence-of-legacy gate for the whole consumer.
 - The Cosecha lock still resolves CXP 4.1.0, because 4.3.0 is only a local
   candidate. Its source tests use the installed exact 4.3.0 wheel. The
   migration release must raise the dependency floor to the published exchange
