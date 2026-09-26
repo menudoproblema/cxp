@@ -2,8 +2,8 @@
 
 Instalamos `cxp[exchange]` y usamos `cxp.exchange` explícitamente. El paquete base
 solo requiere msgspec y no importa ni instala los validadores del intercambio.
-Si falta el extra, el import explica cómo instalarlo. La API heredada permanece
-disponible; no se activa el protocolo nuevo cambiando una versión en su handshake.
+Si falta el extra, el import explica cómo instalarlo. Esta major solo ofrece
+compatibilidad por intercambio documental explícito.
 
 ## Documentos offline
 

@@ -1,61 +1,19 @@
 # Documentación de CXP
 
-## Visión General
-CXP es un protocolo de interoperabilidad semántica para componentes de software y sus orquestadores.
+CXP define documentos portables y una evaluación trivaluada de compatibilidad.
+Los productores mantienen sus catálogos; los consumidores fijan requisitos,
+contexto y procedencia admitida. El evaluador no importa a ninguno de ellos.
 
-Permite que un componente publique:
+- [Especificación documental v1](protocol/exchange-v1.md)
+- [Contexto v2 y procedencia](protocol/context-v2.md)
+- [Integración](protocol/exchange-integration.md)
+- [CLI](cli.md)
+- [Catálogos de referencia](catalogs/exchange-reference.md)
+- [Ejemplos industriales](catalogs/exchange-industrial-capabilities.md)
+- [Estabilidad](stability.md)
+- [Migración y retirada del legado](migration-c4.md)
+- [Matriz de conservación C4](architecture/c4-conservation-matrix.md)
+- [Candidatas y publicación](release.md)
 
-- qué puede hacer mediante capacidades;
-- qué está ocurriendo en runtime mediante telemetría.
-
-El protocolo se mantiene orientado a datos y agnóstico respecto a la implementación para poder usarse entre librerías, runtimes, servicios y capas de orquestación.
-
-## Mapa de Documentación
-- [Arquitectura](./architecture.md)
-- [Plan de cierre de 4.0](./architecture/next-release-plan.md)
-- [Evolución 4.1](./architecture/evolution-4.1-plan.md)
-- [CLI](./cli.md)
-- [Estabilidad y deprecación](./stability.md)
-- [Intercambio documental v1](./protocol/exchange-v1.md)
-- [Integración del intercambio](./protocol/exchange-integration.md)
-- [Catálogos de referencia](./catalogs/exchange-reference.md)
-- [Capacidades industriales declarativas](./catalogs/exchange-industrial-capabilities.md)
-- [Migración a 4.0](./migration-4.0.md)
-- [Cierre de la revisión de 4.0.0](./architecture/review-4.0.0.md)
-- [Candidata y publicación](./release.md)
-- [Integración](./integration.md)
-- [Protocolo de Capacidades](./protocol/capabilities.md)
-- [Compliance Bridge](./protocol/compliance.md)
-- [Descriptores de Capacidades](./protocol/descriptors.md)
-- [Protocolo de Telemetría](./protocol/telemetry.md)
-- [Catálogos](./catalogs/index.md)
-- [Catálogo de Browser Automation](./catalogs/interfaces/browser/automation.md)
-- [Catálogo de Playwright Browser](./catalogs/interfaces/browser/playwright.md)
-- [Catálogo de Cosecha Engine](./catalogs/interfaces/cosecha/engine.md)
-- [Catálogo de Cosecha Reporter](./catalogs/interfaces/cosecha/reporter.md)
-- [Catálogo de Cosecha Plugin](./catalogs/interfaces/cosecha/plugin.md)
-- [Catálogo de MongoDB](./catalogs/interfaces/database/mongodb.md)
-- [Catálogo de HTTP Transport](./catalogs/interfaces/transport/http.md)
-- [Catálogo de HTTP Application](./catalogs/interfaces/application/http.md)
-- [Catálogo de HTTP Application Framework](./catalogs/interfaces/application/http-framework.md)
-- [Catálogo de WSGI Application](./catalogs/interfaces/application/wsgi.md)
-- [Catálogo de ASGI Application](./catalogs/interfaces/application/asgi.md)
-- [Catálogo de Execution Engine](./catalogs/interfaces/execution/engine.md)
-- [Catálogo de Execution Plan-Run](./catalogs/interfaces/execution/plan-run.md)
-
-Nota rápida:
-- `browser/automation` documenta la familia abstracta.
-- `browser/playwright` documenta el contrato concreto actual.
-- `cosecha/engine`, `cosecha/reporter` y `cosecha/plugin` documentan contratos concretos para extensiones propias de Cosecha.
-- `execution/engine` documenta la familia abstracta.
-- `execution/plan-run` documenta el contrato concreto actual.
-- Los exports legacy `EXECUTION_ENGINE_*` siguen representando el contrato concreto por compatibilidad.
-
-## Ejemplos
-El repositorio incluye ejemplos ejecutables en:
-
-- `examples/sync_provider.py`
-- `examples/async_provider.py`
-- `examples/async_telemetry_stream.py`
-- `examples/component_descriptors.py`
-- `examples/document_exchange.py`
+El código, pruebas y ejemplos del protocolo retirado permanecen en
+`evidence/legacy-cxp-python-evidence.zip` como historia. No se instalan con CXP.

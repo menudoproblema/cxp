@@ -178,3 +178,13 @@ external published consumers.
   branch's local `scripts/check.py` gate passed (506 tests). This is
   preparatory source code,
   not a published deprecation release or the required subsequent minor.
+- The isolated `ai/cxp-c4-major` source prototype removes the old component
+  modules, root exports and producer catalogs from `src/cxp`. Its retired
+  Python source, tests and examples are preserved byte for byte in
+  `evidence/legacy-cxp-python-evidence.zip` (94 files); historical documents
+  remain in `evidence/legacy-cxp-docs`. Documentation, Ruff, mypy and the
+  active test suite pass (277 tests). A wheel and sdist dry run contain no
+  legacy component modules; each installs with exchange working and the old
+  modules absent. The dry-run files still carry 4.3.0 from the base checkout
+  and are not release candidates or an assigned major version. Public removal
+  waits for the release sequence and complete installed consumer migration.

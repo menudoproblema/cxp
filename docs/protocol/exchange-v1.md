@@ -5,7 +5,8 @@
 Especificación del intercambio enriquecido implementado por `cxp.exchange`
 en la serie 4.0. La versión del documento es `1`; la negociación en vivo usa
 protocolo `2`. Ninguna de ellas se deduce de la versión del paquete Python.
-El handshake y los DTOs heredados siguen usando sus contratos anteriores.
+El protocolo de componentes anterior se conserva únicamente como evidencia
+histórica en este árbol de la major de retirada.
 El contexto v2 se especifica por separado en [context-v2.md](context-v2.md);
 esta especificación v1 y su esquema publicado permanecen intactos.
 
@@ -304,4 +305,3 @@ Publicar una URL estable en el futuro no debe introducir descargas implícitas.
 
 - [JCS, RFC 8785](https://www.rfc-editor.org/rfc/rfc8785.html).
 - [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core).
-- [Plan de implementación](../architecture/next-release-plan.md).

@@ -22,7 +22,8 @@ weaken global lint rules to close a fix.
 New contracts need documented semantics, independent JSON Schema, positive and
 negative vectors and explicit migration impact. Unknown critical extensions must
 never produce a partial verdict. Catalog identifiers never authorize network
-fetches or Python imports. Keep legacy behavior unless a change is documented.
+fetches or Python imports. The retired implementation is preserved under
+`evidence/`; new work uses only exchange.
 
 `tests/fixtures/legacy-3.1-*` freeze evidence from the named MIT-licensed revision;
 do not regenerate them from current code to make regressions pass. Portable

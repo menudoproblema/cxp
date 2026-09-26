@@ -1,6 +1,18 @@
 # Changelog
 
-## Unreleased — legacy migration window
+## Unreleased — removal-major source (not published)
+
+- Remove the old component handshake, descriptors, global registry, compliance
+  evaluator, producer catalogs, adapters and telemetry API from the installed
+  package. Preserve their source, tests and examples under `evidence/`.
+- Retain `cxp.exchange`, explicit catalog resolution and neutral validation
+  diagnostics. Document guarantee ownership and consumer migration in
+  [the C4 guide](docs/migration-c4.md).
+- Publication remains contingent on the deprecation release, a subsequent
+  minor, installed consumer checks and the release gates. No major version is
+  assigned by this source prototype.
+
+## Deprecation-minor source (not published)
 
 - Deprecate root exports and direct module imports of the legacy component
   protocol with a Python `DeprecationWarning`. Exchange and shared validation

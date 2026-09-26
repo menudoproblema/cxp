@@ -1,130 +1,46 @@
 # CXP: Capability Exchange Protocol
 
-![Version](https://img.shields.io/badge/version-4.2.0-blue)
-![Python](https://img.shields.io/badge/python-3.12+-green)
-[![CI](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml/badge.svg)](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml)
-
-**CXP** is a semantic interoperability protocol for software components. It allows libraries, runtimes, and services to publish their capabilities and telemetry through a small shared contract.
-
-## Why CXP?
-Modern components are often black boxes. CXP gives them two explicit surfaces:
-
-- **Capabilities**: So an orchestrator can understand what a component *can* do.
-- **Telemetry**: So an orchestrator can observe what is happening at *runtime*.
-
-CXP acts as a semantic bridge, allowing tools like AI agents, test runners, or orchestrators to operate against a shared contract instead of provider-specific assumptions.
-
-## Design Goals
-- **Small Core**: Keep the protocol surface narrow and stable.
-- **High Fidelity**: Support expressive catalogs with metadata schemas, shared DTOs, and structured telemetry vocabularies.
-- **Data-Oriented**: Exchange typed data using `msgspec` for high performance.
-- **Omnichannel**: From cloud runtimes (ASGI/SQL) to industrial hardware (Zebra/Konica).
-
-## Installation
-```bash
-pip install cxp
-```
-
-The base package only requires msgspec. Document exchange is optional:
+CXP exchanges versioned JSON documents for capabilities, requirements,
+observations and compatibility results. A catalog is selected by its exact
+namespace, name, version and SHA-256. The evaluator returns `compatible`,
+`incompatible` or `indeterminate` from validated inputs.
 
 ```bash
 pip install 'cxp[exchange]'
-```
-
-To pin this release, use `pip install 'cxp[exchange]==4.2.0'`.
-
-## Catalog Layers
-CXP includes a growing suite of first-party catalogs organized in six logical layers:
-
-Each layer exposes a family catalog (the abstract contract) plus one or more concrete catalogs that satisfy it.
-
-1. **Computing**: `execution/plan-run`, `runtime/environment` (secrets/resources), and the `application/http` family with concrete `application/asgi`, `application/wsgi`, and `application/http-framework` catalogs.
-2. **Persistence**: `database/sql`, `database/mongodb` (both satisfying `database/common`), `storage/blob`, `cache/key-value`.
-3. **Communications**: `transport/http` (with the `transport/http-family` umbrella and `transport/websocket` sibling), `messaging/event-bus` (concrete: `messaging/nats`), and `notification/common` (concrete: `notification/web-push`, `notification/mobile-push`).
-4. **Queueing**: `queue/task-engine` for background processing.
-5. **Experience & Media**: `browser/automation` (concrete: `browser/playwright`), `media/video-streaming` (HLS/DASH).
-6. **Industrial**: `printing/manager` (concrete: `printing/label` for Zebra/ZPL, `printing/production` for Konica Minolta).
-
-For the full list of registered interfaces and operations, see [docs/catalogs/index.md](docs/catalogs/index.md).
-
-## Quick Start
-```python
-from cxp import (
-    Capability,
-    CapabilityMatrix,
-    ComponentIdentity,
-    HandshakeRequest,
-    get_catalog,
-    negotiate_with_provider_catalog,
-)
-
-# Resolve the standard catalog for the interface
-catalog = get_catalog("database/sql")
-assert catalog is not None
-
-# Build the orchestrator request
-request = HandshakeRequest(
-    client_identity=ComponentIdentity(
-        interface="database/sql",
-        provider="my-orchestrator",
-        version="1.0.0",
-    ),
-    required_capabilities=("transactions",),
-)
-
-# Negotiate with a provider
-# response = negotiate_with_provider_catalog(request, my_sql_provider, catalog)
-```
-
-## Key Features
-### Versioned document exchange (4.1)
-
-`cxp.exchange` adds strict, portable documents and deterministic three-valued
-requirements evaluation alongside the preserved legacy API. It includes exact
-quantities, immutable snapshots, content-bound catalogs and opt-in protocol v2
-format negotiation. Document specification version 1 is independent of both.
-Version 4.1 adds explicit reference-catalog versions, typed local evaluation
-details and an automation-safe CLI without changing document specification v1.
-
-Run the packaged, hardware-free examples with:
-
-```bash
-python -m cxp.exchange.examples
-python -m cxp.exchange.tutorial
 cxp catalog list
+python -m cxp.exchange.tutorial
 ```
 
-See the [exchange specification](docs/protocol/exchange-v1.md),
-[integration guide](docs/protocol/exchange-integration.md) and
-[CLI guide](docs/cli.md). Consumers upgrading from older majors should also read
-the [4.0 migration guide](docs/migration-4.0.md). Consumers should review their
-dependency constraints and integration tests before adopting this major release.
-
-### 1. Structured Error Reporting (`CxpError`)
-Shared machine-readable error envelopes for catalogs that opt into the semantic layer.
 ```python
-# retryable describes the error, not permission to repeat side effects.
-# Reconcile an uncertain outcome first. Only the caller can authorize a retry
-# under a reviewed idempotency guarantee and its key/scope/time conditions.
+from cxp.exchange import Document, CatalogStore, evaluate_requirements_detailed
+
+# The producer supplies its own catalog and snapshot documents. The consumer
+# supplies its pinned requirements and an explicit context, including the
+# accepted source kinds in context v2.
+result = evaluate_requirements_detailed(
+    snapshot,
+    requirements,
+    context,
+    catalogs=CatalogStore((catalog,)),
+)
+print(result.verdict)
 ```
 
-### 2. High-Fidelity Results
-Many first-party operations return structured data defined in `results.py` (for example `HttpResponse`, `DbCursor`, `AsyncWorkReport`).
+CXP validates and compares claims. It does not discover providers, download
+catalogs, authenticate evidence, perform probes, create leases, manage a
+lifecycle or select a runtime modality. Producers own catalog semantics and
+operational contracts. Consumers own admission policy and evidence checks.
 
-### 3. Bidirectional Validation
-Catalogs can define `input_schema` and `result_schema` for operations when the domain benefits from explicit request/response contracts.
+The component handshake, descriptors, global catalog registry, built-in
+producer catalogs and telemetry protocol from earlier CXP releases were
+retired in the removal major. Historical source, tests and examples are kept
+under `evidence/` as non-installed evidence. See the
+[migration guide](docs/migration-c4.md) and [C4 conservation matrix](docs/architecture/c4-conservation-matrix.md).
 
-## Documentation
-See [docs/index.md](docs/index.md) for the full documentation set:
-- [Protocol Overview](docs/protocol/descriptors.md)
-- [Structured Errors](docs/protocol/errors.md)
-- [Interface Catalogs](docs/catalogs/index.md)
+Read the [exchange specification](docs/protocol/exchange-v1.md),
+[context v2](docs/protocol/context-v2.md),
+[integration guide](docs/protocol/exchange-integration.md),
+[CLI guide](docs/cli.md), and [reference catalogs](docs/catalogs/exchange-reference.md).
 
-## License
-MIT
-
-## Contributing
-
-CXP is standalone. See [CONTRIBUTING.md](CONTRIBUTING.md) for local checks,
-artifact verification and the separate publication gate. No sibling repositories
-or internal infrastructure are required.
+The package supports Python 3.12–3.14. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for local checks and candidate verification. Publication is a separate gate.
