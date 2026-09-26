@@ -87,6 +87,14 @@ cannot establish that no published external consumer exists.
   A profile must carry or resolve an exact owner-authored exchange catalog;
   the abstract execution interface's present implicit concrete lookup cannot
   remain as a fallback.
+- Both migration-branch wheel manifests now require
+  `cxp[exchange]>=4.3.0,<5`, matching their context-v2 code and excluding the
+  removal major. Their checked-in locks still resolve older published CXP and
+  must be refreshed after 4.3.0 publication. Cosecha's instrumentation
+  projection rejects unknown metadata keys; Mongoeco's owner validator rejects
+  unknown top-level keys and wrong top-level types across all ten capability
+  metadata shapes. The latter does not turn nested operational metadata into
+  portable exchange semantics.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
