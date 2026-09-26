@@ -130,5 +130,438 @@
       },
       "schema_valid": false
     }
+  ],
+  "specification": "docs/protocol/context-v2.md",
+  "license": "MIT",
+  "provenance": "CXP maintainers; semantic verdicts and precedence are authored from docs/protocol/context-v2.md, 2026-09-26.",
+  "catalog": {
+    "document_type": "cxp.catalog",
+    "spec_version": 1,
+    "payload": {
+      "identity": {
+        "namespace": "org.cxp",
+        "name": "software-service",
+        "version": "1.0.0"
+      },
+      "owner": "CXP maintainers",
+      "capabilities": [
+        {
+          "name": "service.compute",
+          "description": "Generic software computation; declares limits, not current capacity.",
+          "properties": {
+            "max_items": {
+              "kind": "integer",
+              "description": "Maximum items per request."
+            },
+            "formats": {
+              "kind": "string_set",
+              "description": "Accepted input format identifiers."
+            },
+            "region": {
+              "kind": "string",
+              "description": "Configured region; null means explicitly not region-bound.",
+              "nullable": true,
+              "null_meaning": "No region restriction declared by this configuration."
+            }
+          },
+          "operations": []
+        }
+      ]
+    }
+  },
+  "requirements": {
+    "document_type": "cxp.requirements",
+    "spec_version": 1,
+    "payload": {
+      "catalog": {
+        "name": "software-service",
+        "namespace": "org.cxp",
+        "version": "1.0.0",
+        "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+      },
+      "requirement": {
+        "id": "r1",
+        "operator": "support",
+        "capability": "service.compute"
+      }
+    }
+  },
+  "snapshots": {
+    "declared": {
+      "document_type": "cxp.snapshot",
+      "spec_version": 1,
+      "payload": {
+        "provider_id": "example-provider",
+        "subject_id": "example-1",
+        "catalog": {
+          "name": "software-service",
+          "namespace": "org.cxp",
+          "version": "1.0.0",
+          "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+        },
+        "configuration_revision": "config-1",
+        "observed_at": "2026-09-03T10:00:00Z",
+        "source": {
+          "kind": "declared",
+          "reference": "synthetic-evidence-declared"
+        },
+        "capabilities": [
+          {
+            "name": "service.compute",
+            "support": "supported",
+            "properties": {
+              "max_items": 100,
+              "formats": [
+                "json",
+                "csv"
+              ],
+              "region": null
+            }
+          }
+        ]
+      }
+    },
+    "observed": {
+      "document_type": "cxp.snapshot",
+      "spec_version": 1,
+      "payload": {
+        "provider_id": "example-provider",
+        "subject_id": "example-1",
+        "catalog": {
+          "name": "software-service",
+          "namespace": "org.cxp",
+          "version": "1.0.0",
+          "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+        },
+        "configuration_revision": "config-1",
+        "observed_at": "2026-09-03T10:00:00Z",
+        "source": {
+          "kind": "observed",
+          "reference": "synthetic-evidence-observed"
+        },
+        "capabilities": [
+          {
+            "name": "service.compute",
+            "support": "supported",
+            "properties": {
+              "max_items": 100,
+              "formats": [
+                "json",
+                "csv"
+              ],
+              "region": null
+            }
+          }
+        ]
+      }
+    },
+    "tested": {
+      "document_type": "cxp.snapshot",
+      "spec_version": 1,
+      "payload": {
+        "provider_id": "example-provider",
+        "subject_id": "example-1",
+        "catalog": {
+          "name": "software-service",
+          "namespace": "org.cxp",
+          "version": "1.0.0",
+          "sha256": "b802cbe2be3ef9b3df0ad59a7a296019309f6ace8b9d3ca9c1331be8fd197aad"
+        },
+        "configuration_revision": "config-1",
+        "observed_at": "2026-09-03T10:00:00Z",
+        "source": {
+          "kind": "tested",
+          "reference": "synthetic-evidence-tested"
+        },
+        "capabilities": [
+          {
+            "name": "service.compute",
+            "support": "supported",
+            "properties": {
+              "max_items": 100,
+              "formats": [
+                "json",
+                "csv"
+              ],
+              "region": null
+            }
+          }
+        ]
+      }
+    }
+  },
+  "evaluations": [
+    {
+      "id": "declared-admitted",
+      "snapshot": "declared",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "declared"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "observed-admitted",
+      "snapshot": "observed",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "observed"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "tested-admitted",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "tested"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "declared-excluded",
+      "snapshot": "declared",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "observed",
+            "tested"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "source_not_accepted"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "observed-excluded",
+      "snapshot": "observed",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "declared",
+            "tested"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "source_not_accepted"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "tested-excluded",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "declared",
+            "observed"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "source_not_accepted"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "subject-before-source",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "other",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "declared"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "subject_mismatch"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "revision-before-source",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "other",
+          "accepted_sources": [
+            "declared"
+          ]
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "configuration_mismatch"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "source-before-expiry",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "declared"
+          ],
+          "as_of": "2026-09-03T10:02:00Z",
+          "max_age_seconds": 30
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "source_not_accepted"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "admitted-but-expired",
+      "snapshot": "tested",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 2,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1",
+          "accepted_sources": [
+            "tested"
+          ],
+          "as_of": "2026-09-03T10:02:00Z",
+          "max_age_seconds": 30
+        }
+      },
+      "expected": {
+        "verdict": "indeterminate",
+        "codes": [
+          "stale_observation"
+        ],
+        "evaluator_version": "1.1.0"
+      }
+    },
+    {
+      "id": "context-v1-preserved",
+      "snapshot": "declared",
+      "context": {
+        "document_type": "cxp.context",
+        "spec_version": 1,
+        "payload": {
+          "subject_id": "example-1",
+          "configuration_revision": "config-1"
+        }
+      },
+      "expected": {
+        "verdict": "compatible",
+        "codes": [
+          "requirement_satisfied"
+        ],
+        "evaluator_version": "1.0.0"
+      }
+    }
+  ],
+  "canonical_equivalence": [
+    {
+      "document_type": "cxp.context",
+      "spec_version": 2,
+      "payload": {
+        "subject_id": "example-1",
+        "configuration_revision": "config-1",
+        "accepted_sources": [
+          "observed",
+          "tested"
+        ]
+      }
+    },
+    {
+      "document_type": "cxp.context",
+      "spec_version": 2,
+      "payload": {
+        "subject_id": "example-1",
+        "configuration_revision": "config-1",
+        "accepted_sources": [
+          "tested",
+          "observed"
+        ]
+      }
+    }
   ]
 }

@@ -26,7 +26,11 @@ except ModuleNotFoundError as error:
     ) from error
 
 from cxp.exchange.errors import InvalidDocumentError, invalid, unsupported
-from cxp.exchange.normalization import normalize_payload, requirement_shape_issues
+from cxp.exchange.normalization import (
+    catalog_v2_shape_issues,
+    normalize_payload,
+    requirement_shape_issues,
+)
 from cxp.validation import ValidationIssue
 
 __all__ = ("Document", "document_schema", "load_document")
@@ -140,9 +144,16 @@ def _copy_json(value: object) -> Any:
     return visit(value, "", 0)
 
 
-@lru_cache(maxsize=2)
-def _schema(spec_version: int = 1) -> JsonObject:
-    name = "exchange-v1.json" if spec_version == 1 else "context-v2.json"
+@lru_cache(maxsize=3)
+def _schema(document_type: str | None = None, spec_version: int = 1) -> JsonObject:
+    if spec_version == 1:
+        name = "exchange-v1.json"
+    elif document_type == "cxp.context":
+        name = "context-v2.json"
+    elif document_type == "cxp.catalog":
+        name = "catalog-v2.json"
+    else:
+        raise ValueError("Unsupported document family/version")
     resource = files("cxp.exchange").joinpath(f"schemas/{name}")
     return json.loads(resource.read_text(encoding="utf-8"))
 
@@ -151,12 +162,15 @@ def document_schema(
     *, document_type: str | None = None, spec_version: int = 1
 ) -> JsonObject:
     """Devolvemos una copia del contrato estructural distribuido con CXP."""
-    if (document_type, spec_version) != ("cxp.context", 2) and spec_version != 1:
+    if spec_version != 1 and (document_type, spec_version) not in {
+        ("cxp.context", 2),
+        ("cxp.catalog", 2),
+    }:
         raise ValueError("Unsupported document family/version")
     if document_type is not None and document_type not in DOCUMENT_TYPES:
         raise ValueError("Unknown document family")
     if spec_version == 2:
-        return json.loads(json.dumps(_schema(2)))
+        return json.loads(json.dumps(_schema(document_type, 2)))
     schema = _schema()
     if document_type is None:
         return json.loads(json.dumps(schema))
@@ -170,7 +184,7 @@ def document_schema(
 
 @lru_cache(maxsize=8)
 def _validator(document_type: str, spec_version: int) -> Draft202012Validator:
-    schema = _schema(spec_version)
+    schema = _schema(document_type, spec_version)
     definition = next(
         item
         for item in schema["oneOf"]
@@ -199,12 +213,15 @@ def _validate(value: object, expected_type: str) -> bytes:
         raise invalid(
             "invalid_version", "/spec_version", "Document version must be an integer"
         )
-    if version != 1 and (document_type, version) != ("cxp.context", 2):
+    if version != 1 and (document_type, version) not in {
+        ("cxp.context", 2),
+        ("cxp.catalog", 2),
+    }:
         raise unsupported(
             "unsupported_version", "/spec_version", "Unsupported document version"
         )
     # Damos diagnósticos precisos sin retirar las restricciones del JSON Schema.
-    issues = requirement_shape_issues(content)
+    issues = requirement_shape_issues(content) + catalog_v2_shape_issues(content)
     if (document_type, version) == ("cxp.context", 2):
         sources = (
             content.get("payload", {}).get("accepted_sources")

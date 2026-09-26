@@ -1,6 +1,6 @@
 # CXP: Capability Exchange Protocol
 
-![Version](https://img.shields.io/badge/version-4.2.0-blue)
+![Version](https://img.shields.io/badge/version-4.3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12+-green)
 [![CI](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml/badge.svg)](https://github.com/menudoproblema/cxp/actions/workflows/ci.yml)
 
@@ -31,7 +31,11 @@ The base package only requires msgspec. Document exchange is optional:
 pip install 'cxp[exchange]'
 ```
 
-To pin this release, use `pip install 'cxp[exchange]==4.2.0'`.
+To pin this release, use `pip install 'cxp[exchange]==4.3.0'`.
+New compatibility integrations use the [exchange integration guide](docs/protocol/exchange-integration.md)
+and context v2 when provenance is required. The component protocol shown in the
+historical quick start below remains available in 4.3.0 and emits
+`DeprecationWarning`; its [migration window](docs/stability.md) is explicit.
 
 ## Catalog Layers
 CXP includes a growing suite of first-party catalogs organized in six logical layers:
@@ -91,6 +95,7 @@ Run the packaged, hardware-free examples with:
 ```bash
 python -m cxp.exchange.examples
 python -m cxp.exchange.tutorial
+python examples/resource_guarantees.py
 cxp catalog list
 ```
 

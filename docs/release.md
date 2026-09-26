@@ -39,8 +39,11 @@ resuelve la última combinación admitida.
 `scripts/release_evidence.py` exige los doce resultados (seis combinaciones por
 dos artefactos) y rechaza evidencia stale o incompleta. Genera
 `dist/4.3.0/release-evidence.json`; ese fichero contiene los hashes exactos de la
-candidata realmente comprobada. Los informes son locales y no se incluyen en
-el sdist para evitar ciclos de evidencia que se hashea a sí misma.
+candidata realmente comprobada. Un resumen de Pytest con todos los casos en
+verde y un recuento de `DeprecationWarning` sigue conservando los avisos en el
+informe; un fallo o caso saltado impide el cierre. Los informes son locales y
+no se incluyen en el sdist para evitar ciclos de evidencia que se hashea a sí
+misma.
 
 Modificar cualquier fuente después de la construcción obliga a reconstruir y
 repetir los controles. La CI construye una sola candidata, verifica esos mismos
@@ -74,9 +77,11 @@ exactos. Además, cada owner de consumidores conocidos debe revisar:
 - resolución de dependencias y pruebas de integración con la candidata;
 - aislamiento de los canales legacy/nuevo y conservación de requisitos.
 
-No se han cambiado ni acreditado esos consumidores desde esta tarea. La falta
-de evidencia de integración es una condición explícita que impide publicar,
-no una invitación a actualizar dependencias automáticamente.
+La revisión de consumidores se acredita para cada candidata exacta. Los gates
+de CXP y una prueba sintética con catálogos externos no sustituyen la revisión
+del owner ni las pruebas de integración de los consumidores alcanzados. Si
+falta esa evidencia, la publicación queda pendiente; no se actualizan
+dependencias automáticamente.
 
 La vuelta atrás usa los artefactos previos conocidos; no sobrescribe versiones
 publicadas ni degrada documentos nuevos al formato viejo. Se conservan la

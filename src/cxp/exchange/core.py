@@ -115,7 +115,13 @@ def _compare(
     for key in ("minimum", "maximum", "step", "origin"):
         if key not in node:
             continue
-        expected = property_value(node[key], definition, f"/{key}", allow_null=False)
+        expected = property_value(
+            node[key],
+            definition,
+            f"/{key}",
+            allow_null=False,
+            check_constraints=False,
+        )
         if isinstance(expected, bool) or not isinstance(expected, (int, Fraction)):
             raise invalid("invalid_range", f"/{key}", "Expected numeric limit")
         numbers[key] = expected

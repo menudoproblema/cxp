@@ -1,0 +1,25 @@
+{
+  "document_type": "cxp.catalog",
+  "spec_version": 1,
+  "payload": {
+    "identity": {
+      "namespace": "org.example.resources",
+      "name": "durability",
+      "version": "1.0.0"
+    },
+    "owner": "Synthetic external resource owner",
+    "capabilities": [
+      {
+        "name": "storage.write",
+        "description": "A statement scoped to the selected synthetic resource and configuration.",
+        "properties": {
+          "confirmed": {
+            "kind": "boolean",
+            "description": "The owner report covers the selected confirmation behavior."
+          }
+        },
+        "operations": []
+      }
+    ]
+  }
+}

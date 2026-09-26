@@ -4,11 +4,57 @@ from __future__ import annotations
 
 import re
 from datetime import UTC, datetime
+from fractions import Fraction
 from typing import Any
 
 from cxp.exchange.errors import invalid, unsupported
+from cxp.exchange.property_values import property_value
 from cxp.exchange.quantities import Quantity
 from cxp.validation import ValidationIssue
+
+
+def catalog_v2_shape_issues(content: dict[str, Any]) -> list[ValidationIssue]:
+    """Report duplicate authored domain members before schema oneOf errors."""
+    if (content.get("document_type"), content.get("spec_version")) != (
+        "cxp.catalog",
+        2,
+    ):
+        return []
+    payload = content.get("payload")
+    if not isinstance(payload, dict) or not isinstance(
+        payload.get("capabilities"), list
+    ):
+        return []
+    issues: list[ValidationIssue] = []
+    for capability_index, capability in enumerate(payload["capabilities"]):
+        if not isinstance(capability, dict) or not isinstance(
+            capability.get("properties"), dict
+        ):
+            continue
+        for name, definition in capability["properties"].items():
+            if not isinstance(definition, dict) or not isinstance(
+                definition.get("domain"), dict
+            ):
+                continue
+            domain = definition["domain"]
+            if domain.get("mode") != "closed" or not isinstance(
+                domain.get("values"), list
+            ):
+                continue
+            seen: set[str] = set()
+            for index, value in enumerate(domain["values"]):
+                if not isinstance(value, str):
+                    continue
+                if value in seen:
+                    issues.append(
+                        ValidationIssue(
+                            "duplicate_domain_value",
+                            f"/payload/capabilities/{capability_index}/properties/{name}/domain/values/{index}",
+                            "Domain values must be unique",
+                        )
+                    )
+                seen.add(value)
+    return sorted(issues, key=lambda issue: (issue.path, issue.code))[:100]
 
 
 def requirement_shape_issues(content: dict[str, Any]) -> list[ValidationIssue]:
@@ -135,8 +181,56 @@ def normalize_payload(content: dict[str, Any]) -> None:
                 [item["name"] for item in capability["operations"]],
                 f"{path}/operations",
             )
-            for definition in capability["properties"].values():
+            for name, definition in capability["properties"].items():
                 definition.setdefault("nullable", False)
+                if content["spec_version"] == 2:
+                    property_path = f"{path}/properties/{name}"
+                    domain = definition.get("domain")
+                    if domain is not None and domain["mode"] == "closed":
+                        unique(
+                            domain["values"],
+                            f"{property_path}/domain/values",
+                            "duplicate_domain_value",
+                        )
+                        domain["values"].sort()
+                    bounds = definition.get("bounds")
+                    if bounds is not None:
+                        numbers: dict[str, int | Fraction] = {}
+                        for key in ("minimum", "maximum"):
+                            if key not in bounds:
+                                continue
+                            number = property_value(
+                                bounds[key],
+                                definition,
+                                f"{property_path}/bounds/{key}",
+                                allow_null=False,
+                                check_constraints=False,
+                            )
+                            if isinstance(number, bool) or not isinstance(
+                                number, (int, Fraction)
+                            ):
+                                raise invalid(
+                                    "invalid_catalog_bounds",
+                                    f"{property_path}/bounds/{key}",
+                                    "Catalog bounds require numeric values",
+                                )
+                            numbers[key] = number
+                        for key in numbers:
+                            bounds.setdefault(f"{key}_inclusive", True)
+                        if "minimum" in numbers and "maximum" in numbers:
+                            minimum, maximum = numbers["minimum"], numbers["maximum"]
+                            if minimum > maximum or (
+                                minimum == maximum
+                                and not (
+                                    bounds["minimum_inclusive"]
+                                    and bounds["maximum_inclusive"]
+                                )
+                            ):
+                                raise invalid(
+                                    "invalid_catalog_bounds",
+                                    f"{property_path}/bounds",
+                                    "Catalog bounds are empty or inverted",
+                                )
             for operation in capability["operations"]:
                 operation.setdefault("idempotency", {"state": "unknown"})
     elif kind == "cxp.snapshot":

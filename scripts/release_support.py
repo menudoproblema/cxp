@@ -3,6 +3,7 @@
 import gzip
 import hashlib
 import json
+import re
 import runpy
 import subprocess
 import tarfile
@@ -10,6 +11,14 @@ import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def successful_pytest_summary(summary: str) -> bool:
+    """Accept an all-passed suite while retaining deprecation warning counts."""
+    return (
+        re.fullmatch(r"[1-9][0-9]* passed(?:, [1-9][0-9]* warnings?)? in .+", summary)
+        is not None
+    )
 
 
 def project_version() -> str:

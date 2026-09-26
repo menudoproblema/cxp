@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import re
 
 from release_support import (
     git_is_clean,
@@ -10,6 +9,7 @@ from release_support import (
     release_directory,
     revision,
     source_fingerprint,
+    successful_pytest_summary,
 )
 
 
@@ -36,7 +36,7 @@ def main() -> None:
             raise ValueError("A matrix report belongs to another source")
         if manifest["artifacts"].get(report["artifact"]) != report["sha256"]:
             raise ValueError("A matrix report belongs to another artifact")
-        if re.fullmatch(r"[0-9]+ passed in .+", report["tests"]) is None:
+        if not successful_pytest_summary(report["tests"]):
             raise ValueError("A matrix report has incomplete tests")
         if (
             report["examples"] != "passed"
