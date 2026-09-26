@@ -14,6 +14,7 @@ C1–C3 input; C4 develops separately and has no published target version yet.
 | Metadata schemas for offered descriptors | Cosecha and Mongoeco legacy catalog validation | Owner validates data shape before emitting exchange snapshots; exchange evaluates only normalized reported properties | Invalid metadata cannot become a compatible snapshot |
 | Handshake, descriptors, matrices, compliance evaluation | Cosecha runtime and Mongoeco public facade | One exchange `CatalogStore` + `evaluate_requirements` path; owner construction and lifecycle remain local | No runtime import or public fallback to old modules; negative/unknown cases preserved |
 | Global catalog registry | Cosecha `runtime_interop.py`; CXP legacy imports | Exact explicit `CatalogStore` passed by the consumer | No environmental registration, import-by-ID or network resolution |
+| Reserved runtime interface names and capability matrix checks | Cosecha manifest/profile validation for `application/*`, `database/*`, `execution/*`, `transport/*` | Explicit owner catalog references and requirements for actual runtime services; Cosecha keeps binding names, service graph, modes, readiness and lifecycle as operational state | Unknown reserved interface and unknown capability reject; abstract `execution/engine` cannot silently select a concrete catalog; exact catalog identity/version/SHA is supplied by the profile or its owner, never discovered from a global registry |
 | Cosecha engine/runtime/instrumentation/reporter/plugin catalogs | CXP `catalogs/interfaces/cosecha`; Cosecha adapters and runner | Catalog JSON and requirement documents owned and versioned by Cosecha | Installed Cosecha artifact exports exact hashes and evaluates without Cosecha imports in evaluator process |
 | MongoDB generic interface catalog | CXP `catalogs/interfaces/database/mongodb`; Mongoeco facade, compat and telemetry | Owner-authored Mongoeco exchange catalog and requirements. Mochuelo deployment catalog is separate | Installed Mongoeco artifact, compat outputs and explain/telemetry tests pass without legacy CXP modules |
 | CXP telemetry classes | Mongoeco driver telemetry, Cosecha operational telemetry | Producer-owned telemetry contract; exchange is only compatibility | Existing telemetry outputs preserved and no CXP legacy runtime import |
@@ -78,3 +79,11 @@ cannot establish that no published external consumer exists.
   candidate. Its source tests use the installed exact 4.3.0 wheel. The
   migration release must raise the dependency floor to the published exchange
   version and regenerate the portable lock before its full gate.
+- The Cosecha runtime interface census identified a separate active legacy
+  path: `runtime_interop.py` currently imports the global CXP registry and
+  application, database, execution and transport catalogs to validate
+  reserved interface names and capability matrices during manifest/profile
+  checks. Replacing the component admission catalogs alone does not close C4.
+  A profile must carry or resolve an exact owner-authored exchange catalog;
+  the abstract execution interface's present implicit concrete lookup cannot
+  remain as a fallback.
