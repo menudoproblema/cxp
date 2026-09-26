@@ -102,6 +102,11 @@ cannot establish that no published external consumer exists.
   without loading `cxp.catalogs`. The rebuilt Cosecha core wheel installed
   with CXP 4.3.0 and evaluated the real coverage instrumenter as `composable`.
   These are installed exchange paths, not full consumer release gates.
+- Cosecha runner instrumentation admission now builds the owner-validated
+  declared snapshot and evaluates the summary tier with exchange/context v2.
+  Its strict mode rejects an indeterminate requirement, and a focused runner,
+  planner and catalog set passed 123 tests. Engine, reporter, plugin and
+  runtime runner admission still call the legacy adapter.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
