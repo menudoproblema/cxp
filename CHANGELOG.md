@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.4.0 — 2026-09-26
 
 - Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
   bounds, element-level documentary sources, independent schema and negotiation.

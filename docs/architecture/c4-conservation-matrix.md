@@ -3,8 +3,8 @@
 This ledger records the decision for each legacy guarantee before deleting code.
 It does not certify migration. CXP 4.3.0 is published and verified from PyPI.
 The current C4 branch combines the opt-in catalog v2 contract with the
-deprecation window in a 4.4.0 development candidate. It is not a removal
-release; the public retirement requires a later major.
+deprecation window in a 4.4.0 release candidate. It is not a removal release;
+the public retirement requires a later major.
 
 | Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
 | --- | --- | --- | --- |
@@ -40,10 +40,10 @@ external published consumers.
 
 ## Current preparation status (2026-09-26)
 
-- CXP `ai/cxp-c4@a7bb0e2` merges the catalog v2 implementation and the C4
-  deprecation preparation as `4.4.0.dev0`. Its source gate passes 548 tests;
-  the merged artifact matrix is still required. This version keeps the legacy
-  code and is not the removal major.
+- CXP `ai/cxp-c4@481c757` merged catalog v2 and C4 deprecation preparation as
+  `4.4.0.dev0`; its 12-cell artifact matrix passed. The subsequent stable
+  4.4.0 candidate requires its own exact artifact evidence. This version keeps
+  the legacy code and is not the removal major.
 - Cosecha `ai/cosecha-c4@54d8aaf` has a clean merged source and Python 3.13
   wheel/sdist installations with CXP 4.3.0 from PyPI. All 38 pinned
   requirements and the local runtime verdicts pass in both installations.
