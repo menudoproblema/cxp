@@ -72,11 +72,14 @@ exactos. Además, cada owner de consumidores conocidos debe revisar:
 - restricciones que excluyen 4.x o permiten majors sin límite;
 - catálogos privados, overrides, decoders cerrados y bindings de Web Push;
 - resolución de dependencias y pruebas de integración con la candidata;
-- aislamiento de los canales legacy/nuevo y conservación de requisitos.
+- conservación de cada garantía al migrar a exchange o a su propietario operativo.
 
-No se han cambiado ni acreditado esos consumidores desde esta tarea. La falta
-de evidencia de integración es una condición explícita que impide publicar,
-no una invitación a actualizar dependencias automáticamente.
+La [matriz de conservación](architecture/c4-conservation-matrix.md) registra
+la evidencia de integración y las migraciones que siguen abiertas. La major
+de retirada exige artefactos instalados de cada consumidor admitido, sus
+límites de dependencias coordinados y la secuencia de deprecación de
+[estabilidad](stability.md). La falta de cualquiera de esos gates impide
+publicar; actualizar dependencias automáticamente no los satisface.
 
 La vuelta atrás usa los artefactos previos conocidos; no sobrescribe versiones
 publicadas ni degrada documentos nuevos al formato viejo. Se conservan la
