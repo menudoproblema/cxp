@@ -135,9 +135,12 @@ cannot establish that no published external consumer exists.
 - Mongoeco's real mock/tooling gate now has a sixth pinned exchange profile,
   `mongodb-mock-safe`. It requires operation bindings and owner-validated
   metadata keys without flattening structured values. An omitted required key
-  is incompatible in an independent negative test. The legacy
-  `compat.export_mock_safe_profile_catalog()` path still has its own evaluator
-  and must switch to this document before the major.
+  is incompatible in an independent negative test. The
+  `compat.export_mock_safe_profile_catalog()` path now evaluates this same
+  document with the exchange evaluator. Historical JSON and Markdown fixtures
+  remain unchanged as evidence; tests compare their unaffected sections and
+  assert the deliberate mock-safe projection delta. Its 259 focused compat,
+  cursor and exchange tests pass.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
