@@ -116,6 +116,14 @@ cannot establish that no published external consumer exists.
   compatible for core, knowledge and planning. Engine runner focal tests pass.
   The Cosecha runtime interface validator and standalone `cxp_adapters.py`
   remain legacy and require migration or removal before the major.
+- The Cosecha engine projection now rejects missing declared knowledge scopes
+  instead of supplying a favorable default. Gherkin and Pytest declare their
+  scopes explicitly; a negative omission test and their owner contract tests
+  pass. A rebuilt installed core wheel (`aaede0f21d9a9a564b61ed49686f2c8098e81c7ce10d8319af6a446dc1d0321e`)
+  evaluates the real local runtime as compatible against the pinned runtime
+  tier and loads all five catalog hashes. Importing the operational runtime
+  still loads `cxp.catalogs` and `cxp.descriptors` through legacy runtime
+  interop, so the absence gate remains open.
 - The CXP C4 branch now emits a `DeprecationWarning` when a root export or
   direct module import of the legacy component protocol is resolved. Shared
   validation exports do not warn. The behavior is documented in the unreleased
