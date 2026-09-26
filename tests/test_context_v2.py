@@ -6,7 +6,7 @@ import ast
 import json
 import subprocess
 import sys
-from pathlib import Path
+from importlib.resources import files
 
 import jsonschema_rs
 import pytest
@@ -39,9 +39,7 @@ def context(sources: object, version: int = 2) -> dict:
 
 
 VECTORS = json.loads(
-    (
-        Path(__file__).resolve().parents[1] / "src/cxp/exchange/vectors/context-v2.json"
-    ).read_text()
+    files("cxp.exchange").joinpath("vectors/context-v2.json").read_text()
 )["documents"]
 
 
@@ -207,10 +205,10 @@ def test_v2_schema_and_negotiation_do_not_fallback():
 
 
 def test_pure_core_has_no_validator_imports():
-    source = Path(__file__).resolve().parents[1] / "src/cxp/exchange/core.py"
+    source = files("cxp.exchange").joinpath("core.py").read_text()
     imports = {
         node.module
-        for node in ast.walk(ast.parse(source.read_text()))
+        for node in ast.walk(ast.parse(source))
         if isinstance(node, ast.ImportFrom)
     }
     assert "cxp.exchange.documents" not in imports
