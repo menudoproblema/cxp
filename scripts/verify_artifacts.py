@@ -39,6 +39,16 @@ RUNTIME_DISTRIBUTIONS = (
     "attrs",
     "typing-extensions",
 )
+RETIRED_MODULES = (
+    "capabilities.py",
+    "compliance.py",
+    "contracts.py",
+    "descriptors.py",
+    "handshake.py",
+    "integration.py",
+    "telemetry.py",
+    "types.py",
+)
 
 
 def run(arguments: list[str], *, cwd: Path, env: dict[str, str]) -> str:
@@ -150,6 +160,14 @@ def _verify_wheel_resources(wheel_path: Path) -> None:
         missing = sorted(required - names)
         if missing:
             raise ValueError(f"Missing wheel resources: {missing}")
+        retired = sorted(
+            name
+            for name in names
+            if name.startswith("cxp/catalogs/")
+            or name in {f"cxp/{module}" for module in RETIRED_MODULES}
+        )
+        if retired:
+            raise ValueError(f"Retired protocol present in wheel: {retired}")
         if not any(name.endswith("/licenses/LICENSE") for name in names):
             raise ValueError("Wheel license is missing")
 
@@ -196,6 +214,14 @@ def main() -> None:
         if len(roots) != 1:
             raise ValueError("Expected a single sdist root")
         unpacked = roots[0]
+        retired = sorted(
+            str(path.relative_to(unpacked))
+            for path in (unpacked / "src" / "cxp").rglob("*.py")
+            if "catalogs" in path.relative_to(unpacked / "src" / "cxp").parts
+            or path.name in RETIRED_MODULES
+        )
+        if retired:
+            raise ValueError(f"Retired protocol present in sdist: {retired}")
 
         for artifact in artifacts:
             artifact_kind = "wheel" if artifact.suffix == ".whl" else "sdist"
@@ -221,7 +247,8 @@ def main() -> None:
                         "assert 'cxp.exchange' not in sys.modules; "
                         "assert all(find_spec(name) is None for name in "
                         "('jsonschema','rfc8785','referencing','rpds')); "
-                        "assert cxp.CapabilityMatrix().capabilities == (); "
+                        "assert not hasattr(cxp, 'CapabilityMatrix'); "
+                        "assert find_spec('cxp.handshake') is None; "
                         "print(cxp.__version__)"
                     ),
                 ],
