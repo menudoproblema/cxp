@@ -3,8 +3,10 @@
 This ledger records the decision for each legacy guarantee before deleting code.
 It does not certify migration. CXP 4.3.0 is published and verified from PyPI.
 The owner directed one 5.0.0 release containing catalog v2 and complete legacy
-retirement. The prepared 4.4.0 candidate was not published. This checkout is
-the 5.0.0 source candidate on `main`; publication needs the gates below.
+retirement. The prepared 4.4.0 candidate was not published. CXP 5.0.0 was
+published on 2026-09-27 from `773eeaba456b7ed410c361a0b353a3e1bd3f6d0a`.
+The dated preparation notes below remain historical evidence; they do not
+describe the current state of every consumer.
 
 | Legacy surface / guarantee | Real consumer or owner | Exact successor | Gate before removal |
 | --- | --- | --- | --- |

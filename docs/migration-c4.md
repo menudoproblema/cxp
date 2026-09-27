@@ -1,9 +1,8 @@
 # Migration from the retired component protocol
 
-This guide applies to the CXP 5.0.0 release candidate; it does not announce
-publication. CXP 4.3.0 is the published deprecation release. The owner chose
-direct 5.0.0 retirement as the documented exception in
-[stability policy](stability.md).
+This guide applies to the published CXP 5.0.0 release. CXP 4.3.0 was the
+deprecation release. The owner chose direct 5.0.0 retirement as the documented
+exception in [stability policy](stability.md).
 
 ## Replace the compatibility path
 
@@ -54,7 +53,7 @@ repository. They are not importable from the new wheel or installed sdist.
 The old wire fixtures remain in `tests/fixtures`
 to prove that exchange does not route old payloads to a permissive reader.
 
-Before publication, verify both wheel and sdist, all supported Python and
+For a removal major, verify both wheel and sdist, all supported Python and
 dependency combinations, installed consumer artifacts, exact catalog hashes,
 the absence of legacy modules, and the direct-major decision recorded in the
 [conservation matrix](architecture/c4-conservation-matrix.md). Do not widen

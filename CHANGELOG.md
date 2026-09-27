@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.0.0 — release candidate, not published
+## 5.0.0 — 2026-09-27
 
 - Add opt-in `cxp.catalog` v2 with explicit string domains, exact numeric
   bounds, element-level documentary sources, independent schema and negotiation.
@@ -13,8 +13,8 @@
   [the C4 guide](docs/migration-c4.md).
 - The owner selected a direct 4.3.0 to 5.0.0 release. This is the documented
   exception to the subsequent-minor deprecation window in
-  [stability policy](docs/stability.md). Publication still requires exact
-  artifact checks, consumer migration evidence and approval.
+  [stability policy](docs/stability.md). The published wheel and sdist have
+  the exact hashes recorded in the 5.0.0 release evidence.
 
 ## 4.3.0 — 2026-09-26
 
